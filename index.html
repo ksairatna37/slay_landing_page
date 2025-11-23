@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Slay - Slash the Friction</title>
+    
+    <!-- Google Fonts: Outfit (Sans) & Playfair Display (Serif) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;900&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- GSAP & ScrollTrigger -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    },
+                    colors: {
+                        slay: { bg: '#2e1065' },
+                        accent: {
+                            base: '#A020F0',
+                            dark: '#3d0361',
+                            light: '#cfa3f3'
+                        }
+                    },
+                    boxShadow: {
+                        'glow': '0 0 80px -20px rgba(160, 32, 240, 0.5)',
+                        'purple-glow': '0 20px 60px -10px rgba(160, 32, 240, 0.5)'
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #050505; 
+            overflow-x: hidden; 
+            /* Ensure smooth scrolling behavior */
+            scroll-behavior: smooth;
+        }
+
+        /* --- Hero Background --- */
+        .hero-bg {
+            background-color: #2e1065;
+            background-image: 
+                radial-gradient(circle at 15% 50%, rgba(147, 51, 234, 0.4) 0%, transparent 50%),
+                radial-gradient(circle at 85% 30%, rgba(192, 132, 252, 0.3) 0%, transparent 50%);
+        }
+
+        .glass {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* --- Animation Utilities --- */
+        .reveal-text-container { width: 0; overflow: hidden; white-space: nowrap; opacity: 0; }
+        .slash-mark { display: inline-block; }
+        .nav-item { opacity: 0; display: none; transform: translateX(20px); }
+        .menu-icon { display: inline-block; transition: transform 0.3s ease; font-weight: 300; }
+        
+        .slide-down { opacity: 0; transform: translateY(-30px); }
+        .slide-left { opacity: 0; transform: translateX(30px); }
+        .slide-up   { opacity: 0; transform: translateY(30px); }
+        .fade-in    { opacity: 0; transform: translateY(10px); }
+
+        /* --- STICKY OVERLAY FIX --- */
+        /* The sticky container must be strictly defined with viewport height.
+           The next section uses z-index to overlay it.
+        */
+        .sticky-wrapper {
+            position: relative;
+            height: 200vh; /* Allocating space for the scroll effect */
+        }
+
+        .sticky-hero {
+            position: -webkit-sticky; /* Safari */
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            z-index: 1; /* Lowest level */
+            width: 100%;
+        }
+
+        .overlay-section {
+            position: relative; /* It flows naturally after the hero placeholder */
+            z-index: 10; /* Sits on top */
+            background-color: #000; /* Solid background covers the hero */
+            box-shadow: 0 -20px 50px rgba(0,0,0,0.5); /* Shadow for depth */
+            margin-top: -1px; /* Prevent sub-pixel bleeding */
+        }
+
+        /* --- PHONE & PREMIUM CARD --- */
+        .phone-frame {
+            box-shadow: 
+                0 0 0 2px #333,
+                0 0 0 4px #000,
+                0 20px 50px -10px rgba(0,0,0,0.8);
+        }
+        
+        /* PREMIUM LUXURY GRADIENT */
+        .luxury-card-bg {
+            /* Deep, Rich Purple Base */
+            background: radial-gradient(circle at 50% 120%, #24043a 0%, #5e0b9e 50%, #A020F0 100%);
+            position: relative;
+            overflow: hidden;
+            /* Subtle metallic rim */
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+        }
+
+        /* Anisotropic Sheen (Brushed Metal look) */
+        .luxury-card-bg::after {
+            content: '';
+            position: absolute;
+            top: -50%; left: -50%; width: 200%; height: 200%;
+            background: linear-gradient(
+                45deg, 
+                transparent 45%, 
+                rgba(255, 255, 255, 0.1) 48%, 
+                rgba(255, 255, 255, 0.3) 50%, 
+                rgba(255, 255, 255, 0.1) 52%, 
+                transparent 55%
+            );
+            transform: rotate(15deg);
+            opacity: 0.6;
+            pointer-events: none;
+            mix-blend-mode: overlay;
+        }
+
+        /* Grain Texture for Matte Finish */
+        .noise-texture {
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.08'/%3E%3C/svg%3E");
+            opacity: 0.5;
+            mix-blend-mode: soft-light;
+        }
+
+        /* Engraved Text Effect */
+        .engraved-text {
+            background: linear-gradient(180deg, rgba(0,0,0,0.6) 0%, rgba(255,255,255,0.2) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 
+                0px 1px 1px rgba(255,255,255,0.15),
+                0px -1px 1px rgba(0,0,0,0.5);
+            font-family: 'Playfair Display', serif;
+            font-weight: 900;
+            letter-spacing: 0.05em;
+        }
+
+        /* Foil Chip Effect */
+        .chip-gradient {
+            background: linear-gradient(135deg, #e2e2e2 0%, #999 50%, #e2e2e2 100%);
+            position: relative;
+            overflow: hidden;
+            border-radius: 6px;
+        }
+        .chip-gradient::before {
+             content: "";
+             position: absolute;
+             top: 0; left: 0; right: 0; bottom: 0;
+             border: 1px solid rgba(0,0,0,0.2);
+             border-radius: 6px;
+             background: 
+                linear-gradient(90deg, transparent 33%, rgba(0,0,0,0.1) 33%, rgba(0,0,0,0.1) 66%, transparent 66%),
+                linear-gradient(0deg, transparent 33%, rgba(0,0,0,0.1) 33%, rgba(0,0,0,0.1) 66%, transparent 66%);
+        }
+
+    </style>
+</head>
+<body class="text-white relative w-full selection:bg-purple-500 selection:text-white">
+
+    <!-- 
+       WRAPPER FOR STICKY EFFECT 
+       The sticky element needs to be a direct child of a container that allows scrolling.
+    -->
+    
+    <!-- ==============================================
+         SECTION 1: HERO (Sticky)
+         ============================================== -->
+    <section class="sticky-hero flex flex-col justify-between p-6 md:p-12 hero-bg">
+        
+        <!-- Header -->
+        <header class="flex justify-between items-center z-50 w-full relative">
+            <div class="slide-down flex items-center gap-2 cursor-pointer z-50">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" class="text-white">
+                    <path d="M4 12L9 17L20 6" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M4 6L9 11" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <span class="text-3xl font-bold tracking-tight">Slay</span>
+            </div>
+            <button class="slide-down glass px-6 py-3 rounded-full text-sm font-semibold hover:bg-white/20 transition-all flex items-center gap-2 z-50">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM10 17L5 12L6.41 10.59L10 14.17L17.59 6.58L19 8L10 17Z"/>
+                </svg>
+                Get early access
+            </button>
+        </header>
+
+        <!-- Navigation (Absolute) -->
+        <div class="absolute right-6 md:right-12 top-1/2 -translate-y-1/2 flex items-center gap-3 z-40">
+            <div id="nav-items-container" class="flex gap-2">
+                <button class="nav-item glass px-4 py-2 rounded-full text-xs font-medium hover:bg-white/20">Contact</button>
+                <button class="nav-item glass px-4 py-2 rounded-full text-xs font-medium hover:bg-white/20">FAQ</button>
+                <button class="nav-item glass px-4 py-2 rounded-full text-xs font-medium hover:bg-white/20">Rewards</button>
+                <button class="nav-item glass px-4 py-2 rounded-full text-xs font-medium hover:bg-white/20">Use Case</button>
+            </div>
+            <button id="menu-btn" class="slide-left glass px-5 py-2 rounded-full text-xs font-medium hover:bg-white/20 transition-all flex items-center gap-2 z-50">
+                <span id="menu-text" class="w-10 text-center block relative">Menu</span>
+                <span class="menu-icon text-lg leading-none pb-1">|</span>
+            </button>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-grow flex flex-col items-center justify-center z-10 pointer-events-none w-full">
+            <div class="text-center relative overflow-visible px-4">
+                <h1 class="text-7xl md:text-9xl font-black tracking-tighter leading-tight flex items-center justify-center gap-0">
+                    <span class="slash-mark text-white transform origin-center">/</span>
+                    <span class="reveal-text-container flex items-center">
+                        <span class="pl-2 md:pl-4">Slash the friction</span>
+                    </span>
+                </h1>
+            </div>
+            <div class="fade-in subtext mt-8 text-center max-w-xl px-4">
+                <p class="text-lg md:text-xl font-medium text-gray-200 leading-relaxed">
+                    A refined, seamless way to move crypto — because payments should feel effortless.
+                </p>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="flex flex-col md:flex-row justify-between items-end w-full z-20 pb-0 pointer-events-none">
+            <div class="slide-up glass p-4 rounded-xl max-w-sm text-[10px] md:text-xs text-gray-300 leading-relaxed backdrop-blur-md relative pointer-events-auto">
+                <button onclick="this.parentElement.style.opacity = '0'" class="absolute top-2 right-2 text-white hover:text-gray-300 transition-opacity">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+                Slay is a financial technology company, not a bank. Banking services provided by Column N.A., and Piermont Bank; Members FDIC.
+            </div>
+            <div class="slide-up glass rounded-full p-3 flex items-center justify-center hover:bg-white/20 transition-all cursor-pointer pointer-events-auto" onclick="document.getElementById('section-2').scrollIntoView({behavior: 'smooth'})">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <rect x="5" y="2" width="14" height="20" rx="7" stroke="white" stroke-width="2"/>
+                    <path id="scroll-wheel" d="M12 6V10" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M8 16L12 20L16 16" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
+        </footer>
+    </section>
+
+    <!-- ==============================================
+         SECTION 2: THE CARD (Overlay)
+         ============================================== -->
+    <!-- 
+         The 'overlay-section' has z-index: 10 and a solid background.
+         This ensures it scrolls OVER the sticky hero (z-index: 1).
+    -->
+    <section id="section-2" class="overlay-section min-h-screen w-full bg-black relative flex flex-col items-center pt-24 pb-20 px-6 overflow-hidden">
+        
+        <!-- Ambient Glow Background -->
+        <div class="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#A020F0] rounded-full blur-[150px] opacity-15 pointer-events-none"></div>
+
+        <!-- Phone Mockup Container - ZOOMED and CROPPED -->
+        <div class="relative z-10 phone-anim transform translate-y-20 opacity-0 w-full flex justify-center mb-0 md:mb-10">
+            <!-- iPhone Frame (Scaled Up dramatically) -->
+            <div class="w-[380px] md:w-[500px] h-[700px] md:h-[850px] bg-[#111] rounded-[60px] border-[8px] border-[#222] relative phone-frame overflow-hidden mx-auto transform origin-top hover:scale-[1.01] transition-transform duration-700">
+                
+                <!-- Notch -->
+                <div class="absolute top-0 left-1/2 -translate-x-1/2 h-[35px] w-[160px] bg-black rounded-b-2xl z-30"></div>
+                
+                <!-- Screen Content -->
+                <div class="w-full h-full bg-black flex flex-col items-center pt-36 relative">
+                    
+                    <!-- Background Glow inside phone -->
+                    <div class="absolute inset-0 bg-gradient-to-b from-[#1a0229] to-black"></div>
+
+                    <!-- THE PREMIUM PURPLE CARD -->
+                    <!-- Updated with 'luxury-card-bg' -->
+                    <div class="w-[90%] aspect-[1.586] rounded-2xl luxury-card-bg shadow-purple-glow flex flex-col justify-between p-6 relative z-20">
+                        
+                        <!-- Matte Texture -->
+                        <div class="absolute inset-0 noise-texture pointer-events-none"></div>
+                        
+                        <!-- Top Row: Carved Branding -->
+                        <div class="flex justify-between items-start relative z-10">
+                            <!-- Carved SLAY Logo -->
+                            <span class="engraved-text text-3xl md:text-4xl italic">SLAY</span>
+                            
+                            <!-- Premium Chip -->
+                            <div class="w-12 h-9 chip-gradient shadow-sm"></div>
+                        </div>
+
+                        <!-- Bottom Row: Visa -->
+                        <div class="flex justify-between items-end relative z-10">
+                            <div class="text-white/40 font-mono text-[10px] md:text-xs tracking-widest font-medium">
+                                4000 &bull;&bull;&bull;&bull; &bull;&bull;&bull;&bull; 9010
+                            </div>
+                            <div class="text-right">
+                                <span class="text-white font-bold text-xl leading-none block drop-shadow-md">VISA</span>
+                                <span class="text-white/80 text-[10px] uppercase tracking-wider block drop-shadow-md">Business</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Fake App UI below card to fill space -->
+                    <div class="w-full mt-12 px-6 space-y-4 opacity-30">
+                         <div class="h-4 w-1/3 bg-gray-800 rounded animate-pulse"></div>
+                         <div class="h-20 w-full bg-gray-900 rounded-xl border border-gray-800"></div>
+                         <div class="h-20 w-full bg-gray-900 rounded-xl border border-gray-800"></div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- Text Content -->
+        <div class="relative z-20 -mt-20 md:-mt-32 text-center text-anim opacity-0 translate-y-10 bg-black/60 backdrop-blur-lg p-8 rounded-3xl border border-white/5">
+            <h2 class="font-serif text-4xl md:text-6xl text-white leading-tight mb-8">
+                The era of one-size-fits-all <br/>
+                <span class="italic text-[#A020F0]">banking is over</span>
+            </h2>
+
+            <!-- Buttons -->
+            <div class="flex flex-col md:flex-row gap-4 justify-center items-center mt-4">
+                <button class="bg-white text-black px-8 py-3 rounded-full font-semibold text-sm hover:bg-gray-200 transition-colors min-w-[160px]">
+                    Contact Sales
+                </button>
+                <button class="border border-white/20 bg-white/5 text-white px-8 py-3 rounded-full font-semibold text-sm hover:bg-white/10 transition-colors min-w-[160px] backdrop-blur-sm">
+                    Open Account
+                </button>
+            </div>
+        </div>
+
+    </section>
+
+    <!-- Animation Scripts -->
+    <script>
+        gsap.registerPlugin(ScrollTrigger);
+
+        window.addEventListener('load', () => {
+            // ===========================
+            // HERO ANIMATIONS
+            // ===========================
+            const tl = gsap.timeline({ defaults: { ease: "power4.out" } });
+
+            tl.fromTo(".slash-mark", 
+                { scale: 0, opacity: 0, rotation: -10 },
+                { scale: 2.5, opacity: 1, rotation: 0, duration: 1.2, ease: "elastic.out(1, 0.6)" }
+            )
+            .to({}, { duration: 0.8 }) 
+            .to(".slash-mark", { scale: 1, duration: 1.2, ease: "power3.inOut" }, "reveal")
+            .to(".reveal-text-container", { width: "auto", opacity: 1, duration: 1.2, ease: "power3.inOut" }, "reveal")
+            .addLabel("sync-ui", "-=0.8") 
+            .to(".slide-down", { opacity: 1, y: 0, duration: 1, stagger: 0.1 }, "sync-ui")
+            .to(".slide-left", { opacity: 1, x: 0, duration: 1 }, "sync-ui")
+            .to(".fade-in", { opacity: 1, y: 0, duration: 1 }, "sync-ui")
+            .to(".slide-up", { opacity: 1, y: 0, duration: 1, stagger: 0.1 }, "sync-ui")
+            .to("#scroll-wheel", {
+                y: 5, opacity: 0, duration: 1.5, repeat: -1, ease: "power1.inOut",
+                onStart: () => gsap.set("#scroll-wheel", { y: 0, opacity: 1 })
+            }, "+=0.5");
+
+
+            // ===========================
+            // SECTION 2 SCROLL ANIMATIONS
+            // ===========================
+            
+            // Animate Phone (Zoomed entrance)
+            gsap.to(".phone-anim", {
+                scrollTrigger: {
+                    trigger: "#section-2",
+                    start: "top 70%", 
+                    end: "bottom top",
+                    toggleActions: "play none none reverse"
+                },
+                y: 0,
+                opacity: 1,
+                duration: 1.2,
+                ease: "power3.out"
+            });
+
+            // Animate Text
+            gsap.to(".text-anim", {
+                scrollTrigger: {
+                    trigger: "#section-2",
+                    start: "top 60%",
+                    toggleActions: "play none none reverse"
+                },
+                y: 0,
+                opacity: 1,
+                duration: 1,
+                delay: 0.3,
+                ease: "power3.out"
+            });
+            
+            // Subtle Card Tilt
+            gsap.to(".luxury-card-bg", {
+                scrollTrigger: {
+                    trigger: "#section-2",
+                    start: "top bottom",
+                    end: "bottom top",
+                    scrub: 1
+                },
+                y: -30,
+                rotateX: 5,
+                ease: "none"
+            });
+        });
+
+        // --- MENU LOGIC ---
+        let isMenuOpen = false;
+        const menuBtn = document.getElementById('menu-btn');
+        const menuText = document.getElementById('menu-text');
+        const menuIcon = document.querySelector('.menu-icon');
+        const navItems = document.querySelectorAll('.nav-item');
+
+        menuBtn.addEventListener('click', () => {
+            if (!isMenuOpen) {
+                gsap.to(menuText, { y: 10, opacity: 0, duration: 0.2, ease: "power2.in", onComplete: () => {
+                    menuText.innerText = "Close";
+                    gsap.fromTo(menuText, { y: -10, opacity: 0 }, { y: 0, opacity: 1, duration: 0.2, ease: "power2.out" });
+                }});
+                gsap.to(menuIcon, { rotation: 20, duration: 0.3, ease: "power2.out" });
+                navItems.forEach(el => el.style.display = 'block');
+                gsap.to(navItems, { opacity: 1, x: 0, duration: 0.4, stagger: 0.1, ease: "back.out(1.7)" });
+                isMenuOpen = true;
+            } else {
+                gsap.to(menuText, { y: -10, opacity: 0, duration: 0.2, ease: "power2.in", onComplete: () => {
+                    menuText.innerText = "Menu";
+                    gsap.fromTo(menuText, { y: 10, opacity: 0 }, { y: 0, opacity: 1, duration: 0.2, ease: "power2.out" });
+                }});
+                gsap.to(menuIcon, { rotation: 0, duration: 0.3, ease: "power2.out" });
+                gsap.to(navItems, { opacity: 0, x: 20, duration: 0.3, stagger: 0.05, onComplete: () => { navItems.forEach(el => el.style.display = 'none'); }});
+                isMenuOpen = false;
+            }
+        });
+    </script>
+</body>
+</html>
