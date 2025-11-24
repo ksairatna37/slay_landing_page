@@ -1,17 +1,17 @@
 class SliderLoadingManager {
-  constructor() {
-    this.overlay = null;
-    this.canvas = null;
-    this.ctx = null;
-    this.animationId = null;
-    this.startTime = null;
-    this.duration = 3000;
-    this.createLoadingScreen();
-  }
+    constructor() {
+        this.overlay = null;
+        this.canvas = null;
+        this.ctx = null;
+        this.animationId = null;
+        this.startTime = null;
+        this.duration = 3000;
+        this.createLoadingScreen();
+    }
 
-  createLoadingScreen() {
-    this.overlay = document.createElement("div");
-    this.overlay.style.cssText = `
+    createLoadingScreen() {
+        this.overlay = document.createElement("div");
+        this.overlay.style.cssText = `
       position: fixed;
       top: 0;
       left: 0;
@@ -24,162 +24,162 @@ class SliderLoadingManager {
       z-index: 10000;
     `;
 
-    this.canvas = document.createElement("canvas");
-    this.canvas.width = 300;
-    this.canvas.height = 300;
+        this.canvas = document.createElement("canvas");
+        this.canvas.width = 300;
+        this.canvas.height = 300;
 
-    this.ctx = this.canvas.getContext("2d");
-    this.overlay.appendChild(this.canvas);
-    document.body.appendChild(this.overlay);
+        this.ctx = this.canvas.getContext("2d");
+        this.overlay.appendChild(this.canvas);
+        document.body.appendChild(this.overlay);
 
-    this.startAnimation();
-  }
+        this.startAnimation();
+    }
 
-  startAnimation() {
-    const centerX = this.canvas.width / 2;
-    const centerY = this.canvas.height / 2;
-    let time = 0;
-    let lastTime = 0;
+    startAnimation() {
+        const centerX = this.canvas.width / 2;
+        const centerY = this.canvas.height / 2;
+        let time = 0;
+        let lastTime = 0;
 
-    const dotRings = [
-      { radius: 20, count: 8 },
-      { radius: 35, count: 12 },
-      { radius: 50, count: 16 },
-      { radius: 65, count: 20 },
-      { radius: 80, count: 24 }
-    ];
-
-    const colors = {
-      primary: "#ffffff",
-      accent: "#dddddd"
-    };
-
-    const easeInOutSine = (t) => {
-      return -(Math.cos(Math.PI * t) - 1) / 2;
-    };
-
-    const easeInOutCubic = (t) => {
-      return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-    };
-
-    const smoothstep = (edge0, edge1, x) => {
-      const t = Math.max(0, Math.min(1, (x - edge0) / (edge1 - edge0)));
-      return t * t * (3 - 2 * t);
-    };
-
-    const hexToRgb = (hex) => {
-      if (hex.startsWith("#")) {
-        return [
-          parseInt(hex.slice(1, 3), 16),
-          parseInt(hex.slice(3, 5), 16),
-          parseInt(hex.slice(5, 7), 16)
+        const dotRings = [
+            { radius: 20, count: 8 },
+            { radius: 35, count: 12 },
+            { radius: 50, count: 16 },
+            { radius: 65, count: 20 },
+            { radius: 80, count: 24 }
         ];
-      }
-      const match = hex.match(/\d+/g);
-      return match
-        ? [parseInt(match[0]), parseInt(match[1]), parseInt(match[2])]
-        : [255, 255, 255];
-    };
 
-    const interpolateColor = (color1, color2, t, opacity = 1) => {
-      const rgb1 = hexToRgb(color1);
-      const rgb2 = hexToRgb(color2);
-      const r = Math.round(rgb1[0] + (rgb2[0] - rgb1[0]) * t);
-      const g = Math.round(rgb1[1] + (rgb2[1] - rgb1[1]) * t);
-      const b = Math.round(rgb1[2] + (rgb2[2] - rgb1[2]) * t);
-      return `rgba(${r}, ${g}, ${b}, ${opacity})`;
-    };
+        const colors = {
+            primary: "#ffffff",
+            accent: "#dddddd"
+        };
 
-    const animate = (timestamp) => {
-      if (!this.startTime) this.startTime = timestamp;
+        const easeInOutSine = (t) => {
+            return -(Math.cos(Math.PI * t) - 1) / 2;
+        };
 
-      if (!lastTime) lastTime = timestamp;
-      const deltaTime = timestamp - lastTime;
-      lastTime = timestamp;
-      time += deltaTime * 0.001;
+        const easeInOutCubic = (t) => {
+            return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+        };
 
-      this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        const smoothstep = (edge0, edge1, x) => {
+            const t = Math.max(0, Math.min(1, (x - edge0) / (edge1 - edge0)));
+            return t * t * (3 - 2 * t);
+        };
 
-      this.ctx.beginPath();
-      this.ctx.arc(centerX, centerY, 3, 0, Math.PI * 2);
-      const rgb = hexToRgb(colors.primary);
-      this.ctx.fillStyle = `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, 0.9)`;
-      this.ctx.fill();
+        const hexToRgb = (hex) => {
+            if (hex.startsWith("#")) {
+                return [
+                    parseInt(hex.slice(1, 3), 16),
+                    parseInt(hex.slice(3, 5), 16),
+                    parseInt(hex.slice(5, 7), 16)
+                ];
+            }
+            const match = hex.match(/\d+/g);
+            return match
+                ? [parseInt(match[0]), parseInt(match[1]), parseInt(match[2])]
+                : [255, 255, 255];
+        };
 
-      dotRings.forEach((ring, ringIndex) => {
-        for (let i = 0; i < ring.count; i++) {
-          const angle = (i / ring.count) * Math.PI * 2;
-          const pulseTime = time * 2 - ringIndex * 0.4;
-          const radiusPulse =
-            easeInOutSine((Math.sin(pulseTime) + 1) / 2) * 6 - 3;
-          const x = centerX + Math.cos(angle) * (ring.radius + radiusPulse);
-          const y = centerY + Math.sin(angle) * (ring.radius + radiusPulse);
+        const interpolateColor = (color1, color2, t, opacity = 1) => {
+            const rgb1 = hexToRgb(color1);
+            const rgb2 = hexToRgb(color2);
+            const r = Math.round(rgb1[0] + (rgb2[0] - rgb1[0]) * t);
+            const g = Math.round(rgb1[1] + (rgb2[1] - rgb1[1]) * t);
+            const b = Math.round(rgb1[2] + (rgb2[2] - rgb1[2]) * t);
+            return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+        };
 
-          const opacityPhase = (Math.sin(pulseTime + i * 0.2) + 1) / 2;
-          const opacityBase = 0.3 + easeInOutSine(opacityPhase) * 0.7;
-          const highlightPhase = (Math.sin(pulseTime) + 1) / 2;
-          const highlightIntensity = easeInOutCubic(highlightPhase);
+        const animate = (timestamp) => {
+            if (!this.startTime) this.startTime = timestamp;
 
-          this.ctx.beginPath();
-          this.ctx.arc(x, y, 2, 0, Math.PI * 2);
-          const colorBlend = smoothstep(0.2, 0.8, highlightIntensity);
-          this.ctx.fillStyle = interpolateColor(
-            colors.primary,
-            colors.accent,
-            colorBlend,
-            opacityBase
-          );
-          this.ctx.fill();
+            if (!lastTime) lastTime = timestamp;
+            const deltaTime = timestamp - lastTime;
+            lastTime = timestamp;
+            time += deltaTime * 0.001;
+
+            this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+            this.ctx.beginPath();
+            this.ctx.arc(centerX, centerY, 3, 0, Math.PI * 2);
+            const rgb = hexToRgb(colors.primary);
+            this.ctx.fillStyle = `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, 0.9)`;
+            this.ctx.fill();
+
+            dotRings.forEach((ring, ringIndex) => {
+                for (let i = 0; i < ring.count; i++) {
+                    const angle = (i / ring.count) * Math.PI * 2;
+                    const pulseTime = time * 2 - ringIndex * 0.4;
+                    const radiusPulse =
+                        easeInOutSine((Math.sin(pulseTime) + 1) / 2) * 6 - 3;
+                    const x = centerX + Math.cos(angle) * (ring.radius + radiusPulse);
+                    const y = centerY + Math.sin(angle) * (ring.radius + radiusPulse);
+
+                    const opacityPhase = (Math.sin(pulseTime + i * 0.2) + 1) / 2;
+                    const opacityBase = 0.3 + easeInOutSine(opacityPhase) * 0.7;
+                    const highlightPhase = (Math.sin(pulseTime) + 1) / 2;
+                    const highlightIntensity = easeInOutCubic(highlightPhase);
+
+                    this.ctx.beginPath();
+                    this.ctx.arc(x, y, 2, 0, Math.PI * 2);
+                    const colorBlend = smoothstep(0.2, 0.8, highlightIntensity);
+                    this.ctx.fillStyle = interpolateColor(
+                        colors.primary,
+                        colors.accent,
+                        colorBlend,
+                        opacityBase
+                    );
+                    this.ctx.fill();
+                }
+            });
+
+            if (timestamp - this.startTime >= this.duration) {
+                this.complete();
+                return;
+            }
+
+            this.animationId = requestAnimationFrame(animate);
+        };
+
+        this.animationId = requestAnimationFrame(animate);
+    }
+
+    complete() {
+        if (this.animationId) {
+            cancelAnimationFrame(this.animationId);
         }
-      });
 
-      if (timestamp - this.startTime >= this.duration) {
-        this.complete();
-        return;
-      }
+        if (this.overlay) {
+            this.overlay.style.opacity = "0";
+            this.overlay.style.transition = "opacity 0.8s ease";
+            setTimeout(() => {
+                this.overlay?.remove();
 
-      this.animationId = requestAnimationFrame(animate);
-    };
-
-    this.animationId = requestAnimationFrame(animate);
-  }
-
-  complete() {
-    if (this.animationId) {
-      cancelAnimationFrame(this.animationId);
+                setTimeout(() => {
+                    const sliderWrapper = document.querySelector(".slider-wrapper");
+                    if (sliderWrapper) {
+                        sliderWrapper.classList.add("loaded");
+                    }
+                }, 500);
+            }, 800);
+        }
     }
-
-    if (this.overlay) {
-      this.overlay.style.opacity = "0";
-      this.overlay.style.transition = "opacity 0.8s ease";
-      setTimeout(() => {
-        this.overlay?.remove();
-
-        setTimeout(() => {
-          const sliderWrapper = document.querySelector(".slider-wrapper");
-          if (sliderWrapper) {
-            sliderWrapper.classList.add("loaded");
-          }
-        }, 500);
-      }, 800);
-    }
-  }
 }
 
 const SLIDER_CONFIG = {
-  settings: {
-    transitionDuration: 2.5,
-    autoSlideSpeed: 3000,
-    globalIntensity: 1.0,
-    speedMultiplier: 1.0,
-    distortionStrength: 1.0,
-    colorEnhancement: 1.0,
-    glassRefractionStrength: 1.0,
-    glassChromaticAberration: 1.0,
-    glassBubbleClarity: 1.0,
-    glassEdgeGlow: 1.0,
-    glassLiquidFlow: 1.0
-  }
+    settings: {
+        transitionDuration: 2.5,
+        autoSlideSpeed: 3000,
+        globalIntensity: 1.0,
+        speedMultiplier: 1.0,
+        distortionStrength: 1.0,
+        colorEnhancement: 1.0,
+        glassRefractionStrength: 1.0,
+        glassChromaticAberration: 1.0,
+        glassBubbleClarity: 1.0,
+        glassEdgeGlow: 1.0,
+        glassLiquidFlow: 1.0
+    }
 };
 
 import * as THREE from "https://esm.sh/three";
@@ -201,36 +201,36 @@ const PROGRESS_UPDATE_INTERVAL = 50;
 const TRANSITION_DURATION = () => SLIDER_CONFIG.settings.transitionDuration;
 
 const slides = [
-  { 
-    title: "E-commerce Sellers", 
-    description: "Instantly pay suppliers, receive crypto payments from global customers, and manage multi-currency settlements efficiently.",
-    media: "https://i.pinimg.com/736x/fb/61/e7/fb61e71d72a192bea6b22a43ef2b979a.jpg" 
-  },
-  { 
-    title: "Freelancers & Creators", 
-    description: "Accept crypto for services worldwide, split earnings, and convert seamlessly to local currencies or stablecoins.",
-    media: "assets/img1.jpeg" 
-  },
-  { 
-    title: "Agencies & Startups", 
-    description: "Issue dedicated crypto cards for teams, automate recurring international contractor payments, and control spending in real time.",
-    media: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=2070&auto=format&fit=crop" 
-  },
-  { 
-    title: "Remote & Distributed Teams", 
-    description: "Pay team members around the world in crypto, bypassing slow traditional wires, with instant, low-fee transfers.",
-    media: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=2070&auto=format&fit=crop" 
-  },
-  { 
-    title: "Web3 Businesses & DAOs", 
-    description: "Manage treasury, payroll, and vendor payments in crypto or stablecoins with advanced security and reporting.",
-    media: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=2070&auto=format&fit=crop" 
-  },
-  { 
-    title: "Digital Marketplaces", 
-    description: "Enable fast, borderless payouts to sellers, influencers, or affiliates in any supported cryptocurrency.",
-    media: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=2070&auto=format&fit=crop" 
-  }
+    {
+        title: "E-commerce Sellers",
+        description: "Instantly pay suppliers, receive crypto payments from global customers, and manage multi-currency settlements efficiently.",
+        media: "https://i.pinimg.com/736x/fb/61/e7/fb61e71d72a192bea6b22a43ef2b979a.jpg"
+    },
+    {
+        title: "Freelancers & Creators",
+        description: "Accept crypto for services worldwide, split earnings, and convert seamlessly to local currencies or stablecoins.",
+        media: "assets/img1.jpeg"
+    },
+    {
+        title: "Agencies & Startups",
+        description: "Issue dedicated crypto cards for teams, automate recurring international contractor payments, and control spending in real time.",
+        media: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=2070&auto=format&fit=crop"
+    },
+    {
+        title: "Remote & Distributed Teams",
+        description: "Pay team members around the world in crypto, bypassing slow traditional wires, with instant, low-fee transfers.",
+        media: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=2070&auto=format&fit=crop"
+    },
+    {
+        title: "Web3 Businesses & DAOs",
+        description: "Manage treasury, payroll, and vendor payments in crypto or stablecoins with advanced security and reporting.",
+        media: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=2070&auto=format&fit=crop"
+    },
+    {
+        title: "Digital Marketplaces",
+        description: "Enable fast, borderless payouts to sellers, influencers, or affiliates in any supported cryptocurrency.",
+        media: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=2070&auto=format&fit=crop"
+    }
 ];
 
 const vertexShader = `
@@ -390,337 +390,367 @@ const fragmentShader = `
 `;
 
 const createSlidesNavigation = () => {
-  const navContainer = document.getElementById("slidesNav");
-  navContainer.innerHTML = "";
-  slides.forEach((slide, index) => {
-    const navItem = document.createElement("div");
-    navItem.className = `slide-nav-item ${index === 0 ? "active" : ""}`;
-    navItem.dataset.slideIndex = index;
-    navItem.innerHTML = `
+    const navContainer = document.getElementById("slidesNav");
+    navContainer.innerHTML = "";
+    slides.forEach((slide, index) => {
+        const navItem = document.createElement("div");
+        navItem.className = `slide-nav-item ${index === 0 ? "active" : ""}`;
+        navItem.dataset.slideIndex = index;
+        navItem.innerHTML = `
       <div class="slide-progress-line">
         <div class="slide-progress-fill" style="width: 0%"></div>
       </div>
       <div class="slide-nav-title">${slide.title}</div>
     `;
-    navItem.addEventListener("click", (e) => {
-      e.stopPropagation();
-      const targetIndex = parseInt(navItem.dataset.slideIndex);
-      if (targetIndex !== currentSlideIndex && !isTransitioning) {
-        navigateToSlide(targetIndex);
-      }
+        navItem.addEventListener("click", (e) => {
+            e.stopPropagation();
+            const targetIndex = parseInt(navItem.dataset.slideIndex);
+            if (targetIndex !== currentSlideIndex && !isTransitioning) {
+                navigateToSlide(targetIndex);
+            }
+        });
+        navContainer.appendChild(navItem);
     });
-    navContainer.appendChild(navItem);
-  });
 };
 
 const updateNavigationState = (activeIndex) => {
-  const navItems = document.querySelectorAll(".slide-nav-item");
-  navItems.forEach((item, index) => {
-    item.classList.toggle("active", index === activeIndex);
-  });
+    const navItems = document.querySelectorAll(".slide-nav-item");
+    navItems.forEach((item, index) => {
+        item.classList.toggle("active", index === activeIndex);
+    });
 };
 
 const updateSlideProgress = (slideIndex, progress) => {
-  const navItems = document.querySelectorAll(".slide-nav-item");
-  if (navItems[slideIndex]) {
-    const progressFill = navItems[slideIndex].querySelector(".slide-progress-fill");
-    progressFill.style.width = `${progress}%`;
-    progressFill.style.opacity = "1";
-  }
+    const navItems = document.querySelectorAll(".slide-nav-item");
+    if (navItems[slideIndex]) {
+        const progressFill = navItems[slideIndex].querySelector(".slide-progress-fill");
+        progressFill.style.width = `${progress}%`;
+        progressFill.style.opacity = "1";
+    }
 };
 
 const fadeSlideProgress = (slideIndex) => {
-  const navItems = document.querySelectorAll(".slide-nav-item");
-  if (navItems[slideIndex]) {
-    const progressFill = navItems[slideIndex].querySelector(".slide-progress-fill");
-    progressFill.style.opacity = "0";
-    setTimeout(() => (progressFill.style.width = "0%"), 300);
-  }
+    const navItems = document.querySelectorAll(".slide-nav-item");
+    if (navItems[slideIndex]) {
+        const progressFill = navItems[slideIndex].querySelector(".slide-progress-fill");
+        progressFill.style.opacity = "0";
+        setTimeout(() => (progressFill.style.width = "0%"), 300);
+    }
 };
 
 const quickResetProgress = (slideIndex) => {
-  const navItems = document.querySelectorAll(".slide-nav-item");
-  if (navItems[slideIndex]) {
-    const progressFill = navItems[slideIndex].querySelector(".slide-progress-fill");
-    progressFill.style.transition = "width 0.2s ease-out";
-    progressFill.style.width = "0%";
-    setTimeout(() => {
-      progressFill.style.transition = "width 0.1s ease, opacity 0.3s ease";
-    }, 200);
-  }
+    const navItems = document.querySelectorAll(".slide-nav-item");
+    if (navItems[slideIndex]) {
+        const progressFill = navItems[slideIndex].querySelector(".slide-progress-fill");
+        progressFill.style.transition = "width 0.2s ease-out";
+        progressFill.style.width = "0%";
+        setTimeout(() => {
+            progressFill.style.transition = "width 0.1s ease, opacity 0.3s ease";
+        }, 200);
+    }
 };
 
 const updateCounter = (index) => {
-  const slideNumber = document.getElementById("slideNumber");
-  slideNumber.textContent = String(index + 1).padStart(2, "0");
-  const slideTotal = document.getElementById("slideTotal");
-  slideTotal.textContent = String(slides.length).padStart(2, "0");
+    const slideNumber = document.getElementById("slideNumber");
+    slideNumber.textContent = String(index + 1).padStart(2, "0");
+    const slideTotal = document.getElementById("slideTotal");
+    slideTotal.textContent = String(slides.length).padStart(2, "0");
 };
 
 const updateSlideInfo = (index) => {
-  const titleEl = document.getElementById("slideTitle");
-  const descEl = document.getElementById("slideDescription");
-  if (!titleEl && !descEl) return;
-  const slide = slides[index] || {};
-  if (titleEl) {
-    titleEl.classList.remove("active");
-    setTimeout(() => {
-      titleEl.textContent = slide.title || "";
-      titleEl.classList.add("active");
-    }, 60);
-  }
-  if (descEl) {
-    descEl.classList.remove("active");
-    setTimeout(() => {
-      descEl.textContent = slide.description || "";
-      descEl.classList.add("active");
-    }, 80);
-  }
+    const titleEl = document.getElementById("slideTitle");
+    const descEl = document.getElementById("slideDescription");
+    if (!titleEl && !descEl) return;
+    const slide = slides[index] || {};
+    if (titleEl) {
+        titleEl.classList.remove("active");
+        setTimeout(() => {
+            titleEl.textContent = slide.title || "";
+            titleEl.classList.add("active");
+        }, 60);
+    }
+    if (descEl) {
+        descEl.classList.remove("active");
+        setTimeout(() => {
+            descEl.textContent = slide.description || "";
+            descEl.classList.add("active");
+        }, 80);
+    }
 };
 
 const startAutoSlideTimer = () => {
-  if (!texturesLoaded || !sliderEnabled || slideTextures.length < 2) return;
-  stopAutoSlideTimer();
-  let progress = 0;
-  const increment = (100 / SLIDE_DURATION()) * PROGRESS_UPDATE_INTERVAL;
-  progressAnimation = setInterval(() => {
-    if (!sliderEnabled) {
-      stopAutoSlideTimer();
-      return;
-    }
-    progress += increment;
-    updateSlideProgress(currentSlideIndex, progress);
-    if (progress >= 100) {
-      clearInterval(progressAnimation);
-      progressAnimation = null;
-      fadeSlideProgress(currentSlideIndex);
-      if (!isTransitioning) {
-        handleSlideChange();
-      }
-    }
-  }, PROGRESS_UPDATE_INTERVAL);
+    if (!texturesLoaded || !sliderEnabled || slideTextures.length < 2) return;
+    stopAutoSlideTimer();
+    let progress = 0;
+    const increment = (100 / SLIDE_DURATION()) * PROGRESS_UPDATE_INTERVAL;
+    progressAnimation = setInterval(() => {
+        if (!sliderEnabled) {
+            stopAutoSlideTimer();
+            return;
+        }
+        progress += increment;
+        updateSlideProgress(currentSlideIndex, progress);
+        if (progress >= 100) {
+            clearInterval(progressAnimation);
+            progressAnimation = null;
+            fadeSlideProgress(currentSlideIndex);
+            if (!isTransitioning) {
+                handleSlideChange();
+            }
+        }
+    }, PROGRESS_UPDATE_INTERVAL);
 };
 
 const stopAutoSlideTimer = () => {
-  if (progressAnimation) {
-    clearInterval(progressAnimation);
-    progressAnimation = null;
-  }
-  if (autoSlideTimer) {
-    clearTimeout(autoSlideTimer);
-    autoSlideTimer = null;
-  }
+    if (progressAnimation) {
+        clearInterval(progressAnimation);
+        progressAnimation = null;
+    }
+    if (autoSlideTimer) {
+        clearTimeout(autoSlideTimer);
+        autoSlideTimer = null;
+    }
 };
 
 const safeStartTimer = (delay = 0) => {
-  stopAutoSlideTimer();
-  if (sliderEnabled && texturesLoaded) {
-    if (delay > 0) {
-      autoSlideTimer = setTimeout(() => {
-        if (sliderEnabled) startAutoSlideTimer();
-      }, delay);
-    } else {
-      startAutoSlideTimer();
+    stopAutoSlideTimer();
+    if (sliderEnabled && texturesLoaded) {
+        if (delay > 0) {
+            autoSlideTimer = setTimeout(() => {
+                if (sliderEnabled) startAutoSlideTimer();
+            }, delay);
+        } else {
+            startAutoSlideTimer();
+        }
     }
-  }
 };
 
 const navigateToSlide = (targetIndex) => {
-  if (isTransitioning || targetIndex === currentSlideIndex) return;
-  stopAutoSlideTimer();
-  quickResetProgress(currentSlideIndex);
-  const currentTexture = slideTextures[currentSlideIndex];
-  const targetTexture = slideTextures[targetIndex];
-  if (!currentTexture || !targetTexture) return;
-  isTransitioning = true;
-  shaderMaterial.uniforms.uTexture1.value = currentTexture;
-  shaderMaterial.uniforms.uTexture2.value = targetTexture;
-  shaderMaterial.uniforms.uTexture1Size.value = currentTexture.userData.size;
-  shaderMaterial.uniforms.uTexture2Size.value = targetTexture.userData.size;
-  currentSlideIndex = targetIndex;
-  updateCounter(currentSlideIndex);
-  updateSlideInfo(currentSlideIndex);
-  updateNavigationState(currentSlideIndex);
-  gsap.fromTo(
-    shaderMaterial.uniforms.uProgress,
-    { value: 0 },
-    {
-      value: 1,
-      duration: TRANSITION_DURATION(),
-      ease: "power2.inOut",
-      onComplete: () => {
-        shaderMaterial.uniforms.uProgress.value = 0;
-        shaderMaterial.uniforms.uTexture1.value = targetTexture;
-        shaderMaterial.uniforms.uTexture1Size.value = targetTexture.userData.size;
-        isTransitioning = false;
-        safeStartTimer(100);
-      }
-    }
-  );
+    if (isTransitioning || targetIndex === currentSlideIndex) return;
+    stopAutoSlideTimer();
+    quickResetProgress(currentSlideIndex);
+    const currentTexture = slideTextures[currentSlideIndex];
+    const targetTexture = slideTextures[targetIndex];
+    if (!currentTexture || !targetTexture) return;
+    isTransitioning = true;
+    shaderMaterial.uniforms.uTexture1.value = currentTexture;
+    shaderMaterial.uniforms.uTexture2.value = targetTexture;
+    shaderMaterial.uniforms.uTexture1Size.value = currentTexture.userData.size;
+    shaderMaterial.uniforms.uTexture2Size.value = targetTexture.userData.size;
+    currentSlideIndex = targetIndex;
+    updateCounter(currentSlideIndex);
+    updateSlideInfo(currentSlideIndex);
+    updateNavigationState(currentSlideIndex);
+    gsap.fromTo(
+        shaderMaterial.uniforms.uProgress,
+        { value: 0 },
+        {
+            value: 1,
+            duration: TRANSITION_DURATION(),
+            ease: "power2.inOut",
+            onComplete: () => {
+                shaderMaterial.uniforms.uProgress.value = 0;
+                shaderMaterial.uniforms.uTexture1.value = targetTexture;
+                shaderMaterial.uniforms.uTexture1Size.value = targetTexture.userData.size;
+                isTransitioning = false;
+                safeStartTimer(100);
+            }
+        }
+    );
 };
 
 const handleSlideChange = () => {
-  if (isTransitioning || !texturesLoaded || !sliderEnabled) return;
-  const nextIndex = (currentSlideIndex + 1) % slides.length;
-  navigateToSlide(nextIndex);
+    if (isTransitioning || !texturesLoaded || !sliderEnabled) return;
+    const nextIndex = (currentSlideIndex + 1) % slides.length;
+    navigateToSlide(nextIndex);
 };
 
 const handleSwipe = () => {
-  if (Math.abs(touchEndX - touchStartX) < 50) return;
-  if (touchEndX < touchStartX && !isTransitioning && sliderEnabled) {
-    stopAutoSlideTimer();
-    quickResetProgress(currentSlideIndex);
-    handleSlideChange();
-  } else if (touchEndX > touchStartX && !isTransitioning && sliderEnabled) {
-    stopAutoSlideTimer();
-    quickResetProgress(currentSlideIndex);
-    const prevIndex = (currentSlideIndex - 1 + slides.length) % slides.length;
-    navigateToSlide(prevIndex);
-  }
+    if (Math.abs(touchEndX - touchStartX) < 50) return;
+    if (touchEndX < touchStartX && !isTransitioning && sliderEnabled) {
+        stopAutoSlideTimer();
+        quickResetProgress(currentSlideIndex);
+        handleSlideChange();
+    } else if (touchEndX > touchStartX && !isTransitioning && sliderEnabled) {
+        stopAutoSlideTimer();
+        quickResetProgress(currentSlideIndex);
+        const prevIndex = (currentSlideIndex - 1 + slides.length) % slides.length;
+        navigateToSlide(prevIndex);
+    }
 };
 
 const loadImageTexture = (src) => {
-  return new Promise((resolve, reject) => {
-    const loader = new THREE.TextureLoader();
-    const timeout = setTimeout(() => reject(new Error("Timeout")), 10000);
-    loader.load(
-      src,
-      (texture) => {
-        clearTimeout(timeout);
-        texture.minFilter = texture.magFilter = THREE.LinearFilter;
-        texture.userData = {
-          size: new THREE.Vector2(texture.image.width, texture.image.height)
-        };
-        resolve(texture);
-      },
-      undefined,
-      (error) => {
-        clearTimeout(timeout);
-        reject(error);
-      }
-    );
-  });
+    return new Promise((resolve, reject) => {
+        const loader = new THREE.TextureLoader();
+        const timeout = setTimeout(() => reject(new Error("Timeout")), 10000);
+        loader.load(
+            src,
+            (texture) => {
+                clearTimeout(timeout);
+                texture.minFilter = texture.magFilter = THREE.LinearFilter;
+                texture.userData = {
+                    size: new THREE.Vector2(texture.image.width, texture.image.height)
+                };
+                resolve(texture);
+            },
+            undefined,
+            (error) => {
+                // On error, create a lightweight placeholder canvas texture so
+                // the slider can keep working even if an image fails to load.
+                clearTimeout(timeout);
+                try {
+                    const cw = 1024;
+                    const ch = 576;
+                    const canvas = document.createElement('canvas');
+                    canvas.width = cw;
+                    canvas.height = ch;
+                    const ctx = canvas.getContext('2d');
+                    ctx.fillStyle = '#2b2b2b';
+                    ctx.fillRect(0, 0, cw, ch);
+                    ctx.fillStyle = '#888';
+                    ctx.font = '28px sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('Image failed to load', cw / 2, ch / 2 - 10);
+                    ctx.font = '18px sans-serif';
+                    ctx.fillText(src.split('/').pop() || src, cw / 2, ch / 2 + 20);
+                    const placeholder = new THREE.CanvasTexture(canvas);
+                    placeholder.minFilter = placeholder.magFilter = THREE.LinearFilter;
+                    placeholder.userData = { size: new THREE.Vector2(cw, ch) };
+                    resolve(placeholder);
+                } catch (e) {
+                    // If creating a placeholder somehow fails, still resolve with a minimal empty texture.
+                    const tinyCanvas = document.createElement('canvas');
+                    tinyCanvas.width = 2;
+                    tinyCanvas.height = 2;
+                    const tinyTex = new THREE.CanvasTexture(tinyCanvas);
+                    tinyTex.minFilter = tinyTex.magFilter = THREE.LinearFilter;
+                    tinyTex.userData = { size: new THREE.Vector2(2, 2) };
+                    resolve(tinyTex);
+                }
+            }
+        );
+    });
 };
 
 const initializeRenderer = async () => {
-  const canvas = document.querySelector(".webgl-canvas");
-  if (!canvas) return;
-  scene = new THREE.Scene();
-  camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
-  renderer = new THREE.WebGLRenderer({
-    canvas: canvas,
-    antialias: false,
-    alpha: false
-  });
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-  shaderMaterial = new THREE.ShaderMaterial({
-    uniforms: {
-      uTexture1: { value: null },
-      uTexture2: { value: null },
-      uProgress: { value: 0.0 },
-      uResolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
-      uTexture1Size: { value: new THREE.Vector2(1, 1) },
-      uTexture2Size: { value: new THREE.Vector2(1, 1) },
-      uGlobalIntensity: { value: SLIDER_CONFIG.settings.globalIntensity },
-      uSpeedMultiplier: { value: SLIDER_CONFIG.settings.speedMultiplier },
-      uDistortionStrength: { value: SLIDER_CONFIG.settings.distortionStrength },
-      uColorEnhancement: { value: SLIDER_CONFIG.settings.colorEnhancement },
-      uGlassRefractionStrength: { value: SLIDER_CONFIG.settings.glassRefractionStrength },
-      uGlassChromaticAberration: { value: SLIDER_CONFIG.settings.glassChromaticAberration },
-      uGlassBubbleClarity: { value: SLIDER_CONFIG.settings.glassBubbleClarity },
-      uGlassEdgeGlow: { value: SLIDER_CONFIG.settings.glassEdgeGlow },
-      uGlassLiquidFlow: { value: SLIDER_CONFIG.settings.glassLiquidFlow }
-    },
-    vertexShader,
-    fragmentShader
-  });
-  const geometry = new THREE.PlaneGeometry(2, 2);
-  const mesh = new THREE.Mesh(geometry, shaderMaterial);
-  scene.add(mesh);
-  for (let i = 0; i < slides.length; i++) {
-    try {
-      const texture = await loadImageTexture(slides[i].media);
-      slideTextures.push(texture);
-    } catch (error) {
-      console.warn(`Failed to load image ${i}`);
+    const canvas = document.querySelector(".webgl-canvas");
+    if (!canvas) return;
+    scene = new THREE.Scene();
+    camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+    renderer = new THREE.WebGLRenderer({
+        canvas: canvas,
+        antialias: false,
+        alpha: false
+    });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    shaderMaterial = new THREE.ShaderMaterial({
+        uniforms: {
+            uTexture1: { value: null },
+            uTexture2: { value: null },
+            uProgress: { value: 0.0 },
+            uResolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
+            uTexture1Size: { value: new THREE.Vector2(1, 1) },
+            uTexture2Size: { value: new THREE.Vector2(1, 1) },
+            uGlobalIntensity: { value: SLIDER_CONFIG.settings.globalIntensity },
+            uSpeedMultiplier: { value: SLIDER_CONFIG.settings.speedMultiplier },
+            uDistortionStrength: { value: SLIDER_CONFIG.settings.distortionStrength },
+            uColorEnhancement: { value: SLIDER_CONFIG.settings.colorEnhancement },
+            uGlassRefractionStrength: { value: SLIDER_CONFIG.settings.glassRefractionStrength },
+            uGlassChromaticAberration: { value: SLIDER_CONFIG.settings.glassChromaticAberration },
+            uGlassBubbleClarity: { value: SLIDER_CONFIG.settings.glassBubbleClarity },
+            uGlassEdgeGlow: { value: SLIDER_CONFIG.settings.glassEdgeGlow },
+            uGlassLiquidFlow: { value: SLIDER_CONFIG.settings.glassLiquidFlow }
+        },
+        vertexShader,
+        fragmentShader
+    });
+    const geometry = new THREE.PlaneGeometry(2, 2);
+    const mesh = new THREE.Mesh(geometry, shaderMaterial);
+    scene.add(mesh);
+    for (let i = 0; i < slides.length; i++) {
+        try {
+            const texture = await loadImageTexture(slides[i].media);
+            slideTextures.push(texture);
+        } catch (error) {
+            console.warn(`Failed to load image ${i}`);
+        }
     }
-  }
-  if (slideTextures.length >= 2) {
-    shaderMaterial.uniforms.uTexture1.value = slideTextures[0];
-    shaderMaterial.uniforms.uTexture2.value = slideTextures[1];
-    shaderMaterial.uniforms.uTexture1Size.value = slideTextures[0].userData.size;
-    shaderMaterial.uniforms.uTexture2Size.value = slideTextures[1].userData.size;
-    texturesLoaded = true;
-    sliderEnabled = true;
-    safeStartTimer(500);
-  }
-  const render = () => {
-    requestAnimationFrame(render);
-    renderer.render(scene, camera);
-  };
-  render();
+    if (slideTextures.length >= 2) {
+        shaderMaterial.uniforms.uTexture1.value = slideTextures[0];
+        shaderMaterial.uniforms.uTexture2.value = slideTextures[1];
+        shaderMaterial.uniforms.uTexture1Size.value = slideTextures[0].userData.size;
+        shaderMaterial.uniforms.uTexture2Size.value = slideTextures[1].userData.size;
+        texturesLoaded = true;
+        sliderEnabled = true;
+        safeStartTimer(500);
+    }
+    const render = () => {
+        requestAnimationFrame(render);
+        renderer.render(scene, camera);
+    };
+    render();
 };
 
 window.addEventListener("load", async () => {
-  createSlidesNavigation();
-  updateCounter(0);
-  updateSlideInfo(0);
-  await initializeRenderer();
-  const sliderWrapper = document.querySelector('.slider-wrapper');
-  if (sliderWrapper && !sliderWrapper.classList.contains('loaded')) {
-    sliderWrapper.classList.add('loaded');
-  }
+    createSlidesNavigation();
+    updateCounter(0);
+    updateSlideInfo(0);
+    await initializeRenderer();
+    const sliderWrapper = document.querySelector('.slider-wrapper');
+    if (sliderWrapper && !sliderWrapper.classList.contains('loaded')) {
+        sliderWrapper.classList.add('loaded');
+    }
 });
 
 document.addEventListener("click", (e) => {
-  if (e.target.closest(".slides-navigation")) return;
-  if (!isTransitioning && sliderEnabled) {
-    stopAutoSlideTimer();
-    quickResetProgress(currentSlideIndex);
-    handleSlideChange();
-  }
+    if (e.target.closest(".slides-navigation")) return;
+    if (!isTransitioning && sliderEnabled) {
+        stopAutoSlideTimer();
+        quickResetProgress(currentSlideIndex);
+        handleSlideChange();
+    }
 });
 
 document.addEventListener("touchstart", (e) => {
-  touchStartX = e.changedTouches[0].screenX;
+    touchStartX = e.changedTouches[0].screenX;
 });
 
 document.addEventListener("touchend", (e) => {
-  touchEndX = e.changedTouches[0].screenX;
-  handleSwipe();
+    touchEndX = e.changedTouches[0].screenX;
+    handleSwipe();
 });
 
 window.addEventListener("resize", () => {
-  if (renderer && shaderMaterial) {
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    shaderMaterial.uniforms.uResolution.value.set(window.innerWidth, window.innerHeight);
-  }
+    if (renderer && shaderMaterial) {
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        shaderMaterial.uniforms.uResolution.value.set(window.innerWidth, window.innerHeight);
+    }
 });
 
 document.addEventListener("keydown", (e) => {
-  if (e.code === "Space" || e.code === "ArrowRight") {
-    e.preventDefault();
-    if (!isTransitioning && sliderEnabled) {
-      stopAutoSlideTimer();
-      quickResetProgress(currentSlideIndex);
-      handleSlideChange();
+    if (e.code === "Space" || e.code === "ArrowRight") {
+        e.preventDefault();
+        if (!isTransitioning && sliderEnabled) {
+            stopAutoSlideTimer();
+            quickResetProgress(currentSlideIndex);
+            handleSlideChange();
+        }
+    } else if (e.code === "ArrowLeft") {
+        e.preventDefault();
+        if (!isTransitioning && sliderEnabled) {
+            stopAutoSlideTimer();
+            quickResetProgress(currentSlideIndex);
+            const prevIndex = (currentSlideIndex - 1 + slides.length) % slides.length;
+            navigateToSlide(prevIndex);
+        }
     }
-  } else if (e.code === "ArrowLeft") {
-    e.preventDefault();
-    if (!isTransitioning && sliderEnabled) {
-      stopAutoSlideTimer();
-      quickResetProgress(currentSlideIndex);
-      const prevIndex = (currentSlideIndex - 1 + slides.length) % slides.length;
-      navigateToSlide(prevIndex);
-    }
-  }
 });
 
 document.addEventListener("visibilitychange", () => {
-  if (document.hidden) {
-    stopAutoSlideTimer();
-  } else if (sliderEnabled && !isTransitioning) {
-    safeStartTimer();
-  }
+    if (document.hidden) {
+        stopAutoSlideTimer();
+    } else if (sliderEnabled && !isTransitioning) {
+        safeStartTimer();
+    }
 });
