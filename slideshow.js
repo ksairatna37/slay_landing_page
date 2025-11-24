@@ -204,12 +204,12 @@ const slides = [
   { 
     title: "E-commerce Sellers", 
     description: "Instantly pay suppliers, receive crypto payments from global customers, and manage multi-currency settlements efficiently.",
-    media: "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?q=80&w=1965&auto=format&fit=crop" 
+    media: "https://i.pinimg.com/736x/fb/61/e7/fb61e71d72a192bea6b22a43ef2b979a.jpg" 
   },
   { 
     title: "Freelancers & Creators", 
     description: "Accept crypto for services worldwide, split earnings, and convert seamlessly to local currencies or stablecoins.",
-    media: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=2070&auto=format&fit=crop" 
+    media: "assets/img1.jpeg" 
   },
   { 
     title: "Agencies & Startups", 
@@ -224,12 +224,12 @@ const slides = [
   { 
     title: "Web3 Businesses & DAOs", 
     description: "Manage treasury, payroll, and vendor payments in crypto or stablecoins with advanced security and reporting.",
-    media: "https://images.unsplash.com/photo-1639322537228-f710d846310a?q=80&w=2232&auto=format&fit=crop" 
+    media: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=2070&auto=format&fit=crop" 
   },
   { 
     title: "Digital Marketplaces", 
     description: "Enable fast, borderless payouts to sellers, influencers, or affiliates in any supported cryptocurrency.",
-    media: "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?q=80&w=1965&auto=format&fit=crop" 
+    media: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=2070&auto=format&fit=crop" 
   }
 ];
 

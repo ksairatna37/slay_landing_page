@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Slay - Slash the Friction</title>
-
+    <link rel="shortcut icon" href="assets/favicon.png" type="image/x-icon">
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -235,7 +235,7 @@
       #section-4 {
         position: relative;
         width: 100%;
-        height: 100vh;
+        height: auto;
         overflow: hidden;
         background: #000;
       }
@@ -344,7 +344,7 @@
       }
 
       .slide-nav-item.active .slide-nav-title {
-        color: white;
+        color: #a020f0;
       }
 
       /* Tweakpane (Hidden by default) */
@@ -384,7 +384,7 @@
       .slide-description {
         font-family: "Outfit", sans-serif;
         font-size: 1.05rem;
-        color: rgba(255,255,255,0.85);
+        color: rgba(255, 255, 255, 0.85);
         max-width: 70rem;
         margin: 0.75rem auto 0;
         opacity: 0;
@@ -764,7 +764,7 @@
     <!-- SECTION 3: FEATURES BENTO GRID (REDESIGNED) -->
     <section
       id="section-3"
-      class="relative z-10 w-full bg-[#050505] py-24 px-6 md:px-12 flex flex-col items-center border-t border-white/5"
+      class="relative z-10 w-full bg-black py-24 px-6 md:px-12 flex flex-col items-center border-t border-white/5"
     >
       <!-- Header -->
       <div
@@ -996,158 +996,812 @@
     </section>
 
     <!-- ==============================================
-         SECTION 4: LIQUID SLIDESHOW (UPDATED)
-         ============================================== -->
-    <section id="section-4" class="slider-wrapper relative z-20">
-      <!-- TITLE OVERLAY -->
-      <div class="section-title-overlay">
+     SECTION 4: LIQUID SLIDESHOW (PERFECTED)
+     ============================================== -->
+    <section
+      id="section-4"
+      class="relative z-20 w-full flex flex-col items-center"
+    >
+      <!-- HEADER (not interfering with canvas) -->
+      <div
+        class="text-center max-w-3xl mb-20 opacity-0 translate-y-10 section-4-anim mt-24"
+      >
         <span
-          class="text-[#A020F0] font-mono text-xs tracking-widest uppercase mb-2 block"
-          >Who Thrives with Slay
+          class="text-[#A020F0] font-mono text-xs tracking-widest uppercase mb-4 block"
+        >
+          Who Thrives with Slay
         </span>
-        <h2 class="font-serif text-3xl md:text-4xl text-white">
-          The <span class="italic text-white/80">Slay</span> Collective
+
+        <h2 class="font-serif text-4xl md:text-6xl text-white leading-tight">
+          The <span class="italic text-[#A020F0]">Slay</span> Collective
         </h2>
+
+        <p class="text-white/60 mt-6 max-w-xl mx-auto leading-relaxed">
+          Discover how Slay powers bold businesses and next-gen creators to move
+          money smarter and faster.
+        </p>
       </div>
 
-      <!-- Slide Info (Title) -->
-      <div class="slide-info">
-        <div class="slide-title active" id="slideTitle">Ethereal Glow</div>
-        <div class="slide-description" id="slideDescription">Instantly pay suppliers, receive crypto payments from global customers, and manage multi-currency settlements efficiently.</div>
+      <!-- =======================
+       SLIDESHOW STAGE WRAPPER
+       ======================= -->
+      <div class="slider-stage relative w-full h-[100vh] md:h-[100vh]">
+        <!-- Slide Info (Always Centered) -->
+        <div
+          class="slide-info absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20 text-center pointer-events-none px-4"
+        >
+          <div
+            id="slideTitle"
+            class="slide-title active font-serif text-[10vw] md:text-6xl text-white leading-tight opacity-0 translate-y-10"
+          >
+            Ethereal Glow
+          </div>
+
+          <div
+            id="slideDescription"
+            class="slide-description mt-4 text-white/80 max-w-2xl mx-auto text-sm md:text-lg opacity-0 translate-y-4"
+          >
+            Instantly pay suppliers, receive crypto payments from global
+            customers, and manage multi-currency settlements efficiently.
+          </div>
+        </div>
+
+        <!-- WebGL Canvas -->
+        <canvas class="webgl-canvas absolute inset-0 w-full h-full"></canvas>
+
+        <!-- Slide Numbers -->
+        <span
+          id="slideNumber"
+          class="slide-number absolute left-6 top-1/2 -translate-y-1/2 text-xs md:text-sm tracking-widest"
+          >01</span
+        >
+        <span
+          id="slideTotal"
+          class="slide-total absolute right-6 top-1/2 -translate-y-1/2 text-xs md:text-sm tracking-widest"
+          >06</span
+        >
+
+        <!-- Bottom Navigation -->
+        <nav
+          id="slidesNav"
+          class="slides-navigation absolute bottom-10 left-10 right-10 flex gap-4 z-20"
+        ></nav>
       </div>
-
-      <canvas class="webgl-canvas"></canvas>
-
-      <span class="slide-number" id="slideNumber">01</span>
-      <span class="slide-total" id="slideTotal">06</span>
-
-      <nav class="slides-navigation" id="slidesNav">
-        <!-- Navigation items will be generated by JavaScript -->
-      </nav>
     </section>
 
     <!-- ==============================================
          SECTION 5: SECURITY & TRUST (New)
          ============================================== -->
-    <section id="section-5" class="relative z-10 w-full bg-[#050505] py-24 px-6 md:px-12 flex flex-col items-center border-t border-white/5">
-        
-        <!-- Header -->
-        <div class="text-center max-w-3xl mb-16 opacity-0 translate-y-10 section-5-anim">
-            <span class="text-[#A020F0] font-mono text-xs tracking-widest uppercase mb-4 block">Unbreakable Trust</span>
-            <h2 class="font-serif text-4xl md:text-6xl text-white leading-tight">
-                Security that’s <br/>
-                <span class="italic text-white/50">ahead of the curve.</span>
-            </h2>
-            <p class="text-white/60 mt-6 max-w-2xl mx-auto leading-relaxed">
-                We use military-grade encryption and cutting-edge biometric security to ensure your assets are protected at every step.
+    <section
+      id="section-5"
+      class="relative z-10 w-full bg-[#050505] py-24 px-6 md:px-12 flex flex-col items-center border-t border-white/5"
+    >
+      <!-- Header -->
+      <div
+        class="text-center max-w-3xl mb-16 opacity-0 translate-y-10 section-5-anim"
+      >
+        <span
+          class="text-[#A020F0] font-mono text-xs tracking-widest uppercase mb-4 block"
+          >Unbreakable Trust</span
+        >
+        <h2 class="font-serif text-4xl md:text-6xl text-white leading-tight">
+          <span class="text-[#a020f0]">Security</span> that’s <br />
+          <span class="italic">ahead of the curve.</span>
+        </h2>
+        <p class="text-white/60 mt-6 max-w-2xl mx-auto leading-relaxed">
+          We use military-grade encryption and cutting-edge biometric security
+          to ensure your assets are protected at every step.
+        </p>
+      </div>
+
+      <!-- Security Grid -->
+      <div
+        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-6xl"
+      >
+        <!-- Feature 1: End-to-End Encryption (Large) -->
+        <div
+          class="col-span-1 md:col-span-2 lg:col-span-2 bg-[#0a0a0a] rounded-[30px] p-8 md:p-12 border border-white/5 hover:border-[#A020F0]/30 transition-all duration-500 group relative overflow-hidden opacity-0 translate-y-10 section-5-anim"
+        >
+          <!-- Abstract Lock/Shield Graphic -->
+          <div
+            class="absolute top-0 right-0 w-1/2 h-full opacity-20 pointer-events-none"
+          >
+            <svg
+              viewBox="0 0 200 200"
+              xmlns="http://www.w3.org/2000/svg"
+              class="w-full h-full text-[#A020F0] fill-current animate-pulse-slow"
+            >
+              <path
+                d="M45.7,-76.3C58.9,-69.3,69.1,-59.1,76.9,-47.6C84.7,-36.1,90.1,-23.3,89.3,-10.8C88.5,1.7,81.5,13.9,74.3,25.4C67.1,36.9,59.7,47.7,50.2,56.3C40.7,64.9,29.1,71.3,16.7,73.9C4.3,76.5,-8.9,75.3,-21.3,71.8C-33.7,68.3,-45.3,62.5,-55.7,54.1C-66.1,45.7,-75.3,34.7,-80.6,21.9C-85.9,9.1,-87.3,-5.5,-83.2,-18.9C-79.1,-32.3,-69.5,-44.5,-57.8,-52.1C-46.1,-59.7,-32.3,-62.7,-19.3,-66.5C-6.3,-70.3,5.9,-74.9,19.4,-76.3L19.4,-76.3Z"
+                transform="translate(100 100)"
+              />
+            </svg>
+          </div>
+
+          <div
+            class="relative z-10 h-full flex flex-col justify-between min-h-[300px]"
+          >
+            <div>
+              <div
+                class="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center mb-6 text-[#A020F0]"
+              >
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                </svg>
+              </div>
+              <h3 class="text-3xl font-bold text-white mb-4">
+                End-to-End Encryption
+              </h3>
+              <p class="text-white/60 max-w-md text-lg">
+                Your data is encrypted in transit and at rest using AES-256 and
+                TLS 1.3 protocols. We never see your private keys.
+              </p>
+            </div>
+
+            <!-- Code Snippet Visual -->
+            <div
+              class="mt-8 p-4 rounded-lg bg-black/50 border border-white/5 font-mono text-xs text-white/40 overflow-hidden"
+            >
+              <div class="flex gap-2 mb-2">
+                <span class="w-3 h-3 rounded-full bg-red-500/20"></span
+                ><span class="w-3 h-3 rounded-full bg-yellow-500/20"></span
+                ><span class="w-3 h-3 rounded-full bg-green-500/20"></span>
+              </div>
+              <p>
+                <span class="text-purple-400">const</span> encrypt =
+                <span class="text-blue-400">(data)</span> => {
+              </p>
+              <p class="pl-4">
+                <span class="text-purple-400">return</span>
+                crypto.subtle.encrypt(
+              </p>
+              <p class="pl-8">
+                { name: <span class="text-green-400">'AES-GCM'</span>, iv: iv },
+              </p>
+              <p class="pl-8">key, data</p>
+              <p class="pl-4">);</p>
+              <p>}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Feature 2: Biometric Auth -->
+        <div
+          class="col-span-1 bg-[#0a0a0a] rounded-[30px] p-8 border border-white/5 hover:border-[#A020F0]/30 transition-all duration-500 group opacity-0 translate-y-10 section-5-anim"
+        >
+          <div
+            class="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center mb-6 text-white group-hover:text-[#A020F0] transition-colors"
+          >
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path
+                d="M2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2"
+              />
+              <path d="M12 7V13" />
+              <path d="M12 17H12.01" />
+            </svg>
+          </div>
+          <h3 class="text-xl font-bold text-white mb-3">Biometric Access</h3>
+          <p class="text-white/60 text-sm mb-8">
+            Login instantly and securely with FaceID or TouchID. No passwords to
+            remember, no compromises.
+          </p>
+
+          <!-- Fingerprint Visual -->
+          <div
+            class="relative w-full h-32 flex items-center justify-center border-t border-white/5"
+          >
+            <img
+              src="assets/icons8-face-id.gif"
+              alt="Face ID Icon"
+              class="w-24 h-24 object-contain text-white/20 group-hover:opacity-100 transition-opacity duration-500"
+            />
+            <div
+              class="absolute inset-0 bg-gradient-to-t from-[#A020F0]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"
+            ></div>
+          </div>
+        </div>
+
+        <!-- Feature 3: Secure Wallet -->
+        <div
+          class="col-span-1 bg-[#0a0a0a] rounded-[30px] p-8 border border-white/5 hover:border-[#A020F0]/30 transition-all duration-500 group opacity-0 translate-y-10 section-5-anim"
+        >
+          <div
+            class="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center mb-6 text-white group-hover:text-[#A020F0] transition-colors"
+          >
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path d="M21 12V7H5a2 2 0 0 1 0-4h14v4" />
+              <path d="M3 5v14a2 2 0 0 0 2 2h16v-5" />
+              <path d="M18 12a2 2 0 0 0 0 4h4v-4Z" />
+            </svg>
+          </div>
+          <h3 class="text-xl font-bold text-white mb-3">
+            Non-Custodial Wallet
+          </h3>
+          <p class="text-white/60 text-sm">
+            You own your keys. We provide the interface. True ownership of your
+            digital assets.
+          </p>
+        </div>
+
+        <!-- Feature 4: Real-time Monitoring -->
+        <div
+          class="col-span-1 lg:col-span-2 bg-[#0a0a0a] rounded-[30px] p-8 border border-white/5 hover:border-[#A020F0]/30 transition-all duration-500 group opacity-0 translate-y-10 section-5-anim flex flex-col md:flex-row gap-6 items-center"
+        >
+          <div class="flex-1">
+            <div
+              class="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center mb-6 text-white group-hover:text-[#A020F0] transition-colors"
+            >
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M12 2v20M2 12h20" />
+                <path d="m4.93 4.93 14.14 14.14" />
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold text-white mb-3">
+              24/7 Fraud Detection
+            </h3>
+            <p class="text-white/60 text-sm">
+              AI-driven monitoring detects and blocks suspicious activity in
+              real-time, keeping your account safe around the clock.
             </p>
+          </div>
+
+          <!-- Radar/Scan Visual -->
+          <div
+            class="w-32 h-32 rounded-full border border-white/10 relative flex items-center justify-center"
+          >
+            <div
+              class="absolute inset-0 rounded-full border border-[#A020F0]/30 animate-ping"
+            ></div>
+            <div class="w-2 h-2 bg-[#A020F0] rounded-full"></div>
+            <div
+              class="absolute top-1/2 left-1/2 w-1/2 h-[1px] bg-gradient-to-r from-[#A020F0] to-transparent origin-left animate-spin-slow"
+            ></div>
+          </div>
         </div>
-
-        <!-- Security Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-6xl">
-            
-            <!-- Feature 1: End-to-End Encryption (Large) -->
-            <div class="col-span-1 md:col-span-2 lg:col-span-2 bg-[#0a0a0a] rounded-[30px] p-8 md:p-12 border border-white/5 hover:border-[#A020F0]/30 transition-all duration-500 group relative overflow-hidden opacity-0 translate-y-10 section-5-anim">
-                <!-- Abstract Lock/Shield Graphic -->
-                <div class="absolute top-0 right-0 w-1/2 h-full opacity-20 pointer-events-none">
-                     <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" class="w-full h-full text-[#A020F0] fill-current animate-pulse-slow">
-                        <path d="M45.7,-76.3C58.9,-69.3,69.1,-59.1,76.9,-47.6C84.7,-36.1,90.1,-23.3,89.3,-10.8C88.5,1.7,81.5,13.9,74.3,25.4C67.1,36.9,59.7,47.7,50.2,56.3C40.7,64.9,29.1,71.3,16.7,73.9C4.3,76.5,-8.9,75.3,-21.3,71.8C-33.7,68.3,-45.3,62.5,-55.7,54.1C-66.1,45.7,-75.3,34.7,-80.6,21.9C-85.9,9.1,-87.3,-5.5,-83.2,-18.9C-79.1,-32.3,-69.5,-44.5,-57.8,-52.1C-46.1,-59.7,-32.3,-62.7,-19.3,-66.5C-6.3,-70.3,5.9,-74.9,19.4,-76.3L19.4,-76.3Z" transform="translate(100 100)" />
-                    </svg>
-                </div>
-                
-                <div class="relative z-10 h-full flex flex-col justify-between min-h-[300px]">
-                    <div>
-                        <div class="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center mb-6 text-[#A020F0]">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                        </div>
-                        <h3 class="text-3xl font-bold text-white mb-4">End-to-End Encryption</h3>
-                        <p class="text-white/60 max-w-md text-lg">Your data is encrypted in transit and at rest using AES-256 and TLS 1.3 protocols. We never see your private keys.</p>
-                    </div>
-                    
-                    <!-- Code Snippet Visual -->
-                    <div class="mt-8 p-4 rounded-lg bg-black/50 border border-white/5 font-mono text-xs text-white/40 overflow-hidden">
-                        <div class="flex gap-2 mb-2"><span class="w-3 h-3 rounded-full bg-red-500/20"></span><span class="w-3 h-3 rounded-full bg-yellow-500/20"></span><span class="w-3 h-3 rounded-full bg-green-500/20"></span></div>
-                        <p><span class="text-purple-400">const</span> encrypt = <span class="text-blue-400">(data)</span> => {</p>
-                        <p class="pl-4"><span class="text-purple-400">return</span> crypto.subtle.encrypt(</p>
-                        <p class="pl-8">{ name: <span class="text-green-400">'AES-GCM'</span>, iv: iv },</p>
-                        <p class="pl-8">key, data</p>
-                        <p class="pl-4">);</p>
-                        <p>}</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Feature 2: Biometric Auth -->
-            <div class="col-span-1 bg-[#0a0a0a] rounded-[30px] p-8 border border-white/5 hover:border-[#A020F0]/30 transition-all duration-500 group opacity-0 translate-y-10 section-5-anim">
-                <div class="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center mb-6 text-white group-hover:text-[#A020F0] transition-colors">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2"/><path d="M12 7V13"/><path d="M12 17H12.01"/></svg>
-                </div>
-                <h3 class="text-xl font-bold text-white mb-3">Biometric Access</h3>
-                <p class="text-white/60 text-sm mb-8">Login instantly and securely with FaceID or TouchID. No passwords to remember, no compromises.</p>
-                
-                <!-- Fingerprint Visual -->
-                <div class="relative w-full h-32 flex items-center justify-center border-t border-white/5">
-                    <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="text-white/20 group-hover:text-[#A020F0] transition-colors duration-500">
-                        <path d="M2 12C2 6.5 6.5 2 12 2a10 10 0 0 1 8 6m-5 4v6a3 3 0 0 0 6 0v-6a9 9 0 0 0-18 0v6a3 3 0 0 0 3 3" />
-                    </svg>
-                    <div class="absolute inset-0 bg-gradient-to-t from-[#A020F0]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                </div>
-            </div>
-
-            <!-- Feature 3: Secure Wallet -->
-            <div class="col-span-1 bg-[#0a0a0a] rounded-[30px] p-8 border border-white/5 hover:border-[#A020F0]/30 transition-all duration-500 group opacity-0 translate-y-10 section-5-anim">
-                <div class="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center mb-6 text-white group-hover:text-[#A020F0] transition-colors">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>
-                </div>
-                <h3 class="text-xl font-bold text-white mb-3">Non-Custodial Wallet</h3>
-                <p class="text-white/60 text-sm">You own your keys. We provide the interface. True ownership of your digital assets.</p>
-            </div>
-
-            <!-- Feature 4: Real-time Monitoring -->
-            <div class="col-span-1 lg:col-span-2 bg-[#0a0a0a] rounded-[30px] p-8 border border-white/5 hover:border-[#A020F0]/30 transition-all duration-500 group opacity-0 translate-y-10 section-5-anim flex flex-col md:flex-row gap-6 items-center">
-                <div class="flex-1">
-                    <div class="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center mb-6 text-white group-hover:text-[#A020F0] transition-colors">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M2 12h20"/><path d="m4.93 4.93 14.14 14.14"/></svg>
-                    </div>
-                    <h3 class="text-xl font-bold text-white mb-3">24/7 Fraud Detection</h3>
-                    <p class="text-white/60 text-sm">AI-driven monitoring detects and blocks suspicious activity in real-time, keeping your account safe around the clock.</p>
-                </div>
-                
-                <!-- Radar/Scan Visual -->
-                <div class="w-32 h-32 rounded-full border border-white/10 relative flex items-center justify-center">
-                    <div class="absolute inset-0 rounded-full border border-[#A020F0]/30 animate-ping"></div>
-                    <div class="w-2 h-2 bg-[#A020F0] rounded-full"></div>
-                    <div class="absolute top-1/2 left-1/2 w-1/2 h-[1px] bg-gradient-to-r from-[#A020F0] to-transparent origin-left animate-spin-slow"></div>
-                </div>
-            </div>
-
-        </div>
+      </div>
     </section>
 
-        <script>
-        // ... (Previous GSAP setups) ...
-        
-        gsap.registerPlugin(ScrollTrigger);
+    <!-- ==============================================
+         SECTION 6: UNIVERSAL PAYMENT SOLUTION (New)
+         ============================================== -->
+    <section
+      id="section-6"
+      class="relative z-10 w-full bg-[#050505] py-32 px-6 md:px-12 border-t border-white/5 overflow-hidden"
+    >
+      <!-- Background Ambient -->
+      <div
+        class="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none"
+      >
+        <div
+          class="absolute top-[10%] left-[20%] w-[500px] h-[500px] bg-[#2e1065] rounded-full blur-[120px] opacity-20"
+        ></div>
+        <div
+          class="absolute bottom-[10%] right-[20%] w-[400px] h-[400px] bg-[#A020F0] rounded-full blur-[120px] opacity-10"
+        ></div>
+      </div>
 
-        window.addEventListener('load', () => {
-            // ... (Existing init code) ...
+      <!-- Main Title -->
+      <div
+        class="flex items-center justify-center text-center max-w-4xl mx-auto mb-16 relative z-10 sec6-header opacity-0 translate-y-10"
+      >
+        <!-- Header -->
+        <div
+          class="text-center max-w-3xl mb-16 opacity-0 translate-y-10 section-5-anim"
+        >
+          <span
+            class="text-[#A020F0] font-mono text-xs tracking-widest uppercase mb-4 block"
+            >Eliminating Friction
 
-            // SECTION 5 ANIMATIONS (Security)
-            gsap.to(".section-5-anim", {
-                scrollTrigger: {
-                    trigger: "#section-5",
-                    start: "top 70%",
-                    toggleActions: "play none none reverse"
-                },
-                y: 0,
-                opacity: 1,
-                duration: 1,
-                stagger: 0.15,
-                ease: "power3.out"
-            });
+</span
+          >
+          <h2 class="font-serif text-4xl md:text-6xl text-white leading-tight">
+            <span class="italic">End-to-End universal</span> Payment
+            <span class="text-[#a020f0]">Solution</span> <br />
+          </h2>
+          <p class="text-white/60 mt-6 max-w-xl mx-auto leading-relaxed">
+            Bridging crypto and fiat currencies — because payments should feel effortless.
+          </p>
+        </div>
+      </div>
+
+      <!-- Timeline Container -->
+      <div class="relative max-w-7xl mx-auto">
+        <!-- Vertical Line -->
+        <div
+          class="absolute left-0 md:left-1/2 top-0 bottom-0 w-[2px] bg-gradient-to-b from-[#A020F0]/0 via-[#A020F0]/50 to-[#A020F0]/0 transform -translate-x-1/2 hidden md:block"
+        ></div>
+
+        <!-- Feature 1: WALLET -->
+        <div
+          class="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-24 mb-32 relative feature-row"
+        >
+          <!-- Node -->
+          <div
+            class="absolute left-1/2 top-0 w-4 h-4 bg-[#A020F0] rounded-full transform -translate-x-1/2 shadow-[0_0_15px_#A020F0] hidden md:block mt-8"
+          ></div>
+
+          <!-- Content (Left) -->
+          <div
+            class="flex flex-col justify-center md:text-right md:pr-12 feature-text opacity-0 -translate-x-10"
+          >
+            <div
+              class="w-12 h-12 rounded-xl bg-[#A020F0]/10 flex items-center justify-center mb-6 text-[#A020F0] self-start md:self-end"
+            >
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <rect x="2" y="5" width="20" height="14" rx="2" />
+                <line x1="2" y1="10" x2="22" y2="10" />
+              </svg>
+            </div>
+            <h3 class="text-3xl font-bold text-white mb-4">
+              Secure Crypto Vault
+            </h3>
+            <p class="text-white/60 leading-relaxed">
+              Store, send, and receive multiple cryptocurrencies with
+              military-grade security. Your digital assets, fully protected and
+              beautifully managed.
+            </p>
+          </div>
+          <!-- Visual (Right) -->
+          <div
+            class="relative h-[400px] bg-[#0a0a0a] rounded-[30px] border border-white/10 overflow-hidden feature-visual opacity-0 translate-x-10 group"
+          >
+            <!-- Glass Card Mockup -->
+
+            <img src="assets/card.jpg" class="w-full h-full object-contain" />
+          </div>
+        </div>
+
+        <!-- Feature 2: ANALYTICS -->
+        <div
+          class="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-24 mb-32 relative feature-row"
+        >
+          <!-- Node -->
+          <div
+            class="absolute left-1/2 top-0 w-4 h-4 bg-[#A020F0] rounded-full transform -translate-x-1/2 shadow-[0_0_15px_#A020F0] hidden md:block mt-8"
+          ></div>
+
+          <!-- Visual (Left) -->
+          <div
+            class="relative h-[400px] bg-[#0a0a0a] rounded-[30px] border border-white/10 overflow-hidden feature-visual opacity-0 -translate-x-10 order-2 md:order-1 group"
+          >
+            <img src="assets/card2.jpg" class="w-full h-full object-contain" />
+          </div>
+          <!-- Content (Right) -->
+          <div
+            class="flex flex-col justify-center md:pl-12 feature-text opacity-0 translate-x-10 order-1 md:order-2"
+          >
+            <div
+              class="w-12 h-12 rounded-xl bg-[#A020F0]/10 flex items-center justify-center mb-6 text-[#A020F0]"
+            >
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M3 3v18h18" />
+                <path d="m19 9-5 5-4-4-3 3" />
+              </svg>
+            </div>
+            <h3 class="text-3xl font-bold text-white mb-4">
+              Financial Intelligence
+            </h3>
+            <p class="text-white/60 leading-relaxed">
+              Real-time spending insights, trend predictions, and smart alerts
+              for every account. Turn your transaction data into actionable
+              financial wisdom.
+            </p>
+          </div>
+        </div>
+
+        <!-- Feature 3: SECURITY -->
+        <div
+          class="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-24 mb-32 relative feature-row"
+        >
+          <div
+            class="absolute left-1/2 top-0 w-4 h-4 bg-[#A020F0] rounded-full transform -translate-x-1/2 shadow-[0_0_15px_#A020F0] hidden md:block mt-8"
+          ></div>
+
+          <div
+            class="flex flex-col justify-center md:text-right md:pr-12 feature-text opacity-0 -translate-x-10"
+          >
+            <div
+              class="w-12 h-12 rounded-xl bg-[#A020F0]/10 flex items-center justify-center mb-6 text-[#A020F0] self-start md:self-end"
+            >
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+              </svg>
+            </div>
+            <h3 class="text-3xl font-bold text-white mb-4">
+              Maximum Protection
+            </h3>
+            <p class="text-white/60 leading-relaxed">
+              End-to-end encryption, biometric authentication, and multi-layer
+              fraud detection. Bank-level security protocols that adapt to
+              emerging threats.
+            </p>
+          </div>
+          <div
+            class="relative h-[400px] bg-[#0a0a0a] rounded-[30px] border border-white/10 overflow-hidden feature-visual opacity-0 -translate-x-10 order-2 md:order-1 group"
+          >
+            <img src="assets/card4.png" class="w-full h-full object-contain" />
+          </div>
+        </div>
+
+        <!-- Feature 4: VIRTUAL CARDS -->
+        <div
+          class="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-24 mb-32 relative feature-row"
+        >
+          <div
+            class="absolute left-1/2 top-0 w-4 h-4 bg-[#A020F0] rounded-full transform -translate-x-1/2 shadow-[0_0_15px_#A020F0] hidden md:block mt-8"
+          ></div>
+
+          <div
+            class="relative h-[400px] bg-[#0a0a0a] rounded-[30px] border border-white/10 overflow-hidden feature-visual opacity-0 -translate-x-10 order-2 md:order-1 flex items-center justify-center"
+          >
+            <!-- Cards Stack -->
+            <div class="relative w-[280px] h-[180px]">
+              <div
+                class="absolute top-4 left-4 w-full h-full bg-gray-800 rounded-2xl border border-white/5 transform rotate-6 opacity-50"
+              ></div>
+              <div
+                class="absolute top-2 left-2 w-full h-full bg-gray-900 rounded-2xl border border-white/5 transform rotate-3 opacity-70"
+              ></div>
+              <!-- Main Card -->
+              <div
+                class="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-[#2e1065] to-[#A020F0] rounded-2xl border border-white/10 p-6 shadow-2xl transform hover:-translate-y-2 transition-transform duration-300"
+              >
+                <div class="flex justify-between items-start mb-8">
+                  <span class="font-bold italic">SLAY</span>
+                  <svg
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="white"
+                    opacity="0.5"
+                  >
+                    <path d="M2 10h20" />
+                    <path d="M2 14h20" />
+                  </svg>
+                </div>
+                <div class="text-lg font-mono tracking-widest mb-2">
+                  **** **** **** 5432
+                </div>
+                <div class="flex justify-between text-xs opacity-70">
+                  <span>JOHN DOE</span>
+                  <span>12/25</span>
+                </div>
+              </div>
+              <!-- Badge -->
+              <div
+                class="absolute -top-4 -right-4 bg-white text-black text-xs font-bold px-3 py-1 rounded-full shadow-lg transform rotate-12"
+              >
+                +5% Back
+              </div>
+            </div>
+          </div>
+          <div
+            class="flex flex-col justify-center md:pl-12 feature-text opacity-0 translate-x-10 order-1 md:order-2"
+          >
+            <div
+              class="w-12 h-12 rounded-xl bg-[#A020F0]/10 flex items-center justify-center mb-6 text-[#A020F0]"
+            >
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <rect x="2" y="5" width="20" height="14" rx="2" />
+                <line x1="2" y1="10" x2="22" y2="10" />
+              </svg>
+            </div>
+            <h3 class="text-3xl font-bold text-white mb-4">Slay Virtually</h3>
+            <p class="text-white/60 leading-relaxed">
+              Enjoy cashback on every purchase, granular spending controls, and
+              seamless integration with Apple Pay and Google Wallet.
+            </p>
+          </div>
+        </div>
+
+        <!-- Feature 5: ON/OFF RAMP -->
+        <div
+          class="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-24 mb-32 relative feature-row"
+        >
+          <div
+            class="absolute left-1/2 top-0 w-4 h-4 bg-[#A020F0] rounded-full transform -translate-x-1/2 shadow-[0_0_15px_#A020F0] hidden md:block mt-8"
+          ></div>
+
+          <div
+            class="flex flex-col justify-center md:text-right md:pr-12 feature-text opacity-0 -translate-x-10"
+          >
+            <div
+              class="w-12 h-12 rounded-xl bg-[#A020F0]/10 flex items-center justify-center mb-6 text-[#A020F0] self-start md:self-end"
+            >
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M7 10v12" />
+                <path
+                  d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2h0a3.13 3.13 0 0 1 3 3.88Z"
+                />
+              </svg>
+              <!-- Placeholder icon -->
+            </div>
+            <h3 class="text-3xl font-bold text-white mb-4">ON/OFF Ramp</h3>
+            <p class="text-white/60 leading-relaxed">
+              Swap between cryptocurrencies and traditional currencies
+              instantly. Zero hidden fees, transparent rates, and lightning-fast
+              settlements.
+            </p>
+          </div>
+          <div
+            class="relative h-[400px] bg-[#0a0a0a] rounded-[30px] border border-white/10 overflow-hidden feature-visual opacity-0 -translate-x-10 order-2 md:order-1 group"
+          >
+            <img src="assets/card3.png" class="w-full h-full object-contain" />
+          </div>
+        </div>
+
+        <!-- Feature 6: GLOBAL PAYMENTS -->
+        <div
+          class="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-24 relative feature-row"
+        >
+          <div
+            class="absolute left-1/2 top-0 w-4 h-4 bg-[#A020F0] rounded-full transform -translate-x-1/2 shadow-[0_0_15px_#A020F0] hidden md:block mt-8"
+          ></div>
+
+            <!-- Simple Map Visualization -->
+            <div
+            class="relative h-[400px] bg-[#0a0a0a] rounded-[30px] border border-white/10 overflow-hidden feature-visual opacity-0 -translate-x-10 order-2 md:order-1 group"
+          >
+            <img src="assets/card5.png" class="w-full h-full object-contain" />
+          </div>    
+            
+          <div
+            class="flex flex-col justify-center md:pl-12 feature-text opacity-0 translate-x-10 order-1 md:order-2"
+          >
+            <div
+              class="w-12 h-12 rounded-xl bg-[#A020F0]/10 flex items-center justify-center mb-6 text-[#A020F0]"
+            >
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <circle cx="12" cy="12" r="10" />
+                <path d="M2 12h20" />
+                <path
+                  d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"
+                />
+              </svg>
+            </div>
+            <h3 class="text-3xl font-bold text-white mb-4">
+              Borderless Payments
+            </h3>
+            <p class="text-white/60 leading-relaxed">
+              Send and receive payments across 180+ countries with instant
+              settlements. Built for modern businesses that operate without
+              boundaries.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <script>
+      gsap.registerPlugin(ScrollTrigger);
+      window.addEventListener("load", () => {
+        // Existing Page Animations
+        const tl = gsap.timeline({ defaults: { ease: "power4.out" } });
+        tl.fromTo(
+          ".slash-mark",
+          { scale: 0, opacity: 0, rotation: -10 },
+          { scale: 2.5, opacity: 1, rotation: 0, duration: 1.2 }
+        )
+          .to({}, { duration: 0.8 })
+          .to(".slash-mark", { scale: 1, duration: 1.2 })
+          .to(".reveal-text-container", {
+            width: "auto",
+            opacity: 1,
+            duration: 1.2,
+          })
+          .addLabel("sync-ui", "-=0.8")
+          .to(
+            ".slide-down",
+            { opacity: 1, y: 0, duration: 1, stagger: 0.1 },
+            "sync-ui"
+          )
+          .to(".slide-left", { opacity: 1, x: 0, duration: 1 }, "sync-ui")
+          .to(".fade-in", { opacity: 1, y: 0, duration: 1 }, "sync-ui")
+          .to(
+            ".slide-up",
+            { opacity: 1, y: 0, duration: 1, stagger: 0.1 },
+            "sync-ui"
+          );
+
+        gsap.to(".phone-anim", {
+          scrollTrigger: {
+            trigger: "#section-2",
+            start: "top 70%",
+            end: "bottom top",
+            toggleActions: "play none none reverse",
+          },
+          y: 0,
+          opacity: 1,
+          duration: 1.2,
         });
-        
-        // ... (Rest of the JS) ...
+        gsap.to(".info-card-anim", {
+          scrollTrigger: {
+            trigger: "#section-2",
+            start: "top 60%",
+            toggleActions: "play none none reverse",
+          },
+          y: 0,
+          opacity: 1,
+          duration: 1,
+          delay: 0.3,
+        });
+        gsap.to(".section-3-header", {
+          scrollTrigger: {
+            trigger: "#section-3",
+            start: "top 80%",
+            toggleActions: "play none none reverse",
+          },
+          y: 0,
+          opacity: 1,
+          duration: 1,
+        });
+        gsap.to(".bento-card", {
+          scrollTrigger: {
+            trigger: "#section-3",
+            start: "top 70%",
+            toggleActions: "play none none reverse",
+          },
+          y: 0,
+          opacity: 1,
+          duration: 1,
+          stagger: 0.15,
+        });
+
+        // SECTION 4 ANIMATIONS (Security)
+        gsap.to(".section-4-anim", {
+          scrollTrigger: {
+            trigger: "#section-4",
+            start: "top 70%",
+            toggleActions: "play none none reverse",
+          },
+          y: 0,
+          opacity: 1,
+          duration: 1,
+          stagger: 0.15,
+          ease: "power3.out",
+        });
+        // SECTION 5 ANIMATIONS (Security)
+        gsap.to(".section-5-anim", {
+          scrollTrigger: {
+            trigger: "#section-5",
+            start: "top 70%",
+            toggleActions: "play none none reverse",
+          },
+          y: 0,
+          opacity: 1,
+          duration: 1,
+          stagger: 0.15,
+          ease: "power3.out",
+        });
+
+        // SECTION 6 ANIMATIONS
+        gsap.to(".sec6-header", {
+          scrollTrigger: { trigger: "#section-6", start: "top 70%" },
+          y: 0,
+          opacity: 1,
+          duration: 1,
+          ease: "power3.out",
+        });
+
+        gsap.utils.toArray(".feature-row").forEach((row) => {
+          const text = row.querySelector(".feature-text");
+          const visual = row.querySelector(".feature-visual");
+
+          gsap.to(text, {
+            scrollTrigger: { trigger: row, start: "top 70%" },
+            x: 0,
+            opacity: 1,
+            duration: 1,
+            ease: "power3.out",
+          });
+
+          gsap.to(visual, {
+            scrollTrigger: { trigger: row, start: "top 70%" },
+            x: 0,
+            opacity: 1,
+            duration: 1,
+            delay: 0.2,
+            ease: "power3.out",
+          });
+        });
+
+        // Initialize Slideshow
+        initSlideshow();
+      });
+      // ... (Previous GSAP setups) ...
+
+      gsap.registerPlugin(ScrollTrigger);
+
+      window.addEventListener("load", () => {
+        // ... (Existing init code) ...
+
+        // SECTION 5 ANIMATIONS (Security)
+        gsap.to(".section-5-anim", {
+          scrollTrigger: {
+            trigger: "#section-5",
+            start: "top 70%",
+            toggleActions: "play none none reverse",
+          },
+          y: 0,
+          opacity: 1,
+          duration: 1,
+          stagger: 0.15,
+          ease: "power3.out",
+        });
+      });
+
+      // ... (Rest of the JS) ...
     </script>
 
     <!-- Animation Scripts -->
