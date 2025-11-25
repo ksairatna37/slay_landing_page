@@ -586,10 +586,7 @@
           id="slay-logo"
           class="flex items-center gap-2 font-bold text-2xl tracking-tight mr-4"
         >
-          <span
-            class="w-6 h-6 bg-white rounded-full flex items-center justify-center text-black text-xs"
-            >/</span
-          >
+          <img src="assets/slaylogo.png" class="w-5 h-5" alt="" />
           Slay
         </div>
 
@@ -663,10 +660,13 @@
           Change the way <br />
           you <span class="text-gradient">money.</span>
         </h1>
+
         <p class="text-xl text-white/60 max-w-2xl mx-auto leading-relaxed">
           One app for all things money. From crypto to fiat, spending to saving.
           Slay bridges the gap with zero friction.
         </p>
+
+        <!-- CTA Buttons -->
         <div class="mt-10 flex flex-col md:flex-row gap-4 justify-center">
           <button
             class="bg-white text-black px-8 py-4 rounded-full font-bold text-base hover:scale-105 transition-transform"
@@ -678,6 +678,27 @@
           >
             View Plans
           </button>
+        </div>
+
+        <!-- ============================
+       ALERT BOX (Glassmorphism)
+       ============================ -->
+        <div
+          id="slayAlert"
+          class="mt-16 px-6 py-4 sm:max-w-xl max-w-sm mx-auto text-sm text-white/80 relative backdrop-blur-md bg-white/10 border border-white/20 rounded-xl opacity-0 translate-y-6 transition-all duration-500 ease-out"
+        >
+          <button
+            onclick="closeSlayAlert()"
+            class="absolute top-2 right-3 text-white/60 hover:text-white text-xl leading-none"
+          >
+            &times;
+          </button>
+
+          <p class="leading-relaxed">
+            Slay is a financial technology company, not a bank. Invite only.
+            Banking services provided by Column N.A. and Piermont Bank; members
+            FDIC.
+          </p>
         </div>
       </div>
 
@@ -1328,6 +1349,28 @@
         </p>
       </div>
     </footer>
+    <script>
+      // Fade & slide-in after mount
+      window.addEventListener("load", () => {
+        const alert = document.getElementById("slayAlert");
+        setTimeout(() => {
+          alert.classList.remove("opacity-0", "translate-y-6");
+          alert.classList.add("opacity-100", "translate-y-0");
+        }, 300);
+      });
+
+      // Slide-down fade-out on close
+      function closeSlayAlert() {
+        const alert = document.getElementById("slayAlert");
+        alert.classList.add("opacity-0", "translate-y-6");
+        alert.classList.remove("opacity-100");
+
+        // Remove from layout after animation
+        setTimeout(() => {
+          alert.style.display = "none";
+        }, 400);
+      }
+    </script>
     <script>
       gsap.registerPlugin(ScrollTrigger);
 
