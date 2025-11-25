@@ -4,24 +4,24 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Slay - Slash the Friction</title>
-    <link rel="shortcut icon" href="assets/favicon.png" type="image/x-icon" />
-    <!-- Google Fonts -->
+
+    <!-- Google Fonts: Outfit Only (Minimalist) -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;900&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
       rel="stylesheet"
     />
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="slideshow.css" />
 
     <!-- Dependencies -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
-    <!-- Three.js for the Slideshow -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <script>
       tailwind.config = {
@@ -29,19 +29,19 @@
           extend: {
             fontFamily: {
               sans: ["Outfit", "sans-serif"],
-              serif: ["Playfair Display", "serif"],
             },
             colors: {
-              slay: { bg: "#2e1065" },
+              slay: { bg: "#050505" },
               accent: {
                 base: "#A020F0",
                 dark: "#3d0361",
                 light: "#cfa3f3",
               },
+              surface: "#0F0F11",
+              surfaceHighlight: "#1A1A1E",
             },
-            boxShadow: {
-              glow: "0 0 80px -20px rgba(160, 32, 240, 0.5)",
-              "purple-glow": "0 20px 60px -10px rgba(160, 32, 240, 0.5)",
+            backgroundImage: {
+              "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
             },
           },
         },
@@ -51,101 +51,229 @@
     <style>
       body {
         background-color: #050505;
+        color: white;
         overflow-x: hidden;
-        scroll-behavior: smooth;
+        font-family: "Outfit", sans-serif;
+        -webkit-font-smoothing: antialiased;
       }
 
-      /* --- SHARED STYLES --- */
+      /* --- UTILS --- */
       .glass {
-        background: rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.03);
         backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.08);
       }
 
-      .hero-bg {
-        background-color: #2e1065;
-        background-image: radial-gradient(
-            circle at 15% 50%,
-            rgba(147, 51, 234, 0.4) 0%,
-            transparent 50%
-          ),
-          radial-gradient(
-            circle at 85% 30%,
-            rgba(192, 132, 252, 0.3) 0%,
-            transparent 50%
-          );
-      }
-      #type-cursor {
-        display: inline-block;
-        width: 1ch;
-        animation: blink 1s steps(1) infinite;
+      .text-gradient {
+        background: linear-gradient(135deg, #fff 0%, #a020f0 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
       }
 
-      @keyframes blink {
-        0%,
-        50% {
-          opacity: 1;
-        }
-        51%,
-        100% {
-          opacity: 0.3;
-        }
+      /* --- HERO STYLES --- */
+      .hero-glow {
+        position: absolute;
+        width: 60vw;
+        height: 60vw;
+        background: radial-gradient(
+          circle,
+          rgba(160, 32, 240, 0.15) 0%,
+          rgba(0, 0, 0, 0) 70%
+        );
+        top: -20%;
+        left: 50%;
+        transform: translateX(-50%);
+        pointer-events: none;
+        z-index: 0;
       }
 
-      .reveal-text-container {
-        width: 0;
-        overflow: hidden;
-        white-space: nowrap;
-        opacity: 0;
-      }
-      .slash-mark {
-        display: inline-block;
-      }
-      .nav-item {
-        opacity: 0;
-        display: none;
-        transform: translateX(20px);
-      }
-      .menu-icon {
-        display: inline-block;
-        transition: transform 0.3s ease;
-        font-weight: 300;
-      }
-      .slide-down {
-        opacity: 0;
-        transform: translateY(-30px);
-      }
-      .slide-left {
-        opacity: 0;
-        transform: translateX(30px);
-      }
-      .slide-up {
-        opacity: 0;
-        transform: translateY(30px);
-      }
-      .fade-in {
-        opacity: 0;
-        transform: translateY(10px);
-      }
-      .sticky-hero {
-        position: -webkit-sticky;
-        position: sticky;
-        top: 0;
-        height: 100vh;
-        z-index: 1;
-        width: 100%;
-      }
-      .overlay-section {
+      /* --- REVOLUT-STYLE TABBED SLIDER --- */
+      .tab-button {
+        text-align: left;
+        padding: 24px;
+        border-radius: 16px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
         position: relative;
-        z-index: 10;
-        background-color: #000;
-        box-shadow: 0 -20px 50px rgba(0, 0, 0, 0.5);
-        margin-top: -1px;
+        overflow: hidden;
+        opacity: 0.5;
       }
-      .phone-frame {
-        box-shadow: 0 0 0 2px #333, 0 0 0 4px #000,
-          0 20px 50px -10px rgba(0, 0, 0, 0.8);
+
+      .container {
+        width: 704px;
+        height: 460px;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+
+      .cover {
+        display: inline-block;
+        height: 350px;
+        width: 550px;
+        margin: 15px;
+        border-radius: 60px;
+      }
+      /* --- NAVBAR (Expanding) --- */
+      .nav-container {
+        transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        width: 110px; /* Initial width for "Menu" */
+        overflow: hidden;
+      }
+
+      .nav-container:hover {
+        width: 420px; /* Expanded width */
+        background: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.2);
+      }
+
+      .nav-links {
+        opacity: 0;
+        transform: translateX(20px);
+        transition: all 0.4s ease 0.1s;
+        pointer-events: none;
+        white-space: nowrap;
+      }
+
+      .nav-container:hover .nav-links {
+        opacity: 1;
+        transform: translateX(0);
+        pointer-events: auto;
+      }
+
+      .menu-label {
+        transition: opacity 0.3s ease;
+        white-space: nowrap;
+      }
+
+      .nav-container:hover .menu-label {
+        opacity: 0;
+        pointer-events: none;
+        position: absolute; /* Remove from flow to let links take space */
+      }
+
+      @media screen and (max-width: 700px) {
+        .container {
+          width: 100%;
+          position: relative;
+          transform: translate(0%, 0%);
+          top: -111px;
+          left: 0;
+        }
+        .cover {
+          display: block;
+          height: 200px;
+          width: 320px;
+          margin: 15px auto;
+        }
+      }
+
+      .atvImg {
+        border-radius: 8px;
+        transform-style: preserve-3d;
+        -webkit-tap-highlight-color: rgba(#000, 0);
+      }
+
+      .atvImg img {
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(14, 21, 47, 0.25);
+      }
+
+      .atvImg-container {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        border-radius: 8px;
+        transition: all 0.2s ease-out;
+      }
+
+      .atvImg-container.over .atvImg-shadow {
+        box-shadow: 0 45px 100px rgba(14, 21, 47, 0.4),
+          0 16px 40px rgba(14, 21, 47, 0.4);
+      }
+
+      .atvImg-layers {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        border-radius: 8px;
+        overflow: hidden;
+        transform-style: preserve-3d;
+      }
+
+      .atvImg-rendered-layer {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0%;
+        left: 0%;
+        background-repeat: no-repeat;
+        background-position: center;
+        background-color: transparent;
+        background-size: cover;
+        transition: all 0.1s ease-out;
+        overflow: hidden;
+        border-radius: 8px;
+      }
+
+      .atvImg-shadow {
+        position: absolute;
+        top: 5%;
+        left: 5%;
+        width: 90%;
+        height: 90%;
+        transition: all 0.2s ease-out;
+        box-shadow: 0 8px 30px rgba(14, 21, 47, 0.6);
+      }
+
+      .atvImg-shine {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        border-radius: 8px;
+        background: linear-gradient(
+          135deg,
+          rgba(255, 255, 255, 0.25) 0%,
+          rgba(255, 255, 255, 0) 60%
+        );
+      }
+
+      .tab-button.active {
+        background-color: #1a1a1e;
+        opacity: 1;
+      }
+
+      .tab-progress {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        height: 2px;
+        width: 0%;
+        background-color: #a020f0;
+      }
+
+      .feature-visual {
+        opacity: 0;
+        transform: scale(0.95) translateY(20px);
+        transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+      }
+
+      .feature-visual.active {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+        pointer-events: auto;
+        z-index: 10;
+      }
+
+      /* --- CARD 3D --- */
+      .perspective-container {
+        perspective: 1000px;
       }
       .luxury-card-bg {
         background: radial-gradient(
@@ -154,12 +282,9 @@
           #5e0b9e 50%,
           #a020f0 100%
         );
-        position: relative;
-        overflow: hidden;
         border: 1px solid rgba(255, 255, 255, 0.15);
         box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
         transform-style: preserve-3d;
-        will-change: transform;
       }
       .luxury-card-bg::after {
         content: "";
@@ -200,6 +325,9 @@
         opacity: 0.5;
         mix-blend-mode: soft-light;
       }
+      .chip-gradient {
+        background: linear-gradient(135deg, #e2e2e2 0%, #999 50%, #e2e2e2 100%);
+      }
       .engraved-text {
         background: linear-gradient(
           180deg,
@@ -208,2668 +336,1613 @@
         );
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-        text-shadow: 0px 1px 1px rgba(255, 255, 255, 0.15),
-          0px -1px 1px rgba(0, 0, 0, 0.5);
-        font-family: "Playfair Display", serif;
-        font-weight: 900;
+        text-shadow: 0px 1px 1px #ffffff26, 0px -1px 1px rgba(0, 0, 0, 0.5);
+        font-weight: 800;
         letter-spacing: 0.05em;
+        font-style: italic;
       }
-      .chip-gradient {
-        background: linear-gradient(135deg, #e2e2e2 0%, #999 50%, #e2e2e2 100%);
-        position: relative;
-        overflow: hidden;
-        border-radius: 6px;
-      }
-      .chip-gradient::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        border: 1px solid rgba(0, 0, 0, 0.2);
-        border-radius: 6px;
-        background: linear-gradient(
-            90deg,
-            transparent 33%,
-            rgba(0, 0, 0, 0.1) 33%,
-            rgba(0, 0, 0, 0.1) 66%,
-            transparent 66%
-          ),
-          linear-gradient(
-            0deg,
-            transparent 33%,
-            rgba(0, 0, 0, 0.1) 33%,
-            rgba(0, 0, 0, 0.1) 66%,
-            transparent 66%
-          );
-      }
-      .perspective-container {
+      /* --- SECTION 7: SHIELD 3D --- */
+      .shield-container {
         perspective: 1000px;
+        width: 300px;
+        height: 360px;
       }
-
-      /* --- SLIDESHOW SECTION STYLES (From slideshow.css) --- */
-      #section-4 {
-        position: relative;
-        width: 100%;
-        height: auto;
-        overflow: hidden;
-        background: #000;
-      }
-
-      .slider-wrapper {
-        position: relative;
+      .shield-3d {
         width: 100%;
         height: 100%;
-        overflow: hidden;
-      }
-
-      .webgl-canvas {
-        display: block;
-        width: 100%;
-        height: 100%;
-      }
-
-      /* Slide Number */
-      .slide-number {
-        position: absolute;
-        top: 50%;
-        left: 40px;
-        transform: translateY(-50%);
-        font-family: "Outfit", monospace;
-        font-size: 12px;
-        font-weight: 600;
-        color: white;
-        z-index: 3;
-        letter-spacing: 1px;
-        text-transform: uppercase;
-      }
-
-      /* Slide Total */
-      .slide-total {
-        position: absolute;
-        top: 50%;
-        right: 40px;
-        transform: translateY(-50%);
-        font-family: "Outfit", monospace;
-        font-size: 12px;
-        font-weight: 600;
-        color: white;
-        z-index: 3;
-        letter-spacing: 1px;
-        text-transform: uppercase;
-      }
-
-      /* Help Text */
-      .help-text {
-        position: absolute;
-        top: 40px;
-        left: 40px;
-        font-family: "Outfit", monospace;
-        font-size: 11px;
-        text-transform: uppercase;
-        color: rgba(255, 255, 255, 0.5);
-        z-index: 3;
-      }
-
-      .neon-pulse {
-        color: #a020f0;
-        text-shadow: 0 0 24px #a020f0, 0 0 48px #a020f0, 0 0 80px #a020f0;
-        filter: brightness(1.2);
         position: relative;
-        animation: neonPulse 1.8s infinite alternate ease-in-out;
+        transform-style: preserve-3d;
+        transition: transform 0.1s;
       }
-
-      @keyframes neonPulse {
-        0% {
-          text-shadow: 0 0 20px #a020f0, 0 0 40px #a020f0, 0 0 80px #a020f0;
-          filter: brightness(1.2);
-        }
-        50% {
-          text-shadow: 0 0 36px #a020f0, 0 0 64px #a020f0, 0 0 120px #a020f0;
-          filter: brightness(1.2);
-        }
-        100% {
-          text-shadow: 0 0 20px #a020f0, 0 0 40px #a020f0, 0 0 80px #a020f0;
-          filter: brightness(1.2);
-        }
-      }
-
-      /* Bottom Navigation */
-      .slides-navigation {
+      .shield-body {
         position: absolute;
-        bottom: 40px;
-        left: 40px;
-        right: 40px;
-        display: flex;
-        gap: 20px;
-        z-index: 3;
-        pointer-events: all;
+        inset: 0;
+        background: linear-gradient(
+          135deg,
+          #e2e2e2 0%,
+          #999 30%,
+          #e2e2e2 50%,
+          #999 70%,
+          #e2e2e2 100%
+        );
+        clip-path: path(
+          "M150 0 L300 60 V160 C300 260 150 360 150 360 C150 360 0 260 0 160 V60 L150 0Z"
+        );
+        box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.5),
+          0 20px 50px rgba(0, 0, 0, 0.5);
       }
-
-      .slide-nav-item {
-        display: flex;
-        flex-direction: column;
-        cursor: pointer;
-        flex: 1;
-        background: none;
-        border: none;
-        padding: 0;
+      .shield-inner {
+        position: absolute;
+        inset: 10px;
+        background: linear-gradient(135deg, #ccc 0%, #888 100%);
+        clip-path: path(
+          "M140 15 L280 70 V160 C280 250 140 340 140 340 C140 340 20 250 20 160 V70 L140 15Z"
+        );
       }
-
-      .slide-progress-line {
-        width: 100%;
-        height: 2px;
-        background: rgba(255, 255, 255, 0.2);
-        margin-bottom: 12px;
-        overflow: hidden;
-      }
-
-      .slide-progress-fill {
-        height: 100%;
-        width: 0%;
-        background: #a020f0; /* Slay Purple */
-        transition: width 0.1s linear;
-      }
-
-      .slide-nav-title {
-        font-family: "Outfit", monospace;
-        font-size: 11px;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        color: rgba(255, 255, 255, 0.5);
-        font-weight: 600;
-        transition: color 0.3s ease;
-        text-align: left;
-      }
-
-      .slide-nav-item.active .slide-nav-title {
-        color: #a020f0;
-      }
-
-      /* Tweakpane (Hidden by default) */
-      .tp-dfwv {
-        display: none;
-        z-index: 10000;
-      }
-
-      /* FIXED: Slide Info Overlay Styles */
-      .slide-info {
+      .shield-logo {
         position: absolute;
         top: 50%;
         left: 50%;
-        transform: translate(-50%, -50%);
-        z-index: 20;
-        pointer-events: none;
-        text-align: center;
+        transform: translate(-50%, -50%) translateZ(20px);
+        font-size: 120px;
+        font-weight: 900;
+        background: linear-gradient(to bottom, #ffffff, #ffffff);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        filter: drop-shadow(0 2px 4px #fdf9ff);
+      }
+
+      /* --- SECTION 8: LIGHTNING BOLT 3D --- */
+      .speed-bolt-container {
+        perspective: 1000px;
+        width: 300px;
+        height: 360px;
+        position: relative;
+      }
+      .bolt-3d {
         width: 100%;
+        height: 100%;
+        position: relative;
+        transform-style: preserve-3d;
+        transition: transform 0.1s;
       }
-
-      .slide-title-wrapper {
-        overflow: hidden;
-        display: inline-block;
-      }
-
-      .slide-title {
-        font-family: "Playfair Display", serif;
-        font-size: 5vw; /* Responsive large text */
-        line-height: 1.1;
-        color: white;
-        opacity: 0;
-        transform: translateY(40px);
-        transition: opacity 0.8s ease, transform 0.8s ease;
-        text-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-      }
-
-      .slide-description {
-        font-family: "Outfit", sans-serif;
-        font-size: 1.05rem;
-        color: rgba(255, 255, 255, 0.85);
-        max-width: 70rem;
-        margin: 0.75rem auto 0;
-        opacity: 0;
-        transform: translateY(10px);
-        transition: opacity 0.6s ease, transform 0.6s ease;
-      }
-
-      .slide-description.active {
-        opacity: 1;
-        transform: translateY(0);
-      }
-
-      .slide-title.active {
-        opacity: 1;
-        transform: translateY(0);
-      }
-
-      /* Ensure Title Overlay doesn't conflict */
-      .section-title-overlay {
+      .bolt-body {
         position: absolute;
-        top: 40px;
-        left: 0;
-        width: 100%;
-        text-align: center;
-        z-index: 30;
+        inset: 0;
+        background: linear-gradient(
+          135deg,
+          #e8e8e8 0%,
+          #a0a0a0 25%,
+          #f0f0f0 50%,
+          #909090 75%,
+          #e8e8e8 100%
+        );
+        clip-path: polygon(
+          50% 0%,
+          35% 35%,
+          55% 35%,
+          30% 70%,
+          45% 70%,
+          20% 100%,
+          50% 65%,
+          80% 100%,
+          55% 70%,
+          70% 70%,
+          45% 35%,
+          65% 35%
+        );
+        box-shadow: inset 0 0 60px rgba(255, 255, 255, 0.4),
+          inset -10px -10px 40px rgba(0, 0, 0, 0.5),
+          0 20px 60px rgba(0, 0, 0, 0.6), 0 0 80px rgba(160, 32, 240, 0.3);
+        filter: drop-shadow(0 0 20px rgba(160, 32, 240, 0.5));
+      }
+      .bolt-inner {
+        position: absolute;
+        inset: 8px;
+        background: linear-gradient(
+          135deg,
+          #ffffff 0%,
+          #c0c0c0 50%,
+          #888888 100%
+        );
+        clip-path: polygon(
+          50% 5%,
+          37% 36%,
+          53% 36%,
+          32% 68%,
+          46% 68%,
+          25% 95%,
+          50% 63%,
+          75% 95%,
+          54% 68%,
+          68% 68%,
+          47% 36%,
+          63% 36%
+        );
+        box-shadow: inset 0 5px 20px rgba(255, 255, 255, 0.8),
+          inset 0 -5px 20px rgba(0, 0, 0, 0.4);
+      }
+      .bolt-highlight {
+        position: absolute;
+        inset: 15px;
+        background: linear-gradient(
+          to bottom right,
+          rgba(255, 255, 255, 0.9) 0%,
+          rgba(255, 255, 255, 0) 40%
+        );
+        clip-path: polygon(
+          50% 8%,
+          38% 37%,
+          52% 37%,
+          34% 66%,
+          47% 66%,
+          30% 90%,
+          50% 61%,
+          70% 90%,
+          53% 66%,
+          66% 66%,
+          48% 37%,
+          62% 37%
+        );
         pointer-events: none;
+      }
+      .bolt-glow {
+        position: absolute;
+        inset: -20px;
+        background: radial-gradient(
+          circle,
+          rgba(160, 32, 240, 0.4) 0%,
+          rgba(160, 32, 240, 0) 70%
+        );
+        filter: blur(30px);
+        animation: pulse-glow 3s ease-in-out infinite;
+        pointer-events: none;
+      }
+      @keyframes pulse-glow {
+        0%,
+        100% {
+          opacity: 0.6;
+          transform: scale(1);
+        }
+        50% {
+          opacity: 1;
+          transform: scale(1.1);
+        }
+      }
+      .bolt-spark {
+        position: absolute;
+        width: 4px;
+        height: 4px;
+        background: white;
+        border-radius: 50%;
+        box-shadow: 0 0 10px white, 0 0 20px rgba(160, 32, 240, 0.8);
+        animation: spark-float 2s ease-in-out infinite;
+      }
+      .bolt-spark:nth-child(1) {
+        top: 10%;
+        left: 45%;
+        animation-delay: 0s;
+      }
+      .bolt-spark:nth-child(2) {
+        top: 30%;
+        right: 35%;
+        animation-delay: 0.7s;
+      }
+      .bolt-spark:nth-child(3) {
+        bottom: 40%;
+        left: 30%;
+        animation-delay: 1.4s;
+      }
+      @keyframes spark-float {
+        0%,
+        100% {
+          transform: translateY(0) scale(1);
+          opacity: 0;
+        }
+        50% {
+          transform: translateY(-20px) scale(1.5);
+          opacity: 1;
+        }
+      }
+
+      /* --- ANIMATED LOADER --- */
+      .loader {
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+      }
+
+      .loader::after {
+        content: "";
+        display: block;
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        border: 2px solid currentColor;
+        border-color: currentColor transparent currentColor transparent;
+        animation: loader-spin 1.2s linear infinite;
+      }
+
+      @keyframes loader-spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
       }
     </style>
   </head>
-  <body
-    class="text-white relative w-full selection:bg-purple-500 selection:text-white"
-  >
-    <script type="module" src="slideshow.js"></script>
-
-    <!-- SECTION 1: HERO (Sticky) -->
-    <section
-      class="sticky-hero flex flex-col justify-between p-6 md:p-12 hero-bg"
+  <body class="selection:bg-purple-500 selection:text-white">
+    <!-- NAV -->
+    <!-- NAV (Revamped Hover-Expand) -->
+    <nav
+      class="backdrop-blur-md fixed top-0 left-0 w-full z-50 px-6 py-6 flex justify-center pointer-events-none"
+      id="navbar"
     >
-      <header class="flex justify-between items-center z-50 w-full relative">
-        <div class="slide-down flex items-center gap-2 cursor-pointer z-50">
-         
-          <span class="text-3xl font-bold tracking-tight">/ Slay</span>
+      <div class="pointer-events-auto flex items-center gap-4">
+        <!-- Logo -->
+        <div
+          id="slay-logo"
+          class="flex items-center gap-2 font-bold text-2xl tracking-tight mr-4"
+        >
+          <span
+            class="w-6 h-6 bg-white rounded-full flex items-center justify-center text-black text-xs"
+            >/</span
+          >
+          Slay
         </div>
+
+        <!-- Expanding Menu -->
+        <div
+          id="menu-container"
+          class="nav-container bg-white/5 backdrop-blur-md border border-white/10 rounded-full h-[50px] flex items-center relative"
+        >
+          <!-- Label when collapsed -->
+          <div
+            class="menu-label absolute left-0 w-full h-full flex items-center justify-center font-medium text-sm"
+          >
+            Menu
+          </div>
+
+          <!-- Links when expanded -->
+          <div
+            class="nav-links flex items-center gap-8 px-8 w-full justify-center"
+          >
+            <a
+              href="#section-features"
+              class="text-sm font-medium text-white/70 hover:text-white transition-colors"
+              >Features</a
+            >
+            <a
+              href="#section-security"
+              class="text-sm font-medium text-white/70 hover:text-white transition-colors"
+              >Security</a
+            >
+            <a
+              href="#section-points"
+              class="text-sm font-medium text-white/70 hover:text-white transition-colors"
+              >Points</a
+            >
+            <a
+              href="#section-card"
+              class="text-sm font-medium text-white/70 hover:text-white transition-colors"
+              >Card</a
+            >
+            <a
+              href="#section-transactions"
+              class="text-sm font-medium text-white/70 hover:text-white transition-colors"
+              >Transactions</a
+            >
+          </div>
+        </div>
+
+        <!-- CTA -->
         <button
-          class="slide-down glass px-6 py-3 rounded-full text-sm font-semibold hover:bg-white/20 transition-all flex items-center gap-2 z-50"
+          id="get-app"
+          class="bg-white text-black px-6 py-2.5 rounded-full text-sm font-bold hover:bg-gray-200 transition-colors ml-4"
         >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-            <path
-              d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM10 17L5 12L6.41 10.59L10 14.17L17.59 6.58L19 8L10 17Z"
-            />
-          </svg>
-          Get early access
-        </button>
-      </header>
-      <div
-        class="absolute right-6 md:right-12 top-1/2 -translate-y-1/2 flex items-center gap-3 z-40"
-      >
-        <div id="nav-items-container" class="flex gap-2">
-          <button
-            class="nav-item glass px-4 py-2 rounded-full text-xs font-medium hover:bg-white/20"
-            data-target="#section-2"
-          >
-            Contact
-          </button>
-          <button
-            class="nav-item glass px-4 py-2 rounded-full text-xs font-medium hover:bg-white/20"
-            data-target="#section-10"
-          >
-            FAQ
-          </button>
-          <button
-            class="nav-item glass px-4 py-2 rounded-full text-xs font-medium hover:bg-white/20"
-            data-target="#section-8"
-          >
-            Rewards
-          </button>
-          <button
-            class="nav-item glass px-4 py-2 rounded-full text-xs font-medium hover:bg-white/20"
-            data-target="#section-6"
-          >
-            Use Case
-          </button>
-        </div>
-        <button
-          id="menu-btn"
-          class="slide-left glass px-5 py-2 rounded-full text-xs font-medium hover:bg-white/20 transition-all flex items-center gap-2 z-50"
-        >
-          <span id="menu-text" class="w-10 text-center block relative"
-            >Menu</span
-          >
-          <span class="menu-icon text-lg leading-none pb-1">|</span>
+          Get App
         </button>
       </div>
+    </nav>
+
+    <!-- SECTION 1: NEW HERO (Revolut Style) -->
+    <section
+      class="relative min-h-screen w-full flex flex-col items-center justify-center pt-32 pb-20 px-6 overflow-hidden"
+    >
+      <div class="hero-glow"></div>
+
       <div
-        class="flex-grow flex flex-col items-center justify-center z-10 pointer-events-none w-full"
+        id="heroText"
+        class="text-center max-w-5xl mx-auto z-10 mb-16 hero-anim opacity-0 translate-y-10"
       >
-        <div class="text-center relative overflow-visible px-4">
-          <h1
-            class="text-5xl md:text-9xl font-black tracking-tighter leading-tight flex items-center justify-center gap-0"
+        <h1
+          class="text-7xl md:text-9xl font-bold tracking-tighter leading-[0.9] mb-8"
+        >
+          Change the way <br />
+          you <span class="text-gradient">money.</span>
+        </h1>
+        <p class="text-xl text-white/60 max-w-2xl mx-auto leading-relaxed">
+          One app for all things money. From crypto to fiat, spending to saving.
+          Slay bridges the gap with zero friction.
+        </p>
+        <div class="mt-10 flex flex-col md:flex-row gap-4 justify-center">
+          <button
+            class="bg-white text-black px-8 py-4 rounded-full font-bold text-base hover:scale-105 transition-transform"
           >
-            <span class="slash-mark text-white transform origin-center">/</span>
-            <span class="reveal-text-container flex items-center"
-              ><span class="pl-2 md:pl-4">Slash the friction</span></span
-            >
-          </h1>
-        </div>
-        <div class="fade-in subtext mt-8 text-center max-w-xl px-4">
-          <p
-            class="text-lg md:text-xl font-medium text-gray-200 leading-relaxed"
+            Get Slay Free
+          </button>
+          <button
+            class="glass px-8 py-4 rounded-full font-bold text-base hover:bg-white/10 transition-colors"
           >
-            A refined, seamless way to move crypto — because payments should
-            feel effortless.
-          </p>
+            View Plans
+          </button>
         </div>
       </div>
-      <footer
-        class="flex flex-col md:flex-row justify-between items-end w-full z-20 pb-0 pointer-events-none"
-      >
-        <div
-          class="slide-up glass p-4 rounded-xl max-w-sm text-[10px] md:text-xs text-gray-300 leading-relaxed backdrop-blur-md relative pointer-events-auto"
-        >
-          <button
-            onclick="this.parentElement.style.opacity = '0'"
-            class="absolute top-2 right-2 text-white hover:text-gray-300 transition-opacity"
-          >
-            <svg
-              width="12"
-              height="12"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-            >
-              <line x1="18" y1="6" x2="6" y2="18"></line>
-              <line x1="6" y1="6" x2="18" y2="18"></line>
-            </svg>
-          </button>
-          Slay is a financial technology company, not a bank. Banking services
-          provided by Column N.A., and Piermont Bank; Members FDIC.
-        </div>
-        <div
-          class="slide-up glass rounded-full p-3 flex items-center justify-center hover:bg-white/20 transition-all cursor-pointer pointer-events-auto"
-          onclick="document.getElementById('section-2').scrollIntoView({behavior: 'smooth'})"
-        >
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <rect
-              x="5"
-              y="2"
-              width="14"
-              height="20"
-              rx="7"
-              stroke="white"
-              stroke-width="2"
-            />
-            <path
-              id="scroll-wheel"
-              d="M12 6V10"
-              stroke="white"
-              stroke-width="2"
-              stroke-linecap="round"
-            />
-            <path
-              d="M8 16L12 20L16 16"
-              stroke="white"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            />
-          </svg>
-        </div>
-      </footer>
-    </section>
 
-    <!-- SECTION 2: THE CARD (Overlay) -->
-    <section
-      id="section-2"
-      class="overlay-section min-h-screen w-full bg-black relative flex flex-col items-center pt-24 pb-20 px-6 overflow-hidden"
-    >
-    
+      <!-- Hero Visual: Dashboard/App Interface -->
+      <!-- HERO VISUAL -->
       <div
-        class="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#A020F0] rounded-full blur-[150px] opacity-15 pointer-events-none"
-      ></div>
-      <div
-        class="relative z-10 phone-anim transform translate-y-20 opacity-0 w-full flex justify-center mb-0 md:mb-10"
+        id="heroVisual"
+        class="relative w-full max-w-7xl hero-anim opacity-0 translate-y-20 scale-95"
       >
         <div
-          class="w-[380px] md:w-[500px] h-[700px] md:h-[850px] bg-[#111] rounded-[60px] border-[8px] border-[#222] relative phone-frame overflow-hidden mx-auto transform origin-top hover:scale-[1.01] transition-transform duration-700"
+          class="aspect-[16/9] md:aspect-[21/9] bg-[#0F0F11] rounded-t-[40px] border-t border-l border-r border-white/10 shadow-2xl overflow-hidden relative"
         >
-          <div
-            class="absolute top-0 left-1/2 -translate-x-1/2 h-[35px] w-[160px] bg-black rounded-b-2xl z-30"
-          ></div>
-          <div
-            class="w-full h-full bg-black flex flex-col items-center pt-36 relative perspective-container"
-          >
-            <div
-              class="absolute inset-0 bg-gradient-to-b from-[#1a0229] to-black"
-            ></div>
-            <div
-              id="tilt-card"
-              class="w-[90%] aspect-[1.586] rounded-2xl luxury-card-bg shadow-purple-glow flex flex-col justify-between p-6 relative z-20 cursor-pointer"
-            >
-              <div class="glossy-shine"></div>
+          <!-- Mock UI -->
+          <div class="container flex items-center justify-center">
+            <div class="cover atvImg">
               <div
-                class="absolute inset-0 noise-texture pointer-events-none"
+                class="atvImg-layer"
+                data-img="https://i.ibb.co/Kpw4G9sC/image-314.png"
               ></div>
               <div
-                class="flex justify-between items-center relative z-10 pointer-events-none"
-              >
-                <div class="w-12 h-9 chip-gradient shadow-sm"></div>
-                <svg
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                  class="text-white/70 rotate-90"
-                >
-                  <path
-                    d="M14 2C14 2 18 6 18 12C18 18 14 22 14 22"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                  />
-                  <path
-                    d="M10 5C10 5 12.5 8 12.5 12C12.5 16 10 19 10 19"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                  />
-                  <path
-                    d="M7 8C7 8 8.5 10 8.5 12C8.5 14 7 16 7 16"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                  />
-                </svg>
-              </div>
-              <div
-                class="flex justify-start relative z-10 mt-8 pointer-events-none"
-              >
-                <div
-                  class="text-white font-mono text-lg md:text-xl tracking-widest font-medium space-x-4"
-                >
-                  <span>1234</span><span>5678</span><span>9876</span
-                  ><span>5432</span>
-                </div>
-              </div>
-              <div
-                class="flex justify-between items-end relative z-10 mt-8 pointer-events-none"
-              >
-                <div class="flex flex-col space-y-1">
-                  <div
-                    class="text-white/60 font-mono text-[10px] uppercase tracking-wider"
-                  >
-                    Card Holder
-                  </div>
-                  <div
-                    class="text-white font-bold text-sm md:text-base uppercase tracking-wide"
-                  >
-                    JAMES SMITH
-                  </div>
-                  <div class="flex items-center space-x-2 mt-1">
-                    <div
-                      class="text-white/60 font-mono text-[10px] uppercase tracking-wider"
-                    >
-                      Expires
-                    </div>
-                    <div class="text-white font-mono text-sm tracking-widest">
-                      09/28
-                    </div>
-                  </div>
-                </div>
-                <div class="flex items-center">
-                  <svg
-                    width="50"
-                    height="30"
-                    viewBox="0 0 40 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <circle
-                      cx="12"
-                      cy="12"
-                      r="12"
-                      fill="#EB001B"
-                      fill-opacity="0.8"
-                    />
-                    <circle
-                      cx="28"
-                      cy="12"
-                      r="12"
-                      fill="#F79E1B"
-                      fill-opacity="0.8"
-                    />
-                    <path
-                      d="M20 12V12C17.2386 12 15 9.76142 15 7C15 4.23858 17.2386 2 20 2C22.7614 2 25 4.23858 25 7C25 9.76142 22.7614 12 20 12Z"
-                      fill="#FF5F00"
-                      fill-opacity="0.6"
-                    />
-                    <path
-                      d="M20 22V22C17.2386 22 15 19.7614 15 17C15 14.2386 17.2386 12 20 12C22.7614 12 25 14.2386 25 17C25 19.7614 22.7614 22 20 22Z"
-                      fill="#FF5F00"
-                      fill-opacity="0.6"
-                    />
-                  </svg>
-                </div>
-              </div>
-            </div>
-            <div class="w-full mt-12 px-6 space-y-4 opacity-30">
-              <div class="h-4 w-1/3 bg-gray-800 rounded animate-pulse"></div>
-              <div
-                class="h-20 w-full bg-gray-900 rounded-xl border border-gray-800"
-              ></div>
-              <div
-                class="h-20 w-full bg-gray-900 rounded-xl border border-gray-800"
+                class="atvImg-layer"
+                data-img="https://i.ibb.co/Kpw4G9sC/image-314.png"
               ></div>
             </div>
           </div>
         </div>
       </div>
-      <div
-        class="info-card-anim relative z-20 -mt-24 md:-mt-48 text-center opacity-0 translate-y-10 bg-black p-8 md:p-12 rounded-[40px] border border-white/10 shadow-2xl max-w-4xl mx-auto"
-      >
-        <h2
-          class="font-serif text-3xl md:text-5xl text-white leading-tight mb-8"
-        >
-          Making Every Transaction <br /><span class="italic text-[#A020F0]"
-            >Smoother, Faster, and More Secure Than Ever.</span
-          >
-        </h2>
-        <div
-          class="flex flex-col md:flex-row gap-4 justify-center items-center mt-8"
-        >
-          <button
-            class="bg-white text-black px-10 py-4 rounded-full font-semibold text-sm hover:bg-gray-200 transition-colors min-w-[180px] flex items-center justify-center gap-2 group"
-          >
-            Discover More
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              class="group-hover:translate-y-1 transition-transform duration-300"
-            >
-              <path d="M12 5v14M19 12l-7 7-7-7" />
-            </svg>
-          </button>
-          <button
-            class="border border-white/20 bg-transparent text-white px-10 py-4 rounded-full font-semibold text-sm hover:bg-white/10 transition-colors min-w-[180px]"
-          >
-            Join the Waitlist
-          </button>
-        </div>
-      </div>
     </section>
 
-    <!-- SECTION 3: FEATURES BENTO GRID (REDESIGNED) -->
+    <!-- SECTION 2: 3D CARD (Preserved) -->
     <section
-      id="section-3"
-      class="relative z-10 w-full bg-black py-24 px-6 md:px-12 flex flex-col items-center border-t border-white/5"
+      id="section-card"
+      class="parallax-section relative z-10 w-full py-32 px-6 flex flex-col items-center overflow-hidden"
     >
-      <!-- Header -->
-      <div
-        class="text-center max-w-3xl mb-16 section-3-header opacity-0 translate-y-10"
-      >
+      <div class="text-center mb-16">
         <span
-          class="text-[#A020F0] font-mono text-xs tracking-widest uppercase mb-4 block"
-          >Why Slay?</span
+          class="text-[#A020F0] font-mono text-sm tracking-widest uppercase mb-4 block"
+          >SlAY VIRTUALLY</span
         >
-        <h2 class="font-serif text-4xl md:text-6xl text-white leading-tight">
-          Built for the <span class="italic text-[#A020F0]">bold</span>, <br />
-          designed for the <span class="italic text-white">future.</span>
+        <h2 class="text-4xl md:text-6xl font-bold mb-4">
+          Physical meets Digital
         </h2>
-      </div>
-
-      <!-- Bento Grid -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-6xl">
-        <div
-          class="bento-card col-span-1 md:col-span-2 bg-[#0a0a0a] rounded-[30px] p-8 md:p-10 border border-white/5 hover:border-[#A020F0]/50 transition-colors duration-500 group relative overflow-hidden opacity-0 translate-y-10"
-        >
-          <div
-            class="absolute top-0 right-0 p-10 opacity-20 group-hover:opacity-40 transition-opacity duration-500"
-          >
-            <svg
-              width="120"
-              height="120"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="#A020F0"
-              stroke-width="1"
-            >
-              <path d="M13 2L3 14H12L11 22L21 10H12L13 2Z" />
-            </svg>
-          </div>
-          <div class="relative z-10">
-            <div
-              class="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center mb-6 text-[#A020F0]"
-            >
-              <svg
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-              >
-                <path d="M13 2L3 14H12L11 22L21 10H12L13 2Z" />
-              </svg>
-            </div>
-            <h3 class="text-2xl font-bold mb-2">Instant Settlement</h3>
-            <p class="text-gray-400 max-w-sm">
-              Move funds globally in milliseconds. No holding periods, no
-              banking hours. Just pure speed.
-            </p>
-          </div>
-        </div>
-        <div
-          class="bento-card col-span-1 bg-[#0a0a0a] rounded-[30px] p-8 md:p-10 border border-white/5 hover:border-[#A020F0]/50 transition-colors duration-500 group relative overflow-hidden opacity-0 translate-y-10"
-        >
-          <div
-            class="absolute inset-0 bg-gradient-to-br from-[#A020F0]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-          ></div>
-          <div class="relative z-10">
-            <div
-              class="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center mb-6 text-white"
-            >
-              <svg
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-              >
-                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-              </svg>
-            </div>
-            <h3 class="text-2xl font-bold mb-2">Vault Security</h3>
-            <p class="text-gray-400">
-              Military-grade encryption for every single transaction.
-            </p>
-          </div>
-        </div>
-        <div
-          class="bento-card col-span-1 bg-[#0a0a0a] rounded-[30px] p-8 md:p-10 border border-white/5 hover:border-[#A020F0]/50 transition-colors duration-500 group relative overflow-hidden opacity-0 translate-y-10"
-        >
-          <div class="relative z-10">
-            <div
-              class="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center mb-6 text-white"
-            >
-              <svg
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-              >
-                <circle cx="12" cy="12" r="10" />
-                <path d="M2 12h20" />
-                <path
-                  d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"
-                />
-              </svg>
-            </div>
-            <h3 class="text-2xl font-bold mb-2">Borderless</h3>
-            <p class="text-gray-400">
-              Spend anywhere Visa is accepted. 200+ countries, 0% FX fees.
-            </p>
-          </div>
-        </div>
-        <div
-          class="bento-card col-span-1 md:col-span-2 bg-[#0a0a0a] rounded-[30px] p-8 md:p-10 border border-white/5 hover:border-[#A020F0]/50 transition-colors duration-500 group relative overflow-hidden opacity-0 translate-y-10"
-        >
-          <div
-            class="absolute -bottom-10 -right-10 w-40 h-40 bg-[#A020F0] rounded-full blur-[80px] opacity-20 group-hover:opacity-40 transition-opacity"
-          ></div>
-          <div
-            class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6"
-          >
-            <div>
-              <div
-                class="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center mb-6 text-[#A020F0]"
-              >
-                <svg
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <path
-                    d="M20.91 8.84 5.91 2.23a1 1 0 0 0-1.24 1.37l2.35 9.66a2 2 0 0 1 .1 1.01l-2.35 9.66a1 1 0 0 0 1.24 1.37l15-6.61a1 1 0 0 0 0-1.83Z"
-                  />
-                  <path d="m22 2-11 11" />
-                </svg>
-              </div>
-              <h3 class="text-2xl font-bold mb-2">3% Cashback on Crypto</h3>
-              <p class="text-gray-400 max-w-sm">
-                Earn rewards in Bitcoin, ETH, or SLAY tokens on every purchase.
-              </p>
-            </div>
-            <button
-              class="px-6 py-2 rounded-full border border-white/20 hover:bg-white hover:text-black transition-all text-sm font-semibold"
-            >
-              View Rates
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <div
-        class="mt-24 w-full h-[1px] bg-gradient-to-r from-transparent via-white/5 to-transparent"
-      ></div>
-    </section>
-
-    <!-- ==============================================
-     SECTION 4: LIQUID SLIDESHOW (PERFECTED)
-     ============================================== -->
-    <section
-      id="section-4"
-      class="relative z-20 w-full flex flex-col items-center"
-    >
-      <!-- HEADER (not interfering with canvas) -->
-      <div
-        class="text-center max-w-3xl mb-20 opacity-0 translate-y-10 section-4-anim mt-24"
-      >
-        <span
-          class="text-[#A020F0] font-mono text-xs tracking-widest uppercase mb-4 block"
-        >
-          Who Thrives with Slay
-        </span>
-
-        <h2 class="font-serif text-4xl md:text-6xl text-white leading-tight">
-          The <span class="italic text-[#A020F0]">Slay</span> Collective
-        </h2>
-
-        <p class="text-white/60 mt-6 max-w-xl mx-auto leading-relaxed">
-          Discover how Slay powers bold businesses and next-gen creators to move
-          money smarter and faster.
+        <p class="text-white/50">
+          Making Every Transaction Smoother, Faster, and More Secure Than Ever.
         </p>
       </div>
 
-      <!-- =======================
-       SLIDESHOW STAGE WRAPPER
-       ======================= -->
-      <div class="slider-stage relative w-full h-[100vh] md:h-[100vh]">
-        <!-- Slide Info (Always Centered) -->
+      <div class="relative w-[320px] h-[500px] perspective-container">
         <div
-          class="slide-info absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20 text-center pointer-events-none px-4"
+          id="tilt-card"
+          class="w-full h-full rounded-[32px] luxury-card-bg shadow-purple-glow flex flex-col justify-between p-8 relative z-20 cursor-pointer transform transition-transform duration-100"
         >
+          <div class="glossy-shine"></div>
+          <div class="absolute inset-0 noise-texture pointer-events-none"></div>
+
           <div
-            id="slideTitle"
-            class="slide-title active font-serif text-[10vw] md:text-6xl text-white leading-tight opacity-0 translate-y-10"
+            class="flex justify-between items-center relative z-10 pointer-events-none"
           >
-            Ethereal Glow
-          </div>
-
-          <div
-            id="slideDescription"
-            class="slide-description mt-4 text-white/80 max-w-2xl mx-auto text-sm md:text-lg opacity-0 translate-y-4"
-          >
-            Instantly pay suppliers, receive crypto payments from global
-            customers, and manage multi-currency settlements efficiently.
-          </div>
-        </div>
-
-        <!-- WebGL Canvas -->
-        <canvas class="webgl-canvas absolute inset-0 w-full h-full"></canvas>
-
-        <!-- Slide Numbers -->
-        <span
-          id="slideNumber"
-          class="slide-number absolute left-6 top-1/2 -translate-y-1/2 text-xs md:text-sm tracking-widest"
-          >01</span
-        >
-        <span
-          id="slideTotal"
-          class="slide-total absolute right-6 top-1/2 -translate-y-1/2 text-xs md:text-sm tracking-widest"
-          >06</span
-        >
-
-        <!-- Bottom Navigation -->
-        <nav
-          id="slidesNav"
-          class="slides-navigation absolute bottom-10 left-10 right-10 flex gap-4 z-20"
-        ></nav>
-      </div>
-    </section>
-
-    <!-- ==============================================
-         SECTION 5: SECURITY & TRUST (New)
-         ============================================== -->
-    <section
-      id="section-5"
-      class="relative z-10 w-full bg-[#050505] py-24 px-6 md:px-12 flex flex-col items-center border-t border-white/5"
-    >
-      <!-- Header -->
-      <div
-        class="text-center max-w-3xl mb-16 opacity-0 translate-y-10 section-5-anim"
-      >
-        <span
-          class="text-[#A020F0] font-mono text-xs tracking-widest uppercase mb-4 block"
-          >Unbreakable Trust</span
-        >
-        <h2 class="font-serif text-4xl md:text-6xl text-white leading-tight">
-          <span class="text-[#a020f0]">Security</span> that’s <br />
-          <span class="italic">ahead of the curve.</span>
-        </h2>
-        <p class="text-white/60 mt-6 max-w-2xl mx-auto leading-relaxed">
-          We use military-grade encryption and cutting-edge biometric security
-          to ensure your assets are protected at every step.
-        </p>
-      </div>
-
-      <!-- Security Grid -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-6xl">
-        <!-- Feature 1: End-to-End Encryption (Large) -->
-        <div
-          class="bento-card col-span-1 md:col-span-2 bg-[#0a0a0a] rounded-[30px] p-8 md:p-10 border border-white/5 hover:border-[#A020F0]/50 transition-colors duration-500 group relative overflow-hidden opacity-0 translate-y-10 section-5-anim"
-        >
-          <!-- Abstract Lock/Shield Graphic -->
-          <div
-            class="absolute inset-0 bg-gradient-to-br from-[#A020F0]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-          ></div>
-
-          <div
-            class="relative z-10 h-full flex flex-col justify-between min-h-[300px]"
-          >
-            <div>
-              <div
-                class="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center mb-6 text-[#A020F0]"
-              >
-                <svg
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-                  <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-                </svg>
-              </div>
-              <h3 class="text-3xl font-bold text-white mb-4">
-                End-to-End Encryption
-              </h3>
-              <p class="text-white/60 max-w-md text-lg">
-                Your data is encrypted in transit and at rest using AES-256 and
-                TLS 1.3 protocols. We never see your private keys.
-              </p>
-            </div>
-
-            <!-- Code Snippet Visual -->
-            <div
-              class="mt-8 p-4 rounded-lg bg-black/50 border border-white/5 font-mono text-xs text-white/40 overflow-hidden"
-            >
-              <div class="flex gap-2 mb-2">
-                <span class="w-3 h-3 rounded-full bg-red-500/20"></span
-                ><span class="w-3 h-3 rounded-full bg-yellow-500/20"></span
-                ><span class="w-3 h-3 rounded-full bg-green-500/20"></span>
-              </div>
-              <p>
-                <span class="text-purple-400">const</span> encrypt =
-                <span class="text-blue-400">(data)</span> => {
-              </p>
-              <p class="pl-4">
-                <span class="text-purple-400">return</span>
-                crypto.subtle.encrypt(
-              </p>
-              <p class="pl-8">
-                { name: <span class="text-green-400">'AES-GCM'</span>, iv: iv },
-              </p>
-              <p class="pl-8">key, data</p>
-              <p class="pl-4">);</p>
-              <p>}</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Feature 2: Biometric Auth -->
-        <div
-          class="bento-card col-span-1 bg-[#0a0a0a] rounded-[30px] p-8 md:p-10 border border-white/5 hover:border-[#A020F0]/50 transition-colors duration-500 group relative overflow-hidden opacity-0 translate-y-10 section-5-anim"
-        >
-          <div
-            class="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center mb-6 text-white group-hover:text-[#A020F0] transition-colors"
-          >
+            <div class="w-12 h-9 chip-gradient shadow-sm rounded-md"></div>
             <svg
-              width="24"
-              height="24"
+              width="32"
+              height="32"
               viewBox="0 0 24 24"
               fill="none"
-              stroke="currentColor"
-              stroke-width="2"
+              xmlns="http://www.w3.org/2000/svg"
+              class="text-white/70 rotate-90"
             >
               <path
-                d="M2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2"
+                d="M14 2C14 2 18 6 18 12C18 18 14 22 14 22"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
               />
-              <path d="M12 7V13" />
-              <path d="M12 17H12.01" />
-            </svg>
-          </div>
-          <h3 class="text-xl font-bold text-white mb-3">Biometric Access</h3>
-          <p class="text-white/60 text-sm mb-8">
-            Login instantly and securely with FaceID or TouchID. No passwords to
-            remember, no compromises.
-          </p>
-
-          <!-- Fingerprint Visual -->
-          <div
-            class="relative w-full h-32 flex items-center justify-center border-t border-white/5"
-          >
-            <img
-              src="assets/icons8-face-id.gif"
-              alt="Face ID Icon"
-              class="w-24 h-24 object-contain text-white/20 group-hover:opacity-100 transition-opacity duration-500"
-            />
-            <div
-              class="absolute inset-0 bg-gradient-to-t from-[#A020F0]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"
-            ></div>
-          </div>
-        </div>
-
-        <!-- Feature 3: Secure Wallet -->
-        <div
-          class="bento-card col-span-1 bg-[#0a0a0a] rounded-[30px] p-8 md:p-10 border border-white/5 hover:border-[#A020F0]/50 transition-colors duration-500 group relative overflow-hidden opacity-0 translate-y-10 section-5-anim"
-        >
-          <div
-            class="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center mb-6 text-white group-hover:text-[#A020F0] transition-colors"
-          >
-            <svg
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-            >
-              <path d="M21 12V7H5a2 2 0 0 1 0-4h14v4" />
-              <path d="M3 5v14a2 2 0 0 0 2 2h16v-5" />
-              <path d="M18 12a2 2 0 0 0 0 4h4v-4Z" />
-            </svg>
-          </div>
-          <h3 class="text-xl font-bold text-white mb-3">
-            Non-Custodial Wallet
-          </h3>
-          <p class="text-white/60 text-sm">
-            You own your keys. We provide the interface. True ownership of your
-            digital assets.
-          </p>
-        </div>
-
-        <!-- Feature 4: Real-time Monitoring -->
-        <div
-          class="bento-card col-span-1 md:col-span-2 bg-[#0a0a0a] rounded-[30px] p-8 md:p-10 border border-white/5 hover:border-[#A020F0]/50 transition-colors duration-500 group relative overflow-hidden opacity-0 translate-y-10 section-5-anim flex flex-col md:flex-row gap-6 items-center"
-        >
-          <div
-            class="absolute -bottom-10 -right-10 w-40 h-40 bg-[#A020F0] rounded-full blur-[80px] opacity-20 group-hover:opacity-40 transition-opacity"
-          ></div>
-          <div class="flex-1">
-            <div
-              class="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center mb-6 text-white group-hover:text-[#A020F0] transition-colors"
-            >
-              <svg
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
+              <path
+                d="M10 5C10 5 12.5 8 12.5 12C12.5 16 10 19 10 19"
                 stroke="currentColor"
                 stroke-width="2"
-              >
-                <path d="M12 2v20M2 12h20" />
-                <path d="m4.93 4.93 14.14 14.14" />
-              </svg>
-            </div>
-            <h3 class="text-xl font-bold text-white mb-3">
-              24/7 Fraud Detection
-            </h3>
-            <p class="text-white/60 text-sm">
-              AI-driven monitoring detects and blocks suspicious activity in
-              real-time, keeping your account safe around the clock.
-            </p>
+                stroke-linecap="round"
+              />
+              <path
+                d="M7 8C7 8 8.5 10 8.5 12C8.5 14 7 16 7 16"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+              />
+            </svg>
           </div>
 
-          <!-- Radar/Scan Visual -->
           <div
-            class="w-32 h-32 rounded-full border border-white/10 relative flex items-center justify-center"
+            class="flex justify-start relative z-10 mt-8 pointer-events-none"
           >
-            <div
-              class="absolute inset-0 rounded-full border border-[#A020F0]/30 animate-ping"
-            ></div>
-            <div class="w-2 h-2 bg-[#A020F0] rounded-full"></div>
-            <div
-              class="absolute top-1/2 left-1/2 w-1/2 h-[1px] bg-gradient-to-r from-[#A020F0] to-transparent origin-left animate-spin-slow"
-            ></div>
+            <div class="text-white font-mono text-xl font-medium space-x-4">
+              <span>1234</span><span>5678</span><span>9876</span
+              ><span>5432</span>
+            </div>
+          </div>
+
+          <div
+            class="flex justify-between items-end relative z-10 mt-8 pointer-events-none"
+          >
+            <div class="flex flex-col space-y-1">
+              <div
+                class="text-white/40 font-mono text-[10px] uppercase tracking-wider"
+              >
+                Card Holder
+              </div>
+              <div class="text-white font-bold text-sm uppercase tracking-wide">
+                JAMES SMITH
+              </div>
+              <div
+                class="text-white/40 font-mono text-[10px] uppercase tracking-wider"
+              >
+                Expires
+                <span
+                  class="text-white font-bold text-sm uppercase tracking-wide"
+                  >09/28</span
+                >
+              </div>
+            </div>
+            <div class="flex items-center">
+              <svg
+                width="48"
+                height="32"
+                viewBox="0 0 40 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <circle
+                  cx="12"
+                  cy="12"
+                  r="12"
+                  fill="#EB001B"
+                  fill-opacity="0.8"
+                />
+                <circle
+                  cx="28"
+                  cy="12"
+                  r="12"
+                  fill="#F79E1B"
+                  fill-opacity="0.8"
+                />
+                <path
+                  d="M20 12V12C17.2386 12 15 9.76142 15 7C15 4.23858 17.2386 2 20 2C22.7614 2 25 4.23858 25 7C25 9.76142 22.7614 12 20 12Z"
+                  fill="#FF5F00"
+                  fill-opacity="0.6"
+                />
+              </svg>
+            </div>
+          </div>
+          <!-- Engraved Logo -->
+          <div
+            class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 engraved-text text-6xl opacity-20 pointer-events-none select-none"
+          >
+            SLAY
           </div>
         </div>
       </div>
     </section>
 
-    <!-- ==============================================
-         SECTION 6: UNIVERSAL PAYMENT SOLUTION (New)
-         ============================================== -->
+    <!-- SECTION 3: UNIVERSAL PAYMENT (Revamped Single Page Slider) -->
     <section
-      id="section-6"
-      class="relative z-10 w-full bg-[#050505] py-32 px-6 md:px-12 border-t border-white/5 overflow-hidden"
+      id="section-features"
+      class="parallax-section py-32 px-6 bg-[#050505] border-t border-white/5"
     >
-      <!-- Background Ambient -->
-      <div
-        class="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none"
-      >
-        <div
-          class="absolute top-[10%] left-[20%] w-[500px] h-[500px] bg-[#2e1065] rounded-full blur-[120px] opacity-20"
-        ></div>
-        <div
-          class="absolute bottom-[10%] right-[20%] w-[400px] h-[400px] bg-[#A020F0] rounded-full blur-[120px] opacity-10"
-        ></div>
-      </div>
-
-      <!-- Main Title -->
-      <div
-        class="flex items-center justify-center text-center max-w-4xl mx-auto mb-16 relative z-10 sec6-header opacity-0 translate-y-10"
-      >
-        <!-- Header -->
-        <div
-          class="text-center max-w-3xl mb-16 opacity-0 translate-y-10 section-5-anim"
-        >
-          <span
-            class="text-[#A020F0] font-mono text-xs tracking-widest uppercase mb-4 block"
-            >Eliminating Friction
-          </span>
-          <h2 class="font-serif text-4xl md:text-6xl text-white leading-tight">
-            <span class="italic">End-to-End universal</span> Payment
-            <span class="text-[#a020f0]">Solution</span> <br />
+      <div class="max-w-7xl mx-auto">
+        <div class="mb-20">
+          <h2 class="text-5xl md:text-7xl font-bold mb-6">
+            Eliminating Friction
           </h2>
-          <p class="text-white/60 mt-6 max-w-xl mx-auto leading-relaxed">
-            Bridging crypto and fiat currencies — because payments should feel
-            effortless.
+          <p class="text-xl text-white/60 max-w-2xl">
+            End-to-end universal payment solution. One platform for everything.
           </p>
         </div>
-      </div>
 
-      <!-- Timeline Container -->
-      <div class="relative max-w-7xl mx-auto">
-        <!-- Vertical Line -->
-        <div
-          class="absolute left-0 md:left-1/2 top-0 bottom-0 w-[2px] bg-gradient-to-b from-[#A020F0]/0 via-[#A020F0]/50 to-[#A020F0]/0 transform -translate-x-1/2 hidden md:block"
-        ></div>
-
-        <!-- Feature 1: WALLET -->
-        <div
-          class="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-24 mb-32 relative feature-row"
-        >
-          <!-- Node -->
-          <div
-            class="absolute left-1/2 top-0 w-4 h-4 bg-[#A020F0] rounded-full transform -translate-x-1/2 shadow-[0_0_15px_#A020F0] hidden md:block mt-8"
-          ></div>
-
-          <!-- Content (Left) -->
-          <div
-            class="flex flex-col justify-center md:text-right md:pr-12 feature-text opacity-0 -translate-x-10"
-          >
-            <div
-              class="w-12 h-12 rounded-xl bg-[#A020F0]/10 flex items-center justify-center mb-6 text-[#A020F0] self-start md:self-end"
-            >
-              <svg
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-              >
-                <rect x="2" y="5" width="20" height="14" rx="2" />
-                <line x1="2" y1="10" x2="22" y2="10" />
-              </svg>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 h-[600px]">
+          <!-- Left: Navigation Tabs -->
+          <div class="flex flex-col justify-center gap-4" id="payment-tabs">
+            <!-- Tab 1 -->
+            <div class="tab-button active" onclick="setPaymentTab(0)">
+              <h3 class="text-2xl font-bold mb-2">Secure Crypto Vault</h3>
+              <p class="text-white/60 text-sm">
+                Store, send, and receive multiple cryptocurrencies with
+                military-grade security.
+              </p>
+              <div class="tab-progress"></div>
             </div>
-            <h3 class="text-3xl font-bold text-white mb-4">
-              Secure Crypto Vault
-            </h3>
-            <p class="text-white/60 leading-relaxed">
-              Store, send, and receive multiple cryptocurrencies with
-              military-grade security. Your digital assets, fully protected and
-              beautifully managed.
-            </p>
-          </div>
-          <!-- Visual (Right) -->
-          <div
-            class="relative h-[400px] bg-[#0a0a0a] rounded-[30px] border border-white/10 overflow-hidden feature-visual opacity-0 translate-x-10 group"
-          >
-            <!-- Glass Card Mockup -->
-
-            <img src="assets/card.jpg" class="w-full h-full object-contain" />
-          </div>
-        </div>
-
-        <!-- Feature 2: ANALYTICS -->
-        <div
-          class="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-24 mb-32 relative feature-row"
-        >
-          <!-- Node -->
-          <div
-            class="absolute left-1/2 top-0 w-4 h-4 bg-[#A020F0] rounded-full transform -translate-x-1/2 shadow-[0_0_15px_#A020F0] hidden md:block mt-8"
-          ></div>
-
-          <!-- Visual (Left) -->
-          <div
-            class="relative h-[400px] bg-[#0a0a0a] rounded-[30px] border border-white/10 overflow-hidden feature-visual opacity-0 -translate-x-10 order-2 md:order-1 group"
-          >
-            <img src="assets/card2.jpg" class="w-full h-full object-contain" />
-          </div>
-          <!-- Content (Right) -->
-          <div
-            class="flex flex-col justify-center md:pl-12 feature-text opacity-0 translate-x-10 order-1 md:order-2"
-          >
-            <div
-              class="w-12 h-12 rounded-xl bg-[#A020F0]/10 flex items-center justify-center mb-6 text-[#A020F0]"
-            >
-              <svg
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-              >
-                <path d="M3 3v18h18" />
-                <path d="m19 9-5 5-4-4-3 3" />
-              </svg>
+            <!-- Tab 2 -->
+            <div class="tab-button" onclick="setPaymentTab(1)">
+              <h3 class="text-2xl font-bold mb-2">Financial Analytics</h3>
+              <p class="text-white/60 text-sm">
+                Real-time spending insights, trend predictions, and smart
+                alerts.
+              </p>
+              <div class="tab-progress"></div>
             </div>
-            <h3 class="text-3xl font-bold text-white mb-4">
-              Financial Intelligence
-            </h3>
-            <p class="text-white/60 leading-relaxed">
-              Real-time spending insights, trend predictions, and smart alerts
-              for every account. Turn your transaction data into actionable
-              financial wisdom.
-            </p>
-          </div>
-        </div>
-
-        <!-- Feature 3: SECURITY -->
-        <div
-          class="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-24 mb-32 relative feature-row"
-        >
-          <div
-            class="absolute left-1/2 top-0 w-4 h-4 bg-[#A020F0] rounded-full transform -translate-x-1/2 shadow-[0_0_15px_#A020F0] hidden md:block mt-8"
-          ></div>
-
-          <div
-            class="flex flex-col justify-center md:text-right md:pr-12 feature-text opacity-0 -translate-x-10"
-          >
-            <div
-              class="w-12 h-12 rounded-xl bg-[#A020F0]/10 flex items-center justify-center mb-6 text-[#A020F0] self-start md:self-end"
-            >
-              <svg
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-              >
-                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-              </svg>
+            <!-- Tab 3 -->
+            <div class="tab-button" onclick="setPaymentTab(2)">
+              <h3 class="text-2xl font-bold mb-2">Global Payments</h3>
+              <p class="text-white/60 text-sm">
+                Send and receive payments across 180+ countries with instant
+                settlements.
+              </p>
+              <div class="tab-progress"></div>
             </div>
-            <h3 class="text-3xl font-bold text-white mb-4">
-              Maximum Protection
-            </h3>
-            <p class="text-white/60 leading-relaxed">
-              End-to-end encryption, biometric authentication, and multi-layer
-              fraud detection. Bank-level security protocols that adapt to
-              emerging threats.
-            </p>
+            <!-- Tab 4 -->
+            <div class="tab-button" onclick="setPaymentTab(3)">
+              <h3 class="text-2xl font-bold mb-2">ON/OFF Ramp</h3>
+              <p class="text-white/60 text-sm">
+                Swap between cryptocurrencies and traditional currencies
+                instantly. Zero hidden fees, transparent rates, and
+                lightning-fast settlements.
+              </p>
+              <div class="tab-progress"></div>
+            </div>
           </div>
-          <div
-            class="relative h-[400px] bg-[#0a0a0a] rounded-[30px] border border-white/10 overflow-hidden feature-visual opacity-0 -translate-x-10 order-2 md:order-1 group"
-          >
-            <img src="assets/card4.png" class="w-full h-full object-contain" />
-          </div>
-        </div>
 
-        <!-- Feature 4: VIRTUAL CARDS -->
-        <div
-          class="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-24 mb-32 relative feature-row"
-        >
+          <!-- Right: Visual Display -->
           <div
-            class="absolute left-1/2 top-0 w-4 h-4 bg-[#A020F0] rounded-full transform -translate-x-1/2 shadow-[0_0_15px_#A020F0] hidden md:block mt-8"
-          ></div>
-
-          <div
-            class="relative h-[400px] bg-[#0a0a0a] rounded-[30px] border border-white/10 overflow-hidden feature-visual opacity-0 -translate-x-10 order-2 md:order-1 flex items-center justify-center"
+            class="relative bg-[#0F0F11] rounded-[32px] border border-white/10 overflow-hidden"
           >
-            <!-- Cards Stack -->
-            <div class="relative w-[280px] h-[180px]">
+            <!-- Visual 1 -->
+            <div
+              id="pay-vis-0"
+              class="feature-visual active flex items-center justify-center p-8"
+            >
               <div
-                class="absolute top-4 left-4 w-full h-full bg-gray-800 rounded-2xl border border-white/5 transform rotate-6 opacity-50"
-              ></div>
-              <div
-                class="absolute top-2 left-2 w-full h-full bg-gray-900 rounded-2xl border border-white/5 transform rotate-3 opacity-70"
-              ></div>
-              <!-- Main Card -->
-              <div
-                class="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-[#2e1065] to-[#A020F0] rounded-2xl border border-white/10 p-6 shadow-2xl transform hover:-translate-y-2 transition-transform duration-300"
+                class="w-[300px] bg-[#1A1A1E] rounded-2xl p-6 border border-white/10 shadow-2xl"
               >
-                <div class="flex justify-between items-start mb-8">
-                  <span class="font-bold italic">SLAY</span>
-                  <svg
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="white"
-                    opacity="0.5"
+                <div class="flex justify-between items-center mb-8">
+                  <span class="font-bold text-lg">Wallet</span>
+                  <div class="w-8 h-8 rounded-full bg-[#A020F0]"></div>
+                </div>
+                <div class="text-4xl font-bold mb-2">$24,500.00</div>
+                <div class="text-green-400 text-sm mb-8">+4.2% this week</div>
+                <div class="space-y-3">
+                  <div
+                    class="bg-black/40 p-3 rounded-lg flex justify-between items-center"
                   >
-                    <path d="M2 10h20" />
-                    <path d="M2 14h20" />
-                  </svg>
-                </div>
-                <div class="text-lg font-mono tracking-widest mb-2">
-                  **** **** **** 5432
-                </div>
-                <div class="flex justify-between text-xs opacity-70">
-                  <span>JOHN DOE</span>
-                  <span>12/25</span>
+                    <span>Bitcoin</span><span>$42,000</span>
+                  </div>
+                  <div
+                    class="bg-black/40 p-3 rounded-lg flex justify-between items-center"
+                  >
+                    <span>Ethereum</span><span>$2,800</span>
+                  </div>
                 </div>
               </div>
-              <!-- Badge -->
-              <div
-                class="absolute -top-4 -right-4 bg-white text-black text-xs font-bold px-3 py-1 rounded-full shadow-lg transform rotate-12"
-              >
-                +5% Back
+            </div>
+            <!-- Visual 2 -->
+            <div
+              id="pay-vis-1"
+              class="feature-visual flex items-center justify-center p-8"
+            >
+              <div class="w-full max-w-md">
+                <div
+                  class="flex gap-4 items-end h-[200px] px-8 pb-8 border-b border-white/10"
+                >
+                  <div
+                    class="flex-1 bg-[#A020F0] rounded-t-lg h-[40%] opacity-50"
+                  ></div>
+                  <div class="flex-1 bg-[#A020F0] rounded-t-lg h-[70%]"></div>
+                  <div
+                    class="flex-1 bg-[#A020F0] rounded-t-lg h-[50%] opacity-50"
+                  ></div>
+                  <div class="flex-1 bg-[#A020F0] rounded-t-lg h-[90%]"></div>
+                  <div
+                    class="flex-1 bg-[#A020F0] rounded-t-lg h-[60%] opacity-50"
+                  ></div>
+                </div>
+                <div
+                  class="flex justify-between mt-4 text-sm text-white/60 px-2"
+                >
+                  <span>Mon</span><span>Tue</span><span>Wed</span
+                  ><span>Thu</span><span>Fri</span>
+                </div>
               </div>
             </div>
-          </div>
-          <div
-            class="flex flex-col justify-center md:pl-12 feature-text opacity-0 translate-x-10 order-1 md:order-2"
-          >
+            <!-- Visual 3 -->
             <div
-              class="w-12 h-12 rounded-xl bg-[#A020F0]/10 flex items-center justify-center mb-6 text-[#A020F0]"
+              id="pay-vis-2"
+              class="feature-visual flex items-center justify-center p-8"
             >
-              <svg
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-              >
-                <rect x="2" y="5" width="20" height="14" rx="2" />
-                <line x1="2" y1="10" x2="22" y2="10" />
-              </svg>
-            </div>
-            <h3 class="text-3xl font-bold text-white mb-4">Slay Virtually</h3>
-            <p class="text-white/60 leading-relaxed">
-              Enjoy cashback on every purchase, granular spending controls, and
-              seamless integration with Apple Pay and Google Wallet.
-            </p>
-          </div>
-        </div>
-
-        <!-- Feature 5: ON/OFF RAMP -->
-        <div
-          class="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-24 mb-32 relative feature-row"
-        >
-          <div
-            class="absolute left-1/2 top-0 w-4 h-4 bg-[#A020F0] rounded-full transform -translate-x-1/2 shadow-[0_0_15px_#A020F0] hidden md:block mt-8"
-          ></div>
-
-          <div
-            class="flex flex-col justify-center md:text-right md:pr-12 feature-text opacity-0 -translate-x-10"
-          >
-            <div
-              class="w-12 h-12 rounded-xl bg-[#A020F0]/10 flex items-center justify-center mb-6 text-[#A020F0] self-start md:self-end"
-            >
-              <svg
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-              >
-                <path d="M7 10v12" />
-                <path
-                  d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2h0a3.13 3.13 0 0 1 3 3.88Z"
-                />
-              </svg>
-              <!-- Placeholder icon -->
-            </div>
-            <h3 class="text-3xl font-bold text-white mb-4">ON/OFF Ramp</h3>
-            <p class="text-white/60 leading-relaxed">
-              Swap between cryptocurrencies and traditional currencies
-              instantly. Zero hidden fees, transparent rates, and lightning-fast
-              settlements.
-            </p>
-          </div>
-          <div
-            class="relative h-[400px] bg-[#0a0a0a] rounded-[30px] border border-white/10 overflow-hidden feature-visual opacity-0 -translate-x-10 order-2 md:order-1 group"
-          >
-            <img src="assets/card3.png" class="w-full h-full object-contain" />
-          </div>
-        </div>
-
-        <!-- Feature 6: GLOBAL PAYMENTS -->
-        <div
-          class="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-24 relative feature-row"
-        >
-          <div
-            class="absolute left-1/2 top-0 w-4 h-4 bg-[#A020F0] rounded-full transform -translate-x-1/2 shadow-[0_0_15px_#A020F0] hidden md:block mt-8"
-          ></div>
-
-          <!-- Simple Map Visualization -->
-          <div
-            class="relative h-[400px] bg-[#0a0a0a] rounded-[30px] border border-white/10 overflow-hidden feature-visual opacity-0 -translate-x-10 order-2 md:order-1 group"
-          >
-            <img src="assets/card5.png" class="w-full h-full object-contain" />
-          </div>
-
-          <div
-            class="flex flex-col justify-center md:pl-12 feature-text opacity-0 translate-x-10 order-1 md:order-2"
-          >
-            <div
-              class="w-12 h-12 rounded-xl bg-[#A020F0]/10 flex items-center justify-center mb-6 text-[#A020F0]"
-            >
-              <svg
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-              >
-                <circle cx="12" cy="12" r="10" />
-                <path d="M2 12h20" />
-                <path
-                  d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"
-                />
-              </svg>
-            </div>
-            <h3 class="text-3xl font-bold text-white mb-4">
-              Borderless Payments
-            </h3>
-            <p class="text-white/60 leading-relaxed">
-              Send and receive payments across 180+ countries with instant
-              settlements. Built for modern businesses that operate without
-              boundaries.
-            </p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ==============================================
-         SECTION 7: TRUSTED BY (New)
-         ============================================== -->
-    <section
-      id="section-7"
-      class="relative z-10 w-full bg-[#050505] py-32 px-6 md:px-12 border-t border-white/5"
-    >
-      <!-- Ambient Glow -->
-      <div
-        class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[300px] bg-[#A020F0] rounded-full blur-[150px] opacity-5 pointer-events-none"
-      ></div>
-
-      <div class="max-w-7xl mx-auto text-center relative z-10">
-        <!-- Header -->
-        <div class="mb-24 section-7-anim opacity-0 translate-y-10">
-          <span
-            class="text-[#A020F0] font-mono text-xs tracking-widest uppercase mb-4 block"
-            >Trust & Compliance</span
-          >
-          <h2
-            class="font-serif text-4xl md:text-5xl text-white leading-tight mb-6"
-          >
-            <span class="text-[#a020f0]">Trusted</span> by the <br />
-            <span class="italic">New Money Movement</span>
-          </h2>
-          <p class="text-white/60 text-lg">
-            Brands that move fast. Money that moves faster.
-          </p>
-        </div>
-
-        <!-- Infinite Marquee -->
-        <div
-          class="relative w-full overflow-hidden mb-24 section-7-anim opacity-0 translate-y-10"
-        >
-          <div
-            class="absolute left-0 top-0 w-32 h-full bg-gradient-to-r from-[#050505] to-transparent z-10"
-          ></div>
-          <div
-            class="absolute right-0 top-0 w-32 h-full bg-gradient-to-l from-[#050505] to-transparent z-10"
-          ></div>
-
-          <div
-            class="flex gap-16 animate-marquee whitespace-nowrap py-4 hover:pause-marquee"
-          >
-            <!-- Partners Loop 1 -->
-            <span
-              class="text-2xl font-bold text-white/30 hover:text-white transition-colors cursor-default"
-              >SOLANA</span
-            >
-            <span
-              class="text-2xl font-bold text-white/30 hover:text-white transition-colors cursor-default"
-              >BASE</span
-            >
-            <span
-              class="text-2xl font-bold text-white/30 hover:text-white transition-colors cursor-default"
-              >PHANTOM</span
-            >
-            <span
-              class="text-2xl font-bold text-white/30 hover:text-white transition-colors cursor-default"
-              >COINBASE</span
-            >
-            <span
-              class="text-2xl font-bold text-white/30 hover:text-white transition-colors cursor-default"
-              >WALLETCONNECT</span
-            >
-            <span
-              class="text-2xl font-bold text-white/30 hover:text-white transition-colors cursor-default"
-              >BINANCE PAY</span
-            >
-            <span
-              class="text-2xl font-bold text-white/30 hover:text-white transition-colors cursor-default"
-              >FIREBLOCKS</span
-            >
-            <span
-              class="text-2xl font-bold text-white/30 hover:text-white transition-colors cursor-default"
-              >CIRCLE</span
-            >
-            <span
-              class="text-2xl font-bold text-white/30 hover:text-white transition-colors cursor-default"
-              >RAMP</span
-            >
-            <!-- Partners Loop 2 (Duplicate for seamless scroll) -->
-            <span
-              class="text-2xl font-bold text-white/30 hover:text-white transition-colors cursor-default"
-              >SOLANA</span
-            >
-            <span
-              class="text-2xl font-bold text-white/30 hover:text-white transition-colors cursor-default"
-              >BASE</span
-            >
-            <span
-              class="text-2xl font-bold text-white/30 hover:text-white transition-colors cursor-default"
-              >PHANTOM</span
-            >
-            <span
-              class="text-2xl font-bold text-white/30 hover:text-white transition-colors cursor-default"
-              >COINBASE</span
-            >
-            <span
-              class="text-2xl font-bold text-white/30 hover:text-white transition-colors cursor-default"
-              >WALLETCONNECT</span
-            >
-            <span
-              class="text-2xl font-bold text-white/30 hover:text-white transition-colors cursor-default"
-              >BINANCE PAY</span
-            >
-            <span
-              class="text-2xl font-bold text-white/30 hover:text-white transition-colors cursor-default"
-              >FIREBLOCKS</span
-            >
-            <span
-              class="text-2xl font-bold text-white/30 hover:text-white transition-colors cursor-default"
-              >CIRCLE</span
-            >
-            <span
-              class="text-2xl font-bold text-white/30 hover:text-white transition-colors cursor-default"
-              >RAMP</span
-            >
-          </div>
-        </div>
-
-        <!-- Trust Badges -->
-        <div
-          class="flex flex-wrap justify-center gap-8 md:gap-16 section-7-anim opacity-0 translate-y-10"
-        >
-          <div class="flex items-center gap-4 group">
-            <div
-              class="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center group-hover:border-[#A020F0]/50 transition-colors"
-            >
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                class="text-white/60 group-hover:text-[#A020F0]"
-              >
-                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-              </svg>
-            </div>
-            <div class="text-left">
-              <div class="text-white font-bold text-sm">SOC2 Type II</div>
-              <div class="text-white/40 text-xs">Certified Compliant</div>
-            </div>
-          </div>
-
-          <div class="flex items-center gap-4 group">
-            <div
-              class="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center group-hover:border-[#A020F0]/50 transition-colors"
-            >
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                class="text-white/60 group-hover:text-[#A020F0]"
-              >
-                <circle cx="12" cy="12" r="10" />
-                <path d="m9 12 2 2 4-4" />
-              </svg>
-            </div>
-            <div class="text-left">
-              <div class="text-white font-bold text-sm">99.99% Uptime</div>
-              <div class="text-white/40 text-xs">Enterprise Reliability</div>
-            </div>
-          </div>
-
-          <div class="flex items-center gap-4 group">
-            <div
-              class="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center group-hover:border-[#A020F0]/50 transition-colors"
-            >
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                class="text-white/60 group-hover:text-[#A020F0]"
-              >
-                <path d="M12 2v20M2 12h20" />
-              </svg>
-            </div>
-            <div class="text-left">
-              <div class="text-white font-bold text-sm">$10B+ Processed</div>
-              <div class="text-white/40 text-xs">Global Transaction Volume</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ==============================================
-         SECTION 8: SLASH POINTS (REDESIGNED)
-         ============================================== -->
-    <section
-      id="section-8"
-      class="relative z-10 w-full bg-[linear-gradient(to_bottom,#050505,#000)] py-32 px-6 md:px-12 overflow-hidden"
-    >
-      <!-- Ambient Background -->
-      <div class="absolute inset-0 pointer-events-none">
-        <!-- Large central glow behind the logo -->
-        <div
-          class="absolute top-1/4 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-[#A020F0]/10 rounded-full blur-[180px]"
-        ></div>
-      </div>
-
-      <div class="max-w-7xl mx-auto relative z-10">
-        <!-- 1. HERO HEADER -->
-        <div
-          class="text-center mb-32 section-8-header opacity-0 translate-y-10"
-        >
-          <span
-            class="text-[#A020F0] font-mono text-xs tracking-widest uppercase mb-4 block"
-            >The Loyalty Program</span
-          >
-          <h2
-            class="font-serif text-4xl md:text-5xl text-white leading-none font-medium mb-6"
-          >
-            <span id="slash-typewriter" class="font-black text-[#a020f0]"></span
-            ><span id="type-cursor" class="text-[#A020F0]"></span>Points
-          </h2>
-
-          <p class="font-serif">
-            Rewards that work for
-            <span class="italic text-[#A020F0]">you</span>, not for them.
-          </p>
-          <p class="text-white/50 mt-6 max-w-xl mx-auto text-lg">
-            Earn on every transaction. Redeem instantly. No middlemen, no
-            limits.
-          </p>
-        </div>
-
-        <!-- 2. CENTRAL VISUAL (Parallax Logo) -->
-        <div
-          class="relative h-[400px] md:h-[600px] flex items-center justify-center mb-32 section-8-visual opacity-0 scale-95"
-        >
-          <!-- Floating Elements -->
-
-          <!-- Main Logo -->
-          <div class="relative w-64 h-64 md:w-96 md:h-96 z-10 parallax-logo">
-            <img
-              src="assets/favicon.png"
-              alt="Slash Points Logo"
-              class="w-full h-full object-contain drop-shadow-[0_0_60px_rgba(160,32,240,0.5)]"
-            />
-            <!-- Fallback if image fails, let's use the uploaded image URL directly in the code below -->
-          </div>
-        </div>
-
-        <!-- 3. HOW IT WORKS (Grid) -->
-        <div class="mb-32">
-          <h3 class="text-3xl text-white font-bold mb-12 text-center">
-            How It Works
-          </h3>
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <!-- Card 1 -->
-            <div
-              class="bg-[#0a0a0a] rounded-[32px] p-10 border border-white/10 hover:border-[#A020F0]/50 transition-all duration-500 group section-8-card opacity-0 translate-y-10"
-            >
-              <div class="text-[#A020F0] font-mono text-xl mb-4">01</div>
-              <h4 class="text-2xl text-white font-bold mb-4">
-                Earn Everywhere
-              </h4>
-              <p class="text-white/60 leading-relaxed">
-                1 Slash Point per $1 spent on eligible crypto or fiat
-                transactions. Tiered earning rates for premium members.
-              </p>
-            </div>
-            <!-- Card 2 -->
-            <div
-              class="bg-[#0a0a0a] rounded-[32px] p-10 border border-white/10 hover:border-[#A020F0]/50 transition-all duration-500 group section-8-card opacity-0 translate-y-10"
-              style="transition-delay: 0.1s"
-            >
-              <div class="text-[#A020F0] font-mono text-xl mb-4">02</div>
-              <h4 class="text-2xl text-white font-bold mb-4">Instant Value</h4>
-              <p class="text-white/60 leading-relaxed">
-                Bonus points on high-value transactions. Your points are
-                credited instantly—no waiting for monthly statements.
-              </p>
-            </div>
-            <!-- Card 3 -->
-            <div
-              class="bg-[#0a0a0a] rounded-[32px] p-10 border border-white/10 hover:border-[#A020F0]/50 transition-all duration-500 group section-8-card opacity-0 translate-y-10"
-              style="transition-delay: 0.2s"
-            >
-              <div class="text-[#A020F0] font-mono text-xl mb-4">03</div>
-              <h4 class="text-2xl text-white font-bold mb-4">Total Freedom</h4>
-              <p class="text-white/60 leading-relaxed">
-                Redeem anytime, anywhere. No blackout dates, no partner
-                restrictions. Your rewards = your crypto.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <!-- 4. REDEEM YOUR WAY (Alternating Features) -->
-        <div class="space-y-32">
-          <!-- Feature 1: Crypto Conversion -->
-          <div
-            class="flex flex-col md:flex-row items-center gap-12 md:gap-24 section-8-feature"
-          >
-            <div class="flex-1 order-2 md:order-1">
               <div
-                class="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#2e1065] to-black border border-white/10 flex items-center justify-center mb-6 text-white text-2xl"
+                class="w-[300px] h-[300px] rounded-full border border-white/10 relative animate-spin-slow flex items-center justify-center"
               >
-                💱
+                <div
+                  class="absolute w-4 h-4 bg-white rounded-full top-0 left-1/2 -translate-x-1/2 shadow-[0_0_20px_white]"
+                ></div>
+                <div
+                  class="absolute w-4 h-4 bg-[#A020F0] rounded-full bottom-0 left-1/2 -translate-x-1/2 shadow-[0_0_20px_#A020F0]"
+                ></div>
+                <div class="text-4xl font-bold text-white/10">GLOBAL</div>
               </div>
-              <h3 class="text-4xl font-bold text-white mb-6">
-                Direct Crypto Conversion
-              </h3>
-              <p class="text-xl text-white/60 leading-relaxed mb-8">
-                Convert Slash Points 1:1 into stablecoins (USDC, USDT) or
-                popular cryptocurrencies (BTC, ETH, SOL).
-              </p>
-              <ul class="space-y-4">
-                <li class="flex items-center gap-3 text-white/80">
-                  <span class="w-1.5 h-1.5 rounded-full bg-[#A020F0]"></span
-                  >Instant Settlement
-                </li>
-                <li class="flex items-center gap-3 text-white/80">
-                  <span class="w-1.5 h-1.5 rounded-full bg-[#A020F0]"></span
-                  >Zero Conversion Fees
-                </li>
-              </ul>
             </div>
+            <!-- Visual 4 -->
             <div
-              class="flex-1 h-[400px] bg-[#0a0a0a] rounded-[40px] border border-white/10 relative overflow-hidden flex items-center justify-center order-1 md:order-2 group"
+              id="pay-vis-3"
+              class="feature-visual flex items-center justify-center p-8"
             >
-              <!-- Visual Mockup -->
               <div
-                class="relative w-[280px] bg-[#111] rounded-3xl border border-white/10 p-6 shadow-2xl transform group-hover:scale-105 transition-transform duration-500"
+                class="w-[300px] bg-[#1A1A1E] rounded-2xl p-6 border border-white/10 shadow-2xl"
               >
                 <div class="flex justify-between items-center mb-6">
-                  <span class="text-white text-sm">Swap</span>
-                  <span class="text-[#A020F0] text-xs">Max</span>
-                </div>
-                <div
-                  class="bg-black/50 rounded-xl p-4 mb-2 flex justify-between items-center"
-                >
-                  <div>
-                    <div class="text-xs text-white/40">From</div>
-                    <div class="text-white font-mono">5,000 PTS</div>
-                  </div>
-                  <div
-                    class="w-8 h-8 rounded-full flex items-center justify-center text-[10px]"
+                  <span class="text-xs uppercase tracking-widest text-white/60"
+                    >Exchange Rate</span
                   >
-                    <img src="assets/favicon.png" class="w-7 h-7" alt="" />
-                  </div>
                 </div>
-                <div class="flex justify-center -my-3 relative z-10">
-                  <div
-                    class="w-8 h-8 rounded-full bg-[#222] border border-white/10 flex items-center justify-center text-white"
-                  >
-                    ↓
+                <div class="flex justify-between items-center mb-6">
+                  <div class="flex flex-col">
+                    <span class="text-sm text-white/60 mb-1">You send</span>
+                    <span class="text-2xl font-mono font-bold">1 BTC</span>
+                  </div>
+                  <div class="text-2xl">⇄</div>
+                  <div class="flex flex-col text-right">
+                    <span class="text-sm text-white/60 mb-1">You get</span>
+                    <span class="text-2xl font-mono font-bold">$45,230</span>
                   </div>
                 </div>
-                <div
-                  class="bg-black/50 rounded-xl p-4 mt-2 flex justify-between items-center"
-                >
-                  <div>
-                    <div class="text-xs text-white/40">To</div>
-                    <div class="text-white font-mono">0.05 ETH</div>
-                  </div>
-                  <div
-                    class="w-8 h-8 rounded-full flex items-center justify-center text-xs"
-                  >
-                    <img
-                      src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTJDn0ojTITvcdAzMsfBMJaZC4STaDHzduleQ&s"
-                      class="w-7 h-7 rounded-full"
-                      alt=""
-                    />
+                <div class="bg-black/40 p-3 rounded-lg mb-4 text-sm">
+                  <div class="flex justify-between text-white/60">
+                    <span>Fee</span>
+                    <span class="text-green-400">$0 (0%)</span>
                   </div>
                 </div>
                 <button
-                  class="w-full mt-6 bg-[#A020F0] text-white py-3 rounded-xl font-bold text-sm"
+                  class="w-full bg-[#A020F0] text-white py-3 rounded-lg font-bold hover:bg-[#8a1ad4] transition-colors"
+                >
+                  Convert Now
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 4: SLASH POINTS (Revamped Single Page Slider) -->
+    <section
+      id="section-points"
+      class="parallax-section py-32 px-6 bg-[#050505] border-t border-white/5"
+    >
+      <div class="max-w-7xl mx-auto">
+        <div class="mb-20 text-center md:text-left">
+          <span
+            class="text-[#A020F0] font-mono text-sm tracking-widest uppercase mb-4 block"
+            >THE LOYALTY PROGRAM</span
+          >
+          <h2 class="text-5xl md:text-7xl font-bold mb-6">
+            Points that slay harder.
+          </h2>
+          <p class="text-xl text-white/60 max-w-2xl">
+            Rewards that work for you, not for them. No middlemen, no limits.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 h-[600px]">
+          <!-- Right: Visual Display (Order 2 on mobile, but we use grid-flow) -->
+          <div
+            class="order-2 lg:order-1 relative bg-[#0F0F11] rounded-[32px] border border-white/10 overflow-hidden"
+          >
+            <div
+              class="absolute top-0 left-0 w-full h-full bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20"
+            ></div>
+
+            <!-- Visual 1: Swap -->
+            <div
+              id="point-vis-0"
+              class="feature-visual active flex items-center justify-center h-full"
+            >
+              <div
+                class="w-[280px] bg-[#1A1A1E] p-6 rounded-2xl border border-white/10 shadow-2xl"
+              >
+                <div class="flex justify-between mb-6">
+                  <span class="text-xs uppercase tracking-widest">Convert</span>
+                </div>
+                <div class="flex justify-between items-center mb-4">
+                  <div class="text-2xl font-mono">5,000 PTS</div>
+                  <div>➜</div>
+                  <div class="text-2xl font-mono">0.05 ETH</div>
+                </div>
+                <button
+                  class="w-full bg-white text-black py-3 rounded-lg font-bold"
                 >
                   Confirm Swap
                 </button>
               </div>
             </div>
-          </div>
-
-          <!-- Feature 2: NFT & Digital Assets -->
-          <div
-            class="flex flex-col md:flex-row items-center gap-12 md:gap-24 section-8-feature"
-          >
+            <!-- Visual 2: NFT -->
             <div
-              class="flex-1 h-[400px] bg-[#0a0a0a] rounded-[40px] border border-white/10 relative overflow-hidden flex items-center justify-center group"
+              id="point-vis-1"
+              class="feature-visual flex items-center justify-center h-full"
             >
-              <!-- Visual Mockup -->
               <div
-                class="relative w-[260px] h-[340px] bg-gradient-to-b from-[#1a1a1a] to-black rounded-2xl border border-white/10 p-4 shadow-2xl transform group-hover:-rotate-2 transition-transform duration-500"
+                class="w-[260px] bg-[#1A1A1E] p-4 rounded-2xl border border-white/10 shadow-2xl text-center"
               >
                 <div
-                  class="w-full h-[200px] bg-[#a020f0] rounded-xl mb-4 relative overflow-hidden"
+                  class="w-full h-[200px] bg-gradient-to-tr from-purple-600 to-blue-600 rounded-xl mb-4"
+                ></div>
+                <div class="font-bold text-lg mb-1">Slay Genesis #1</div>
+                <div class="text-[#A020F0] text-sm mb-4">25k PTS</div>
+                <button
+                  class="w-full border border-white/20 py-2 rounded-lg text-sm hover:bg-white hover:text-black transition-colors"
                 >
-                  <div
-                    class="absolute inset-0 bg-[url('https://i.pinimg.com/736x/0f/ac/fc/0facfc1fcd1c1a3bd2779c0174a7c0cc.jpg')] bg-cover bg-center opacity-80"
-                  ></div>
-                </div>
-                <h4 class="text-white font-bold text-lg">Slay Genesis #402</h4>
-                <div class="flex justify-between items-end mt-4">
-                  <div>
-                    <div class="text-xs text-white/40">Price</div>
-                    <div class="text-[#A020F0] font-mono">25k PTS</div>
-                  </div>
-                  <button
-                    class="px-4 py-2 bg-white text-black text-xs font-bold rounded-lg"
-                  >
-                    Claim
-                  </button>
-                </div>
+                  Claim
+                </button>
               </div>
             </div>
-            <div class="flex-1">
-              <div
-                class="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#2e1065] to-black border border-white/10 flex items-center justify-center mb-6 text-white text-2xl"
-              >
-                🖼️
-              </div>
-              <h3 class="text-4xl font-bold text-white mb-6">
-                NFT & Digital Assets
-              </h3>
-              <p class="text-xl text-white/60 leading-relaxed mb-8">
-                Redeem for exclusive Slay NFTs, digital collectibles, or early
-                access to Web3 drops.
-              </p>
-              <ul class="space-y-4">
-                <li class="flex items-center gap-3 text-white/80">
-                  <span class="w-1.5 h-1.5 rounded-full bg-[#A020F0]"></span
-                  >Exclusive Drops
-                </li>
-                <li class="flex items-center gap-3 text-white/80">
-                  <span class="w-1.5 h-1.5 rounded-full bg-[#A020F0]"></span
-                  >Community Access
-                </li>
-              </ul>
-            </div>
-          </div>
-
-          <!-- Feature 3: Staking & Fees -->
-          <div
-            class="flex flex-col md:flex-row items-center gap-12 md:gap-24 section-8-feature"
-          >
-            <div class="flex-1 order-2 md:order-1">
-              <div
-                class="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#2e1065] to-black border border-white/10 flex items-center justify-center mb-6 text-white text-2xl"
-              >
-                📈
-              </div>
-              <h3 class="text-4xl font-bold text-white mb-6">
-                Staking & Fee Discounts
-              </h3>
-              <p class="text-xl text-white/60 leading-relaxed mb-8">
-                Apply points to increase your staking yields or reduce
-                transaction fees.
-              </p>
-              <div class="flex gap-4">
-                <div
-                  class="px-6 py-3 rounded-full bg-white/5 border border-white/10 text-white text-sm"
-                >
-                  Higher APY
-                </div>
-                <div
-                  class="px-6 py-3 rounded-full bg-white/5 border border-white/10 text-white text-sm"
-                >
-                  0% Trading Fees
-                </div>
-              </div>
-            </div>
+            <!-- Visual 3: Staking -->
             <div
-              class="flex-1 h-[300px] bg-[#0a0a0a] rounded-[40px] border border-white/10 relative overflow-hidden flex items-center justify-center order-1 md:order-2 group"
+              id="point-vis-2"
+              class="feature-visual flex items-center justify-center h-full"
             >
               <div class="text-center">
-                <div class="text-6xl font-bold text-white font-mono mb-2">
-                  +5.0%
+                <div class="text-[8rem] font-bold leading-none text-white">
+                  +5%
                 </div>
-                <div class="text-[#A020F0] text-lg uppercase tracking-widest">
-                  Staking Boost
-                </div>
+                <div class="text-2xl text-[#A020F0]">APY BOOST</div>
               </div>
             </div>
           </div>
-        </div>
 
-        <!-- 5. CLOSING CTA -->
-        <div class="mt-32 text-center section-8-cta opacity-0 scale-90">
-          <h3
-            class="neon-pulse text-4xl text-white font-serif italic mb-8 text-[#A020F0]"
+          <!-- Left: Navigation Tabs -->
+          <div
+            class="order-1 lg:order-2 flex flex-col justify-center gap-4"
+            id="points-tabs"
           >
-            Start earning your future.
-          </h3>
-
-          <button
-            class="mt-12 px-12 py-5 bg-white text-black rounded-full font-bold text-lg hover:bg-gray-200 transition-transform hover:scale-105 shadow-[0_0_30px_rgba(255,255,255,0.3)]"
-          >
-            Join Slay Rewards
-          </button>
+            <!-- Tab 1 -->
+            <div class="tab-button active" onclick="setPointsTab(0)">
+              <h3 class="text-2xl font-bold mb-2">Crypto Conversion</h3>
+              <p class="text-white/60 text-sm">
+                Convert points 1:1 into stablecoins or popular crypto instantly.
+              </p>
+              <div class="tab-progress"></div>
+            </div>
+            <!-- Tab 2 -->
+            <div class="tab-button" onclick="setPointsTab(1)">
+              <h3 class="text-2xl font-bold mb-2">NFT & Digital Assets</h3>
+              <p class="text-white/60 text-sm">
+                Redeem for exclusive Slay NFTs and digital collectibles.
+              </p>
+              <div class="tab-progress"></div>
+            </div>
+            <!-- Tab 3 -->
+            <div class="tab-button" onclick="setPointsTab(2)">
+              <h3 class="text-2xl font-bold mb-2">Staking Boosts</h3>
+              <p class="text-white/60 text-sm">
+                Apply points to increase your staking yields or unlock premium
+                pools.
+              </p>
+              <div class="tab-progress"></div>
+            </div>
+          </div>
         </div>
       </div>
     </section>
 
-    <!-- ==============================================
-         SECTION 9: QUICK TRANSActions (New)
-         ============================================== -->
+    <!-- SECTION 7: YOUR MONEY'S SAFE SPACE (New) -->
     <section
-      id="section-9"
-      class="relative z-10 w-full h-[100vh] bg-[#000] px-6 border-t border-white/5 flex flex-col justify-center items-center text-center"
+      id="section-security"
+      class="parallax-section w-full bg-[#050505] py-32 px-6 md:px-12 border-t border-white/5 overflow-hidden flex flex-col md:flex-row items-center justify-center gap-16"
     >
-            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-[#A020F0]/10 rounded-full blur-[150px] pointer-events-none"></div>
-
-      <div class="max-w-5xl mx-auto text-center">
-        <span
-          class="text-[#A020F0] font-mono text-xs tracking-widest uppercase mb-4 block"
-          >Fast Transactions</span
-        >
-        <h2 class="font-serif text-4xl md:text-6xl text-white leading-tight mb-6">
-          Make transaction in less than
-          <span class="text-[#A020F0]"> 3 minutes</span>
-          today
+      <!-- Left: Text Content -->
+      <div class="max-w-xl z-10">
+        <h2 class="text-5xl md:text-7xl font-bold mb-6 leading-tight">
+          Your assets’
+          <br />
+          secure zone
         </h2>
-        <p class="text-white/60 max-w-2xl mx-auto mb-8 text-lg">
-          Send funds, pay suppliers, and settle in minutes — a workflow
-          designed for speed without sacrificing security.
+        <p class="text-lg text-white/60 leading-relaxed mb-8">
+          With Slay Secure, your assets are protected around the clock by
+          advanced crypto defenses, real-time monitoring, and a global team of
+          security experts. Instant alerts and biometrics keep your wallets and
+          peace of mind safe—always.
         </p>
+        <button
+          class="bg-white text-black px-8 py-4 rounded-full font-bold text-sm hover:bg-gray-200 transition-colors"
+        >
+          Get Started
+        </button>
+      </div>
 
-        <div class="flex justify-center">
-          <button
-            class="bg-white text-black px-8 py-3 rounded-full font-semibold hover:bg-gray-200 transition-colors"
-          >
-            Start a transaction
-          </button>
+      <!-- Right: 3D Metallic Shield -->
+      <div class="shield-container relative z-10">
+        <!-- 3D Shield Construction (CSS Only) -->
+        <div class="shield-3d" id="tilt-shield">
+          <div class="shield-body"></div>
+          <div class="shield-inner"></div>
+          <div class="shield-logo text-[#a020f0]">/</div>
         </div>
+        <!-- Shine effect overlay -->
+        <div
+          class="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/10 to-white/0 pointer-events-none mix-blend-overlay rounded-full blur-3xl animate-pulse-slow"
+        ></div>
       </div>
     </section>
 
-    <!-- ==============================================
-         SECTION 10: FAQ (Frequently Asked Questions)
-         ============================================== -->
+    <!-- SECTION 8: FAST TRANSACTIONS -->
     <section
-      id="section-10"
-      class="relative z-10 w-full h-[100vh] bg-[linear-gradient(to_top,#050505,#000)] py-28 px-6 md:px-12 border-t border-white/5"
+      id="section-transactions"
+      class="parallax-section w-full bg-[#050505] py-32 px-6 md:px-12 border-t border-white/5 overflow-hidden flex flex-col md:flex-row items-center justify-center gap-16"
     >
-      <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
-        <div class="pt-6">
-            <span
-          class="text-[#A020F0] font-mono text-xs tracking-widest uppercase mb-4 block"
-          >FAQ</span
-        >
-          <h3 class="font-serif text-4xl md:text-6xl text-white leading-tight mb-4">
-            Frequently
-            <br />asked questions
-          </h3>
-          <p class="text-white/60">Don't see the answer you're looking for? Get in touch.</p>
+      <!-- Left: 3D Speed Bolt with Magnetic Hover -->
+      <div class="speed-bolt-container relative z-10">
+        <!-- 3D Lightning Bolt Construction (CSS Only) -->
+        <div class="bolt-3d flex items-center justify-center" id="tilt-bolt">
+          <img src="assets/bolt.png" alt="" />
         </div>
+        <!-- Shine effect overlay -->
+        <div
+          class="absolute inset-0 bg-gradient-to-br from-white/0 via-white/20 to-purple-500/10 pointer-events-none mix-blend-overlay rounded-full blur-2xl"
+        ></div>
+      </div>
 
-        <div class="pt-6">
-          <div class="space-y-4">
-            <div class="faq-item-wrapper bg-transparent rounded-lg overflow-hidden border border-white/5">
-              <button class="faq-item w-full text-left flex justify-between items-center p-4 bg-transparent">
-                <span class="font-medium">What is a Treasury account and how does it work?</span>
-                <svg class="faq-chevron w-5 h-5 text-white/60 transition-transform duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M6 9l6 6 6-6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              </button>
-              <div class="faq-panel max-h-0 overflow-hidden transition-all duration-300 px-4 text-white/60">
-                <p class="py-3">A Treasury account is a custodial business account optimized for liquidity management, offering secure custody and integrated settlement rails for fast transfers.</p>
-              </div>
-            </div>
+      <!-- Right: Text Content -->
+      <div class="max-w-xl z-10">
+        <!-- <span
+          class="text-[#A020F0] font-mono text-sm tracking-widest uppercase mb-4 block"
+          >SPEED REDEFINED</span
+        > -->
+        <h2 class="text-5xl md:text-7xl font-bold mb-6 leading-tight">
+          Fast
+          <br />
+          transactions
+        </h2>
+        <p class="text-lg text-white/60 leading-relaxed mb-8">
+          Make transaction in less than 3 minutes today. Send funds, pay
+          salaries, and settle in minutes — a workflow designed for speed
+          without sacrificing security.
+        </p>
+        <button
+          class="bg-white text-black px-8 py-4 rounded-full font-bold text-sm hover:bg-gray-200 transition-colors"
+        >
+          Start a transaction
+        </button>
+      </div>
+    </section>
 
-            <div class="faq-item-wrapper bg-transparent rounded-lg overflow-hidden border border-white/5">
-              <button class="faq-item w-full text-left flex justify-between items-center p-4 bg-transparent">
-                <span class="font-medium">Is my money safe in the Treasury account?</span>
-                <svg class="faq-chevron w-5 h-5 text-white/60 transition-transform duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M6 9l6 6 6-6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              </button>
-              <div class="faq-panel max-h-0 overflow-hidden transition-all duration-300 px-4 text-white/60">
-                <p class="py-3">Yes. We employ industry-standard encryption, SOC2 controls, and partner with FDIC-insured banks for fiat custody to keep funds safe.</p>
-              </div>
+    <!-- SECTION 5: FOOTER (Minimal & Simple) -->
+    <footer
+      class="bg-[#050505] border-t border-white/10 w-screen h-screen flex flex-col items-center justify-end"
+    >
+      <!-- Main Footer Content -->
+      <div class="max-w-7xl mx-auto w-full px-6 pb-20 footer-parallax-section">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+          <!-- Left: Company Info -->
+          <div>
+            <div
+              class="font-bold text-2xl tracking-tight mb-6 flex items-center gap-2"
+            >
+              <span
+                class="w-6 h-6 bg-white rounded-full flex items-center justify-center text-black text-xs"
+                >/</span
+              >
+              Slay
             </div>
+            <p class="text-sm text-white/60 mb-6">
+              2261 Market Street #5039<br />
+              San Francisco, CA 94114
+            </p>
+            <p class="text-xs text-white/40 mb-6 flex items-center gap-2">
+              <span class="w-2 h-2 bg-green-500 rounded-full"></span>
+              All systems normal
+            </p>
+            <!-- Social Icons -->
+            <div class="flex gap-4">
+              <a
+                href="#"
+                class="text-white/40 hover:text-white/70 transition-colors"
+              >
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                  <path
+                    d="M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2s9 5 20 5a9.5 9.5 0 00-9-5.5c4.75 2.25 7-7 7-7"
+                  />
+                </svg>
+              </a>
+              <a
+                href="#"
+                class="text-white/40 hover:text-white/70 transition-colors"
+              >
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                  <path
+                    d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-1-2.61c3.3-.37 6.74-.83 6.74-7a5.44 5.44 0 00-1.5-3.78 5.07 5.07 0 00-.1-3.77s-1.02-.35-3.3 1.23a9.38 9.38 0 00-6.06 0C6.5 2.06 5.48 2.41 5.48 2.41a5.07 5.07 0 00-.1 3.77 5.44 5.44 0 00-1.5 3.78c0 6.21 3.44 6.63 6.74 7a3.37 3.37 0 00-1 2.61v3.87"
+                  />
+                </svg>
+              </a>
+              <a
+                href="#"
+                class="text-white/40 hover:text-white/70 transition-colors"
+              >
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                  <path
+                    d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"
+                  />
+                  <circle cx="4" cy="4" r="2" />
+                </svg>
+              </a>
+            </div>
+          </div>
 
-            <div class="faq-item-wrapper bg-transparent rounded-lg overflow-hidden border border-white/5">
-              <button class="faq-item w-full text-left flex justify-between items-center p-4 bg-transparent">
-                <span class="font-medium">How do I earn returns with the Treasury account?</span>
-                <svg class="faq-chevron w-5 h-5 text-white/60 transition-transform duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M6 9l6 6 6-6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <!-- Right: Get in Touch -->
+          <div class="flex flex-col justify-start">
+            <h3 class="text-xl font-bold mb-6">Get in Touch</h3>
+            <p class="text-white/60 text-sm mb-6">
+              Subscribe to our newsletter and stay updated with the latest Slay
+              features.
+            </p>
+            <!-- Email Input Form -->
+            <form
+              id="newsletter-form"
+              class="flex gap-3 mb-3"
+              onsubmit="handleNewsletterSubmit(event);"
+            >
+              <input
+                id="newsletter-email"
+                type="email"
+                placeholder="Enter your email"
+                class="flex-1 bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder:text-white/40 focus:outline-none focus:border-white/30 focus:bg-white/10 transition-all"
+                required
+              />
+              <button
+                id="subscribe-btn"
+                type="submit"
+                class="bg-white text-black px-6 py-3 rounded-lg font-bold hover:bg-gray-200 transition-all duration-300 whitespace-nowrap"
+              >
+                Subscribe
               </button>
-              <div class="faq-panel max-h-0 overflow-hidden transition-all duration-300 px-4 text-white/60">
-                <p class="py-3">You can opt into yield programs or swap idle balances into yield-bearing stablecoins — returns depend on market rates and selected products.</p>
-              </div>
-            </div>
-
-            <div class="faq-item-wrapper bg-transparent rounded-lg overflow-hidden border border-white/5">
-              <button class="faq-item w-full text-left flex justify-between items-center p-4 bg-transparent">
-                <span class="font-medium">How do I deposit or withdraw funds?</span>
-                <svg class="faq-chevron w-5 h-5 text-white/60 transition-transform duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M6 9l6 6 6-6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              </button>
-              <div class="faq-panel max-h-0 overflow-hidden transition-all duration-300 px-4 text-white/60">
-                <p class="py-3">Deposits and withdrawals are available via bank transfer or crypto rails. Processing times vary by method; most fiat transfers settle in 1–3 business days.</p>
-              </div>
-            </div>
-
-            <div class="faq-item-wrapper bg-transparent rounded-lg overflow-hidden border border-white/5">
-              <button class="faq-item w-full text-left flex justify-between items-center p-4 bg-transparent">
-                <span class="font-medium">What to do with excess cash in a business?</span>
-                <svg class="faq-chevron w-5 h-5 text-white/60 transition-transform duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M6 9l6 6 6-6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              </button>
-              <div class="faq-panel max-h-0 overflow-hidden transition-all duration-300 px-4 text-white/60">
-                <p class="py-3">Consider allocating excess cash into short-term yield options, sweep accounts, or stablecoin treasuries to earn yield while keeping liquidity accessible.</p>
-              </div>
-            </div>
+            </form>
+            <p id="form-message" class="text-xs text-white/40 mb-6">
+              We'll never spam you. Unsubscribe anytime.
+            </p>
+            <!-- Contact Email -->
+            <p class="text-xs text-white/60">
+              Questions? Reach us at:
+              <a
+                href="mailto:slaymoneyapp@gmail.com"
+                class="text-[#A020F0] hover:text-[#8a1ad4] transition-colors"
+                >slaymoneyapp@gmail.com</a
+              >
+            </p>
           </div>
         </div>
       </div>
-    </section>
 
-    
-
+      <!-- Bottom Section: Copyright -->
+      <div class="w-full border-t border-white/10 py-8 px-6">
+        <p class="text-xs text-white/40 text-center">
+          © 2025 Slay Money App. All rights reserved.
+        </p>
+      </div>
+    </footer>
     <script>
-      // FAQ accordion interactions
-      document.addEventListener('DOMContentLoaded', function () {
-        const items = document.querySelectorAll('.faq-item-wrapper');
-        items.forEach((wrapper) => {
-          const btn = wrapper.querySelector('.faq-item');
-          const panel = wrapper.querySelector('.faq-panel');
-          const chevron = wrapper.querySelector('.faq-chevron');
-          btn.addEventListener('click', () => {
-            const isOpen = wrapper.classList.toggle('open');
-            if (isOpen) {
-              panel.style.maxHeight = panel.scrollHeight + 'px';
-              chevron.style.transform = 'rotate(180deg)';
-            } else {
-              panel.style.maxHeight = null;
-              chevron.style.transform = '';
-            }
-          });
-        });
+      gsap.registerPlugin(ScrollTrigger);
 
-        // Simple reveal animations using gsap if available
-        if (window.gsap && window.ScrollTrigger) {
-          gsap.to('#section-9 .max-w-5xl, #section-9 p', {
-            scrollTrigger: { trigger: '#section-9', start: 'top 80%' },
-            y: 0,
-            opacity: 1,
-            duration: 0.8,
-            stagger: 0.08,
-          });
-
-          gsap.to('#section-10 .faq-item-wrapper, #section-10 h3', {
-            scrollTrigger: { trigger: '#section-10', start: 'top 80%' },
-            y: 0,
-            opacity: 1,
-            duration: 0.8,
-            stagger: 0.08,
-          });
+      // --- SCALE DOWN HERO TEXT ---
+      gsap.fromTo(
+        "#heroText",
+        {
+          scale: 1,
+          opacity: 1,
+          y: 0,
+        },
+        {
+          scale: 0.75,
+          opacity: 0.5,
+          y: -40,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: "#heroVisual",
+            start: "top 100%",
+            end: "top 20%",
+            scrub: true,
+          },
         }
-      });
+      );
+
+      // --- SCALE UP HERO VISUAL ---
+      gsap.fromTo(
+        "#heroVisual",
+        {
+          scale: 0.55,
+          width: "70vw",
+          opacity: 0.7,
+          y: 50,
+        },
+        {
+          scale: 1,
+          width: "100vw",
+          opacity: 1,
+          y: 0,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: "#heroVisual",
+            start: "top 90%",
+            end: "top 20%",
+            scrub: true,
+          },
+        }
+      );
+    </script>
+
+    <!-- LOGIC -->
+    <script>
+      function atvImg() {
+        var d = document,
+          de = d.documentElement,
+          bd = d.getElementsByTagName("body")[0],
+          htm = d.getElementsByTagName("html")[0],
+          win = window,
+          imgs = d.querySelectorAll(".atvImg"),
+          totalImgs = imgs.length,
+          supportsTouch = "ontouchstart" in win || navigator.msMaxTouchPoints;
+
+        if (totalImgs <= 0) {
+          return;
+        }
+
+        for (var l = 0; l < totalImgs; l++) {
+          var thisImg = imgs[l],
+            layerElems = thisImg.querySelectorAll(".atvImg-layer"),
+            totalLayerElems = layerElems.length;
+
+          if (totalLayerElems <= 0) {
+            continue;
+          }
+
+          while (thisImg.firstChild) {
+            thisImg.removeChild(thisImg.firstChild);
+          }
+
+          var containerHTML = d.createElement("div"),
+            shineHTML = d.createElement("div"),
+            shadowHTML = d.createElement("div"),
+            layersHTML = d.createElement("div"),
+            layers = [];
+
+          thisImg.id = "atvImg__" + l;
+          containerHTML.className = "atvImg-container";
+          shineHTML.className = "atvImg-shine";
+          shadowHTML.className = "atvImg-shadow";
+          layersHTML.className = "atvImg-layers";
+
+          for (var i = 0; i < totalLayerElems; i++) {
+            var layer = d.createElement("div"),
+              imgSrc = layerElems[i].getAttribute("data-img");
+
+            layer.className = "atvImg-rendered-layer";
+            layer.setAttribute("data-layer", i);
+            layer.style.backgroundImage = "url(" + imgSrc + ")";
+            layersHTML.appendChild(layer);
+
+            layers.push(layer);
+          }
+
+          containerHTML.appendChild(shadowHTML);
+          containerHTML.appendChild(layersHTML);
+          containerHTML.appendChild(shineHTML);
+          thisImg.appendChild(containerHTML);
+
+          var w =
+            thisImg.clientWidth || thisImg.offsetWidth || thisImg.scrollWidth;
+          thisImg.style.transform = "perspective(" + w * 3 + "px)";
+
+          if (supportsTouch) {
+            win.preventScroll = false;
+
+            (function (_thisImg, _layers, _totalLayers, _shine) {
+              thisImg.addEventListener("touchmove", function (e) {
+                if (win.preventScroll) {
+                  e.preventDefault();
+                }
+                processMovement(
+                  e,
+                  true,
+                  _thisImg,
+                  _layers,
+                  _totalLayers,
+                  _shine
+                );
+              });
+              thisImg.addEventListener("touchstart", function (e) {
+                win.preventScroll = true;
+                processEnter(e, _thisImg);
+              });
+              thisImg.addEventListener("touchend", function (e) {
+                win.preventScroll = false;
+                processExit(e, _thisImg, _layers, _totalLayers, _shine);
+              });
+            })(thisImg, layers, totalLayerElems, shineHTML);
+          } else {
+            (function (_thisImg, _layers, _totalLayers, _shine) {
+              thisImg.addEventListener("mousemove", function (e) {
+                processMovement(
+                  e,
+                  false,
+                  _thisImg,
+                  _layers,
+                  _totalLayers,
+                  _shine
+                );
+              });
+              thisImg.addEventListener("mouseenter", function (e) {
+                processEnter(e, _thisImg);
+              });
+              thisImg.addEventListener("mouseleave", function (e) {
+                processExit(e, _thisImg, _layers, _totalLayers, _shine);
+              });
+            })(thisImg, layers, totalLayerElems, shineHTML);
+          }
+        }
+
+        function processMovement(
+          e,
+          touchEnabled,
+          elem,
+          layers,
+          totalLayers,
+          shine
+        ) {
+          var bdst = bd.scrollTop || htm.scrollTop,
+            bdsl = bd.scrollLeft,
+            pageX = touchEnabled ? e.touches[0].pageX : e.pageX,
+            pageY = touchEnabled ? e.touches[0].pageY : e.pageY,
+            offsets = elem.getBoundingClientRect(),
+            w = elem.clientWidth || elem.offsetWidth || elem.scrollWidth,
+            h = elem.clientHeight || elem.offsetHeight || elem.scrollHeight,
+            wMultiple = 320 / w,
+            offsetX = 0.52 - (pageX - offsets.left - bdsl) / w,
+            offsetY = 0.52 - (pageY - offsets.top - bdst) / h,
+            dy = pageY - offsets.top - bdst - h / 2,
+            dx = pageX - offsets.left - bdsl - w / 2,
+            yRotate = (offsetX - dx) * (0.07 * wMultiple),
+            xRotate = (dy - offsetY) * (0.1 * wMultiple),
+            imgCSS = "rotateX(" + xRotate + "deg) rotateY(" + yRotate + "deg)",
+            arad = Math.atan2(dy, dx),
+            angle = (arad * 180) / Math.PI - 90;
+
+          if (angle < 0) {
+            angle = angle + 360;
+          }
+
+          if (elem.firstChild.className.indexOf(" over") != -1) {
+            imgCSS += " scale3d(1.07,1.07,1.07)";
+          }
+          elem.firstChild.style.transform = imgCSS;
+
+          shine.style.background =
+            "linear-gradient(" +
+            angle +
+            "deg, rgba(255,255,255," +
+            ((pageY - offsets.top - bdst) / h) * 0.4 +
+            ") 0%,rgba(255,255,255,0) 80%)";
+          shine.style.transform =
+            "translateX(" +
+            offsetX * totalLayers -
+            0.1 +
+            "px) translateY(" +
+            offsetY * totalLayers -
+            0.1 +
+            "px)";
+
+          var revNum = totalLayers;
+          for (var ly = 0; ly < totalLayers; ly++) {
+            layers[ly].style.transform =
+              "translateX(" +
+              offsetX * revNum * ((ly * 2.5) / wMultiple) +
+              "px) translateY(" +
+              offsetY * totalLayers * ((ly * 2.5) / wMultiple) +
+              "px)";
+            revNum--;
+          }
+        }
+
+        function processEnter(e, elem) {
+          elem.firstChild.className += " over";
+        }
+
+        function processExit(e, elem, layers, totalLayers, shine) {
+          var container = elem.firstChild;
+
+          container.className = container.className.replace(" over", "");
+          container.style.transform = "";
+          shine.style.cssText = "";
+
+          for (var ly = 0; ly < totalLayers; ly++) {
+            layers[ly].style.transform = "";
+          }
+        }
+      }
+
+      atvImg();
     </script>
 
     <script>
-      const parallaxLogo = document.querySelector(".parallax-logo");
+      gsap.registerPlugin(ScrollTrigger);
 
-      if (parallaxLogo) {
-        const strength = 30; // how much the logo moves
-        parallaxLogo.addEventListener("mousemove", (e) => {
-          const rect = parallaxLogo.getBoundingClientRect();
-          const x = e.clientX - rect.left - rect.width / 2;
-          const y = e.clientY - rect.top - rect.height / 2;
-          gsap.to(parallaxLogo, {
-            x: (x / (rect.width / 2)) * strength,
-            y: (y / (rect.height / 2)) * strength,
-            scale: 1.07,
-            filter: "drop-shadow(0 0 24px #A020F0)",
-            duration: 0.4,
-            ease: "power3.out",
-          });
+      // --- HERO ANIMATIONS ---
+      window.addEventListener("load", () => {
+        gsap.to(".hero-anim", {
+          y: 0,
+          opacity: 1,
+          duration: 1.2,
+          stagger: 0.2,
+          ease: "power3.out",
         });
-        parallaxLogo.addEventListener("mouseleave", () => {
-          gsap.to(parallaxLogo, {
-            x: 0,
+
+        // Mouse Tilt on Card
+        const card = document.getElementById("tilt-card");
+        const shine = card.querySelector(".glossy-shine");
+        if (card) {
+          card.addEventListener("mousemove", (e) => {
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const rotateX = ((y - rect.height / 2) / (rect.height / 2)) * -10;
+            const rotateY = ((x - rect.width / 2) / (rect.width / 2)) * 10;
+            gsap.to(card, {
+              rotateX: rotateX,
+              rotateY: rotateY,
+              transformPerspective: 1000,
+              duration: 0.5,
+            });
+            gsap.to(shine, {
+              opacity: 1,
+              background: `radial-gradient(circle at ${x}px ${y}px, rgba(255,255,255,0.3) 0%, transparent 60%)`,
+              duration: 0.5,
+            });
+          });
+          card.addEventListener("mouseleave", () => {
+            gsap.to(card, {
+              rotateX: 0,
+              rotateY: 0,
+              duration: 1,
+              ease: "elastic.out(1, 0.5)",
+            });
+            gsap.to(shine, { opacity: 0, duration: 0.5 });
+          });
+        }
+
+        // Mouse Tilt on Shield
+        const shield = document.getElementById("tilt-shield");
+        const shieldContainer = document.querySelector(".shield-container");
+        if (shield && shieldContainer) {
+          shieldContainer.addEventListener("mousemove", (e) => {
+            const rect = shieldContainer.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const rotateX = ((y - rect.height / 2) / (rect.height / 2)) * -15;
+            const rotateY = ((x - rect.width / 2) / (rect.width / 2)) * 15;
+            gsap.to(shield, {
+              rotateX: rotateX,
+              rotateY: rotateY,
+              duration: 0.5,
+            });
+          });
+          shieldContainer.addEventListener("mouseleave", () => {
+            gsap.to(shield, {
+              rotateX: 0,
+              rotateY: 0,
+              duration: 1,
+              ease: "elastic.out(1, 0.5)",
+            });
+          });
+        }
+
+        // Magnetic Hover on Speed Bolt
+        // Enhanced tilt effect for folded lightning bolt
+        // Tilt effect for lightning bolt
+        const tiltBolt = document.getElementById("tilt-bolt");
+        if (tiltBolt) {
+          const boltContainer = tiltBolt.parentElement;
+          boltContainer.addEventListener("mousemove", (e) => {
+            const rect = boltContainer.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const rotateX = ((y - rect.height / 2) / (rect.height / 2)) * -15;
+            const rotateY = ((x - rect.width / 2) / (rect.width / 2)) * 15;
+            tiltBolt.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateZ(30px)`;
+          });
+          boltContainer.addEventListener("mouseleave", () => {
+            tiltBolt.style.transform = "rotateX(0) rotateY(0) translateZ(0)";
+          });
+        }
+
+        // Init Tab Sliders
+        initTabSlider("payment-tabs", "pay-vis", 4);
+        initTabSlider("points-tabs", "point-vis", 3);
+      });
+
+      // --- GENERIC TAB SLIDER LOGIC ---
+      function initTabSlider(containerId, visualPrefix, count) {
+        let activeIndex = 0;
+        const container = document.getElementById(containerId);
+        if (!container) return;
+
+        const tabs = container.querySelectorAll(".tab-button");
+        let timer;
+
+        function activate(index) {
+          // Reset all
+          tabs.forEach((t, i) => {
+            t.classList.remove("active");
+            gsap.killTweensOf(t.querySelector(".tab-progress"));
+            t.querySelector(".tab-progress").style.width = "0%";
+
+            // Visuals
+            const vis = document.getElementById(`${visualPrefix}-${i}`);
+            if (vis) vis.classList.remove("active");
+          });
+
+          // Activate Current
+          const currentTab = tabs[index];
+          currentTab.classList.add("active");
+          const currentVis = document.getElementById(
+            `${visualPrefix}-${index}`
+          );
+          if (currentVis) currentVis.classList.add("active");
+
+          // Progress Bar Animation
+          gsap.fromTo(
+            currentTab.querySelector(".tab-progress"),
+            { width: "0%" },
+            { width: "100%", duration: 4, ease: "linear", onComplete: next }
+          );
+          activeIndex = index;
+        }
+
+        function next() {
+          activate((activeIndex + 1) % count);
+        }
+
+        // Click Handlers
+        tabs.forEach((t, i) => {
+          t.onclick = () => activate(i);
+        });
+
+        // Expose to global scope for onClick if needed, though closure handles it.
+        // Define global setter for onclick attribute if used, but here we attached directly.
+
+        // Start observer to play only when in view
+        ScrollTrigger.create({
+          trigger: container,
+          start: "top 70%",
+          onEnter: () => activate(0),
+          once: true,
+        });
+      }
+
+      // Expose specific setters for HTML onclick attributes if my JS attachment fails or for explicit control
+      window.setPaymentTab = (i) => {
+        // Logic is handled by closure above, but to support inline onclick:
+        // We'd need to expose the activate function globally or re-architect slightly.
+        // The above JS attaches listeners directly, so inline onclicks in HTML can be removed or this function filled.
+        // For robustness, I will rely on the addEventListener above.
+      };
+      window.setPointsTab = (i) => {}; // Same
+
+      // --- SUPABASE INITIALIZATION ---
+      const SUPABASE_URL = "https://drepvbrhkxzwtwqncnyd.supabase.co";
+      const SUPABASE_KEY =
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRyZXB2YnJoa3h6d3R3cW5jbnlkIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTcyOTM5NzMyNCwiZXhwIjoyMDQ0OTczMzI0fQ.GVD_sFzFo0FVqiBj_w984txrUwKNaB_EYIHGMf6ywAA";
+      const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+      // --- NEWSLETTER FORM HANDLER ---
+      window.handleNewsletterSubmit = async (e) => {
+        e.preventDefault();
+
+        const form = document.getElementById("newsletter-form");
+        const emailInput = document.getElementById("newsletter-email");
+        const submitBtn = document.getElementById("subscribe-btn");
+        const formMessage = document.getElementById("form-message");
+        const email = emailInput.value.trim();
+
+        if (!email) return;
+
+        // State: Loading with animated spinner
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="loader"></span>';
+        submitBtn.classList.remove(
+          "bg-white",
+          "text-black",
+          "hover:bg-gray-200"
+        );
+        submitBtn.classList.add("bg-gray-500", "text-white");
+        formMessage.textContent = "Processing your subscription...";
+        formMessage.classList.remove(
+          "text-white/40",
+          "text-[#A020F0]",
+          "text-red-400"
+        );
+        formMessage.classList.add("text-white/40");
+
+        try {
+          // Check if email already exists
+          const { data: existingEmails, error: checkError } = await supabase
+            .from("notify_emails")
+            .select("email")
+            .eq("email", email);
+
+          if (checkError) throw checkError;
+
+          if (existingEmails && existingEmails.length > 0) {
+            // Email already subscribed
+            submitBtn.innerHTML = "✓ Already Subscribed";
+            submitBtn.classList.remove("bg-gray-500", "text-white");
+            submitBtn.classList.add(
+              "bg-[#A020F0]",
+              "text-white",
+              "hover:bg-[#8a1ad4]"
+            );
+            formMessage.textContent = "✓ Email already subscribed";
+            formMessage.classList.remove("text-white/40");
+            formMessage.classList.add("text-[#A020F0]");
+            emailInput.disabled = true;
+            emailInput.classList.add("opacity-50");
+
+            setTimeout(() => {
+              form.reset();
+              submitBtn.innerHTML = "Subscribe";
+              submitBtn.disabled = false;
+              submitBtn.classList.remove(
+                "bg-[#A020F0]",
+                "text-white",
+                "hover:bg-[#8a1ad4]"
+              );
+              submitBtn.classList.add(
+                "bg-white",
+                "text-black",
+                "hover:bg-gray-200"
+              );
+              emailInput.disabled = false;
+              emailInput.classList.remove("opacity-50");
+              formMessage.textContent =
+                "We'll never spam you. Unsubscribe anytime.";
+              formMessage.classList.remove("text-[#A020F0]");
+              formMessage.classList.add("text-white/40");
+            }, 3000);
+            return;
+          }
+
+          // Insert new email into database
+          const { data, error } = await supabase
+            .from("notify_emails")
+            .insert([{ email: email }])
+            .select();
+
+          if (error) throw error;
+
+          // State: Subscribed
+          submitBtn.innerHTML = "✓ Subscribed";
+          submitBtn.classList.remove("bg-gray-500", "text-white");
+          submitBtn.classList.add(
+            "bg-[#A020F0]",
+            "text-white",
+            "hover:bg-[#8a1ad4]"
+          );
+
+          emailInput.disabled = true;
+          emailInput.classList.add("opacity-50");
+
+          formMessage.textContent = `Thank you! We'll keep ${email} posted.`;
+          formMessage.classList.remove("text-white/40");
+          formMessage.classList.add("text-[#A020F0]");
+
+          // Reset after 5 seconds for demo purposes
+          setTimeout(() => {
+            form.reset();
+            submitBtn.innerHTML = "Subscribe";
+            submitBtn.disabled = false;
+            submitBtn.classList.remove(
+              "bg-[#A020F0]",
+              "text-white",
+              "hover:bg-[#8a1ad4]"
+            );
+            submitBtn.classList.add(
+              "bg-white",
+              "text-black",
+              "hover:bg-gray-200"
+            );
+            emailInput.disabled = false;
+            emailInput.classList.remove("opacity-50");
+            formMessage.textContent =
+              "We'll never spam you. Unsubscribe anytime.";
+            formMessage.classList.remove("text-[#A020F0]");
+            formMessage.classList.add("text-white/40");
+          }, 5000);
+        } catch (error) {
+          // Error state
+          console.error("Subscription error:", error);
+          submitBtn.innerHTML = "✗ Error";
+          submitBtn.classList.remove("bg-gray-500", "text-white");
+          submitBtn.classList.add("bg-red-500", "text-white");
+          formMessage.textContent = "Subscription failed. Please try again.";
+          formMessage.classList.remove("text-white/40", "text-[#A020F0]");
+          formMessage.classList.add("text-red-400");
+
+          setTimeout(() => {
+            submitBtn.innerHTML = "Subscribe";
+            submitBtn.disabled = false;
+            submitBtn.classList.remove("bg-red-500", "text-white");
+            submitBtn.classList.add(
+              "bg-white",
+              "text-black",
+              "hover:bg-gray-200"
+            );
+            formMessage.textContent =
+              "We'll never spam you. Unsubscribe anytime.";
+            formMessage.classList.remove("text-red-400");
+            formMessage.classList.add("text-white/40");
+          }, 3000);
+        }
+      };
+    </script>
+
+    <!-- Global GSAP Parallax Script -->
+    <script>
+      gsap.registerPlugin(ScrollTrigger);
+
+      gsap.utils.toArray(".parallax-section").forEach((section, i) => {
+        gsap.fromTo(
+          section,
+          {
+            y: 80, // parallax offset
+            scale: 0.65, // slight zoom-out start
+            opacity: 0.5, // softer entry
+          },
+          {
             y: 0,
             scale: 1,
-            filter: "drop-shadow(0 0 60px rgba(160,32,240,0.5))",
-            duration: 0.7,
-            ease: "elastic.out(1,0.37)",
-          });
-        });
-      }
-
-      const words = ["Slash", "/"];
-      let i = 0,
-        j = 0,
-        isDeleting = false;
-      const el = document.getElementById("slash-typewriter");
-      const cursor = document.getElementById("type-cursor");
-      cursor.textContent = "|"; // You can change this to "_" or whatever symbol you prefer
-
-      const speed = 140,
-        pause = 800;
-
-      function typeWriter() {
-        let current = words[i];
-        if (!isDeleting) {
-          el.textContent = current.substring(0, j + 1);
-          j++;
-          if (j === current.length) {
-            setTimeout(() => {
-              isDeleting = true;
-              typeWriter();
-            }, pause);
-          } else {
-            setTimeout(typeWriter, speed);
-          }
-        } else {
-          el.textContent = current.substring(0, j - 1);
-          j--;
-          if (j === 0) {
-            isDeleting = false;
-            i = (i + 1) % words.length;
-            setTimeout(typeWriter, speed);
-          } else {
-            setTimeout(typeWriter, speed / 2);
-          }
-        }
-      }
-      typeWriter();
-    </script>
-
-    <script>
-      gsap.registerPlugin(ScrollTrigger);
-
-      window.addEventListener("load", () => {
-        // ... (Previous init code) ...
-
-        // SECTION 7 ANIMATIONS (Trust)
-        gsap.to(".section-7-anim", {
-          scrollTrigger: {
-            trigger: "#section-7",
-            start: "top 80%",
-            toggleActions: "play none none reverse",
-          },
-          y: 0,
-          opacity: 1,
-          duration: 1,
-          stagger: 0.2,
-          ease: "power3.out",
-        });
-
-        // Add Marquee Animation CSS
-        const style = document.createElement("style");
-        style.innerHTML = `
-                @keyframes marquee {
-                    0% { transform: translateX(0); }
-                    100% { transform: translateX(-50%); }
-                }
-                .animate-marquee {
-                    animation: marquee 30s linear infinite;
-                }
-                .hover\\:pause-marquee:hover {
-                    animation-play-state: paused;
-                }
-            `;
-        document.head.appendChild(style);
-      });
-    </script>
-
-    <script>
-      gsap.registerPlugin(ScrollTrigger);
-      window.addEventListener("load", () => {
-        // Existing Page Animations
-        const tl = gsap.timeline({ defaults: { ease: "power4.out" } });
-        tl.fromTo(
-          ".slash-mark",
-          { scale: 0, opacity: 0, rotation: -10 },
-          { scale: 2.5, opacity: 1, rotation: 0, duration: 1.2 }
-        )
-          .to({}, { duration: 0.8 })
-          .to(".slash-mark", { scale: 1, duration: 1.2 })
-          .to(".reveal-text-container", {
-            width: "auto",
             opacity: 1,
-            duration: 1.2,
-          })
-          .addLabel("sync-ui", "-=0.8")
-          .to(
-            ".slide-down",
-            { opacity: 1, y: 0, duration: 1, stagger: 0.1 },
-            "sync-ui"
-          )
-          .to(".slide-left", { opacity: 1, x: 0, duration: 1 }, "sync-ui")
-          .to(".fade-in", { opacity: 1, y: 0, duration: 1 }, "sync-ui")
-          .to(
-            ".slide-up",
-            { opacity: 1, y: 0, duration: 1, stagger: 0.1 },
-            "sync-ui"
-          );
-
-        gsap.to(".phone-anim", {
-          scrollTrigger: {
-            trigger: "#section-2",
-            start: "top 70%",
-            end: "bottom top",
-            toggleActions: "play none none reverse",
-          },
-          y: 0,
-          opacity: 1,
-          duration: 1.2,
-        });
-        gsap.to(".info-card-anim", {
-          scrollTrigger: {
-            trigger: "#section-2",
-            start: "top 60%",
-            toggleActions: "play none none reverse",
-          },
-          y: 0,
-          opacity: 1,
-          duration: 1,
-          delay: 0.3,
-        });
-        gsap.to(".section-3-header", {
-          scrollTrigger: {
-            trigger: "#section-3",
-            start: "top 80%",
-            toggleActions: "play none none reverse",
-          },
-          y: 0,
-          opacity: 1,
-          duration: 1,
-        });
-        gsap.to(".bento-card", {
-          scrollTrigger: {
-            trigger: "#section-3",
-            start: "top 70%",
-            toggleActions: "play none none reverse",
-          },
-          y: 0,
-          opacity: 1,
-          duration: 1,
-          stagger: 0.15,
-        });
-
-        // SECTION 4 ANIMATIONS (Security)
-        gsap.to(".section-4-anim", {
-          scrollTrigger: {
-            trigger: "#section-4",
-            start: "top 70%",
-            toggleActions: "play none none reverse",
-          },
-          y: 0,
-          opacity: 1,
-          duration: 1,
-          stagger: 0.15,
-          ease: "power3.out",
-        });
-        // SECTION 5 ANIMATIONS (Security)
-        gsap.to(".section-5-anim", {
-          scrollTrigger: {
-            trigger: "#section-5",
-            start: "top 70%",
-            toggleActions: "play none none reverse",
-          },
-          y: 0,
-          opacity: 1,
-          duration: 1,
-          stagger: 0.15,
-          ease: "power3.out",
-        });
-
-        // SECTION 6 ANIMATIONS
-        gsap.to(".sec6-header", {
-          scrollTrigger: { trigger: "#section-6", start: "top 70%" },
-          y: 0,
-          opacity: 1,
-          duration: 1,
-          ease: "power3.out",
-        });
-
-        gsap.utils.toArray(".feature-row").forEach((row) => {
-          const text = row.querySelector(".feature-text");
-          const visual = row.querySelector(".feature-visual");
-
-          gsap.to(text, {
-            scrollTrigger: { trigger: row, start: "top 70%" },
-            x: 0,
-            opacity: 1,
-            duration: 1,
-            ease: "power3.out",
-          });
-
-          gsap.to(visual, {
-            scrollTrigger: { trigger: row, start: "top 70%" },
-            x: 0,
-            opacity: 1,
-            duration: 1,
-            delay: 0.2,
-            ease: "power3.out",
-          });
-        });
-        gsap.to(".section-7-anim", {
-          scrollTrigger: { trigger: "#section-7", start: "top 80%" },
-          y: 0,
-          opacity: 1,
-          duration: 1,
-          stagger: 0.2,
-        });
-
-        // Header
-        gsap.to(".section-8-header", {
-          scrollTrigger: { trigger: "#section-8", start: "top 70%" },
-          y: 0,
-          opacity: 1,
-          duration: 1,
-          ease: "power3.out",
-        });
-
-        // Visual Parallax
-        gsap.to(".section-8-visual", {
-          scrollTrigger: { trigger: "#section-8", start: "top 60%" },
-          scale: 1,
-          opacity: 1,
-          duration: 1.2,
-          ease: "power3.out",
-        });
-
-        // Float animation for logo
-        gsap.to(".parallax-logo", {
-          y: -20,
-          duration: 2,
-          repeat: -1,
-          yoyo: true,
-          ease: "sine.inOut",
-        });
-
-        // Cards
-        gsap.to(".section-8-card", {
-          scrollTrigger: { trigger: ".section-8-header", start: "bottom 80%" },
-          y: 0,
-          opacity: 1,
-          duration: 1,
-          stagger: 0.2,
-          ease: "power3.out",
-        });
-
-        // Alternating Features
-        gsap.utils.toArray(".section-8-feature").forEach((feature) => {
-          gsap.fromTo(
-            feature,
-            { opacity: 0, y: 50 },
-            {
-              scrollTrigger: { trigger: feature, start: "top 80%" },
-              opacity: 1,
-              y: 0,
-              duration: 1,
-              ease: "power3.out",
-            }
-          );
-        });
-
-        // CTA
-        gsap.to(".section-8-cta", {
-          scrollTrigger: { trigger: ".section-8-cta", start: "top 90%" },
-          scale: 1,
-          opacity: 1,
-          duration: 0.8,
-          ease: "back.out(1.7)",
-        });
-
-        // Update Logo Image in JS to be safe
-        const logoImg = document.querySelector(".parallax-logo img");
-        if (logoImg) {
-          // Using the uploaded slashpoint.png URL would be ideal here if accessible via JS context
-          // For now, I'll use a placeholder that represents the slash
-        }
-
-        // Initialize Slideshow
-        initSlideshow();
-      });
-      // ... (Previous GSAP setups) ...
-
-      gsap.registerPlugin(ScrollTrigger);
-
-      window.addEventListener("load", () => {
-        // ... (Existing init code) ...
-
-        // SECTION 5 ANIMATIONS (Security)
-        gsap.to(".section-5-anim", {
-          scrollTrigger: {
-            trigger: "#section-5",
-            start: "top 70%",
-            toggleActions: "play none none reverse",
-          },
-          y: 0,
-          opacity: 1,
-          duration: 1,
-          stagger: 0.15,
-          ease: "power3.out",
-        });
-      });
-
-      // ... (Rest of the JS) ...
-    </script>
-
-    <!-- Animation Scripts -->
-    <script>
-      gsap.registerPlugin(ScrollTrigger);
-
-      window.addEventListener("load", () => {
-        // ... (Previous Animations for Hero & Section 2) ...
-
-        // Re-adding Hero & Sec 2 Animations for context if needed,
-        // but focusing on Section 3 here:
-
-        // --- HERO ANIMATIONS ---
-        const tl = gsap.timeline({ defaults: { ease: "power4.out" } });
-        tl.fromTo(
-          ".slash-mark",
-          { scale: 0, opacity: 0, rotation: -10 },
-          {
-            scale: 2.5,
-            opacity: 1,
-            rotation: 0,
-            duration: 1.2,
-            ease: "elastic.out(1, 0.6)",
-          }
-        )
-          .to({}, { duration: 0.8 })
-          .to(
-            ".slash-mark",
-            { scale: 1, duration: 1.2, ease: "power3.inOut" },
-            "reveal"
-          )
-          .to(
-            ".reveal-text-container",
-            { width: "auto", opacity: 1, duration: 1.2, ease: "power3.inOut" },
-            "reveal"
-          )
-          .addLabel("sync-ui", "-=0.8")
-          .to(
-            ".slide-down",
-            { opacity: 1, y: 0, duration: 1, stagger: 0.1 },
-            "sync-ui"
-          )
-          .to(".slide-left", { opacity: 1, x: 0, duration: 1 }, "sync-ui")
-          .to(".fade-in", { opacity: 1, y: 0, duration: 1 }, "sync-ui")
-          .to(
-            ".slide-up",
-            { opacity: 1, y: 0, duration: 1, stagger: 0.1 },
-            "sync-ui"
-          )
-          .to(
-            "#scroll-wheel",
-            {
-              y: 5,
-              opacity: 0,
-              duration: 1.5,
-              repeat: -1,
-              ease: "power1.inOut",
-              onStart: () => gsap.set("#scroll-wheel", { y: 0, opacity: 1 }),
+            ease: "power2.out",
+            scrollTrigger: {
+              trigger: section,
+              start: "top 85%",
+              end: "top 20%",
+              scrub: true,
             },
-            "+=0.5"
-          );
-
-        // --- SECTION 2 ANIMATIONS ---
-        gsap.to(".phone-anim", {
-          scrollTrigger: {
-            trigger: "#section-2",
-            start: "top 70%",
-            end: "bottom top",
-            toggleActions: "play none none reverse",
-          },
-          y: 0,
-          opacity: 1,
-          duration: 1.2,
-          ease: "power3.out",
-        });
-        gsap.to(".info-card-anim", {
-          scrollTrigger: {
-            trigger: "#section-2",
-            start: "top 60%",
-            toggleActions: "play none none reverse",
-          },
-          y: 0,
-          opacity: 1,
-          duration: 1,
-          delay: 0.3,
-          ease: "power3.out",
-        });
-        gsap.to(".info-card-anim", {
-          scrollTrigger: {
-            trigger: "#section-2",
-            start: "top bottom",
-            end: "bottom top",
-            scrub: 1,
-          },
-          y: -250,
-          ease: "none",
-        });
-        gsap.to(".luxury-card-bg", {
-          scrollTrigger: {
-            trigger: "#section-2",
-            start: "top bottom",
-            end: "bottom top",
-            scrub: 1,
-          },
-          y: -30,
-          ease: "none",
-        });
-
-        // --- SECTION 3 ANIMATIONS (NEW) ---
-
-        // 1. Header Reveal
-        gsap.to(".section-3-header", {
-          scrollTrigger: {
-            trigger: "#section-3",
-            start: "top 80%",
-            toggleActions: "play none none reverse",
-          },
-          y: 0,
-          opacity: 1,
-          duration: 1,
-          ease: "power3.out",
-        });
-
-        // 2. Bento Cards Stagger
-        gsap.to(".bento-card", {
-          scrollTrigger: {
-            trigger: "#section-3",
-            start: "top 70%",
-            toggleActions: "play none none reverse",
-          },
-          y: 0,
-          opacity: 1,
-          duration: 1,
-          stagger: 0.15, // Cards appear one after another
-          ease: "power3.out",
-        });
-      });
-
-      // ... (Mouse Tilt & Menu Logic remains the same) ...
-      const card = document.getElementById("tilt-card");
-      const shine = card?.querySelector(".glossy-shine");
-
-      if (card && shine) {
-        card.addEventListener("mousemove", (e) => {
-          const rect = card.getBoundingClientRect();
-          const x = e.clientX - rect.left;
-          const y = e.clientY - rect.top;
-          const centerX = rect.width / 2;
-          const centerY = rect.height / 2;
-          const rotateX = ((y - centerY) / centerY) * -15;
-          const rotateY = ((x - centerX) / centerX) * 15;
-
-          gsap.to(card, {
-            duration: 0.5,
-            rotateX: rotateX,
-            rotateY: rotateY,
-            ease: "power2.out",
-            transformPerspective: 1000,
-            transformOrigin: "center",
-          });
-          gsap.to(shine, {
-            duration: 0.5,
-            opacity: 1,
-            background: `radial-gradient(circle at ${x}px ${y}px, rgba(255,255,255,0.3) 0%, transparent 60%)`,
-            ease: "power2.out",
-          });
-        });
-
-        card.addEventListener("mouseleave", () => {
-          gsap.to(card, {
-            duration: 1,
-            rotateX: 0,
-            rotateY: 0,
-            ease: "elastic.out(1, 0.5)",
-          });
-          gsap.to(shine, { duration: 1, opacity: 0, ease: "power2.out" });
-        });
-      }
-
-      let isMenuOpen = false;
-      const menuBtn = document.getElementById("menu-btn");
-      const menuText = document.getElementById("menu-text");
-      const menuIcon = document.querySelector(".menu-icon");
-      const navItems = document.querySelectorAll(".nav-item");
-
-      if (menuBtn) {
-        menuBtn.addEventListener("click", () => {
-          if (!isMenuOpen) {
-            gsap.to(menuText, {
-              y: 10,
-              opacity: 0,
-              duration: 0.2,
-              ease: "power2.in",
-              onComplete: () => {
-                menuText.innerText = "Close";
-                gsap.fromTo(
-                  menuText,
-                  { y: -10, opacity: 0 },
-                  { y: 0, opacity: 1, duration: 0.2, ease: "power2.out" }
-                );
-              },
-            });
-            gsap.to(menuIcon, {
-              rotation: 20,
-              duration: 0.3,
-              ease: "power2.out",
-            });
-            navItems.forEach((el) => (el.style.display = "block"));
-            gsap.to(navItems, {
-              opacity: 1,
-              x: 0,
-              duration: 0.4,
-              stagger: 0.1,
-              ease: "back.out(1.7)",
-            });
-            isMenuOpen = true;
-          } else {
-            gsap.to(menuText, {
-              y: -10,
-              opacity: 0,
-              duration: 0.2,
-              ease: "power2.in",
-              onComplete: () => {
-                menuText.innerText = "Menu";
-                gsap.fromTo(
-                  menuText,
-                  { y: 10, opacity: 0 },
-                  { y: 0, opacity: 1, duration: 0.2, ease: "power2.out" }
-                );
-              },
-            });
-            gsap.to(menuIcon, {
-              rotation: 0,
-              duration: 0.3,
-              ease: "power2.out",
-            });
-            gsap.to(navItems, {
-              opacity: 0,
-              x: 20,
-              duration: 0.3,
-              stagger: 0.05,
-              onComplete: () => {
-                navItems.forEach((el) => (el.style.display = "none"));
-              },
-            });
-            isMenuOpen = false;
           }
-        });
-      }
+        );
+      });
     </script>
 
-    <!-- NAV LINK HANDLER: Smooth scroll to sections -->
     <script>
-      document.addEventListener('DOMContentLoaded', function () {
-        const navItems = document.querySelectorAll('.nav-item');
-        const menuBtnEl = document.getElementById('menu-btn');
+      gsap.registerPlugin(ScrollTrigger);
 
-        if (!navItems.length || !menuBtnEl) return;
-
-        navItems.forEach((el) => {
-          el.addEventListener('click', (e) => {
-            e.preventDefault();
-            const target = el.dataset?.target;
-            if (!target) return;
-            
-            const dest = document.querySelector(target);
-            if (!dest) return;
-
-            // Check if menu is currently open by checking first nav item visibility
-            const firstNav = navItems[0];
-            const navDisplay = window.getComputedStyle(firstNav).display;
-            const menuOpen = navDisplay !== 'none';
-
-            const doScroll = () => {
-              dest.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            };
-
-            if (menuOpen) {
-              // Close menu first, then scroll
-              menuBtnEl.click();
-              setTimeout(doScroll, 320);
-            } else {
-              // Menu already closed, scroll immediately
-              doScroll();
-            }
-          });
-        });
+      gsap.utils.toArray(".footer-parallax-section").forEach((section, i) => {
+        gsap.fromTo(
+          section,
+          {
+            y: 80, // parallax offset
+            scale: 0.8, // slight zoom-out start
+            opacity: 0.5, // softer entry
+          },
+          {
+            y: 0,
+            scale: 1,
+            opacity: 1,
+            ease: "power2.out",
+            scrollTrigger: {
+              trigger: section,
+              start: "top 100%",
+              end: "top 50%",
+              scrub: true,
+            },
+          }
+        );
       });
     </script>
   </body>

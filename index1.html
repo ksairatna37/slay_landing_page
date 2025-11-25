@@ -5,20 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Slay - Slash the Friction</title>
 
-    <!-- Google Fonts: Outfit (Sans) & Playfair Display (Serif) -->
+    <!-- Google Fonts: Outfit Only (Minimalist) -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;900&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
       rel="stylesheet"
     />
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-        <link rel="stylesheet" href="slideshow.css">
 
-
-    <!-- GSAP & ScrollTrigger -->
+    <!-- Dependencies -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
 
@@ -28,19 +26,19 @@
           extend: {
             fontFamily: {
               sans: ["Outfit", "sans-serif"],
-              serif: ["Playfair Display", "serif"],
             },
             colors: {
-              slay: { bg: "#2e1065" },
+              slay: { bg: "#050505" },
               accent: {
                 base: "#A020F0",
                 dark: "#3d0361",
                 light: "#cfa3f3",
               },
+              surface: "#0F0F11",
+              surfaceHighlight: "#1A1A1E",
             },
-            boxShadow: {
-              glow: "0 0 80px -20px rgba(160, 32, 240, 0.5)",
-              "purple-glow": "0 20px 60px -10px rgba(160, 32, 240, 0.5)",
+            backgroundImage: {
+              "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
             },
           },
         },
@@ -50,94 +48,193 @@
     <style>
       body {
         background-color: #050505;
+        color: white;
         overflow-x: hidden;
-        scroll-behavior: smooth;
+        font-family: "Outfit", sans-serif;
+        -webkit-font-smoothing: antialiased;
       }
 
-      /* --- Hero Background --- */
-      .hero-bg {
-        background-color: #2e1065;
-        background-image: radial-gradient(
-            circle at 15% 50%,
-            rgba(147, 51, 234, 0.4) 0%,
-            transparent 50%
-          ),
-          radial-gradient(
-            circle at 85% 30%,
-            rgba(192, 132, 252, 0.3) 0%,
-            transparent 50%
-          );
-      }
-
+      /* --- UTILS --- */
       .glass {
-        background: rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.03);
         backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.08);
       }
 
-      /* --- Animation Utilities --- */
-      .reveal-text-container {
-        width: 0;
-        overflow: hidden;
-        white-space: nowrap;
-        opacity: 0;
-      }
-      .slash-mark {
-        display: inline-block;
-      }
-      .nav-item {
-        opacity: 0;
-        display: none;
-        transform: translateX(20px);
-      }
-      .menu-icon {
-        display: inline-block;
-        transition: transform 0.3s ease;
-        font-weight: 300;
+      .text-gradient {
+        background: linear-gradient(135deg, #fff 0%, #a020f0 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
       }
 
-      .slide-down {
-        opacity: 0;
-        transform: translateY(-30px);
-      }
-      .slide-left {
-        opacity: 0;
-        transform: translateX(30px);
-      }
-      .slide-up {
-        opacity: 0;
-        transform: translateY(30px);
-      }
-      .fade-in {
-        opacity: 0;
-        transform: translateY(10px);
-      }
-
-      /* --- STICKY OVERLAY FIX --- */
-      .sticky-hero {
-        position: -webkit-sticky;
-        position: sticky;
-        top: 0;
-        height: 100vh;
-        z-index: 1;
-        width: 100%;
+      /* --- HERO STYLES --- */
+      .hero-glow {
+        position: absolute;
+        width: 60vw;
+        height: 60vw;
+        background: radial-gradient(
+          circle,
+          rgba(160, 32, 240, 0.15) 0%,
+          rgba(0, 0, 0, 0) 70%
+        );
+        top: -20%;
+        left: 50%;
+        transform: translateX(-50%);
+        pointer-events: none;
+        z-index: 0;
       }
 
-      .overlay-section {
+      /* --- REVOLUT-STYLE TABBED SLIDER --- */
+      .tab-button {
+        text-align: left;
+        padding: 24px;
+        border-radius: 16px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
         position: relative;
+        overflow: hidden;
+        opacity: 0.5;
+      }
+
+      .container {
+        width: 704px;
+        height: 460px;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+
+      .cover {
+        display: inline-block;
+        height: 200px;
+        width: 320px;
+        margin: 15px;
+        border-radius: 8px;
+      }
+
+      @media screen and (max-width: 700px) {
+        .container {
+          width: 100%;
+          position: relative;
+          transform: translate(0%, 0%);
+          top: 0;
+          left: 0;
+        }
+        .cover {
+          display: block;
+          height: 200px;
+          width: 320px;
+          margin: 15px auto;
+        }
+      }
+
+      .atvImg {
+        border-radius: 8px;
+        transform-style: preserve-3d;
+        -webkit-tap-highlight-color: rgba(#000, 0);
+      }
+
+      .atvImg img {
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(14, 21, 47, 0.25);
+      }
+
+      .atvImg-container {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        border-radius: 8px;
+        transition: all 0.2s ease-out;
+      }
+
+      .atvImg-container.over .atvImg-shadow {
+        box-shadow: 0 45px 100px rgba(14, 21, 47, 0.4),
+          0 16px 40px rgba(14, 21, 47, 0.4);
+      }
+
+      .atvImg-layers {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        border-radius: 8px;
+        overflow: hidden;
+        transform-style: preserve-3d;
+      }
+
+      .atvImg-rendered-layer {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0%;
+        left: 0%;
+        background-repeat: no-repeat;
+        background-position: center;
+        background-color: transparent;
+        background-size: cover;
+        transition: all 0.1s ease-out;
+        overflow: hidden;
+        border-radius: 8px;
+      }
+
+      .atvImg-shadow {
+        position: absolute;
+        top: 5%;
+        left: 5%;
+        width: 90%;
+        height: 90%;
+        transition: all 0.2s ease-out;
+        box-shadow: 0 8px 30px rgba(14, 21, 47, 0.6);
+      }
+
+      .atvImg-shine {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        border-radius: 8px;
+        background: linear-gradient(
+          135deg,
+          rgba(255, 255, 255, 0.25) 0%,
+          rgba(255, 255, 255, 0) 60%
+        );
+      }
+
+      .tab-button.active {
+        background-color: #1a1a1e;
+        opacity: 1;
+      }
+
+      .tab-progress {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        height: 2px;
+        width: 0%;
+        background-color: #a020f0;
+      }
+
+      .feature-visual {
+        opacity: 0;
+        transform: scale(0.95) translateY(20px);
+        transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+      }
+
+      .feature-visual.active {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+        pointer-events: auto;
         z-index: 10;
-        background-color: #000;
-        box-shadow: 0 -20px 50px rgba(0, 0, 0, 0.5);
-        margin-top: -1px;
       }
 
-      /* --- PHONE & PREMIUM CARD --- */
-      .phone-frame {
-        box-shadow: 0 0 0 2px #333, 0 0 0 4px #000,
-          0 20px 50px -10px rgba(0, 0, 0, 0.8);
+      /* --- CARD 3D --- */
+      .perspective-container {
+        perspective: 1000px;
       }
-
       .luxury-card-bg {
         background: radial-gradient(
           circle at 50% 120%,
@@ -145,14 +242,10 @@
           #5e0b9e 50%,
           #a020f0 100%
         );
-        position: relative;
-        overflow: hidden;
         border: 1px solid rgba(255, 255, 255, 0.15);
         box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
-        transform-style: preserve-3d; /* Essential for 3D tilt */
-        will-change: transform;
+        transform-style: preserve-3d;
       }
-
       .luxury-card-bg::after {
         content: "";
         position: absolute;
@@ -173,8 +266,6 @@
         pointer-events: none;
         mix-blend-mode: overlay;
       }
-
-      /* --- GLOSSY SHINE --- */
       .glossy-shine {
         position: absolute;
         inset: 0;
@@ -189,13 +280,14 @@
         pointer-events: none;
         z-index: 30;
       }
-
       .noise-texture {
         background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.08'/%3E%3C/svg%3E");
         opacity: 0.5;
         mix-blend-mode: soft-light;
       }
-
+      .chip-gradient {
+        background: linear-gradient(135deg, #e2e2e2 0%, #999 50%, #e2e2e2 100%);
+      }
       .engraved-text {
         background: linear-gradient(
           180deg,
@@ -206,703 +298,808 @@
         -webkit-text-fill-color: transparent;
         text-shadow: 0px 1px 1px rgba(255, 255, 255, 0.15),
           0px -1px 1px rgba(0, 0, 0, 0.5);
-        font-family: "Playfair Display", serif;
-        font-weight: 900;
+        font-weight: 800;
         letter-spacing: 0.05em;
-      }
-
-      /* Foil Chip Effect */
-      .chip-gradient {
-        background: linear-gradient(135deg, #e2e2e2 0%, #999 50%, #e2e2e2 100%);
-        position: relative;
-        overflow: hidden;
-        border-radius: 6px;
-      }
-      .chip-gradient::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        border: 1px solid rgba(0, 0, 0, 0.2);
-        border-radius: 6px;
-        background: linear-gradient(
-            90deg,
-            transparent 33%,
-            rgba(0, 0, 0, 0.1) 33%,
-            rgba(0, 0, 0, 0.1) 66%,
-            transparent 66%
-          ),
-          linear-gradient(
-            0deg,
-            transparent 33%,
-            rgba(0, 0, 0, 0.1) 33%,
-            rgba(0, 0, 0, 0.1) 66%,
-            transparent 66%
-          );
-      }
-
-      /* 3D Perspective Container */
-      .perspective-container {
-        perspective: 1000px;
+        font-style: italic;
       }
     </style>
   </head>
-  <body
-    class="text-white relative w-full selection:bg-purple-500 selection:text-white"
-  >
-      <script type="module" src="slideshow.js"></script> <!-- Link to your JavaScript file -->
-
-    <!-- ==============================================
-         SECTION 1: HERO (Sticky)
-         ============================================== -->
-    <section
-      class="sticky-hero flex flex-col justify-between p-6 md:p-12 hero-bg"
+  <body class="selection:bg-purple-500 selection:text-white">
+    <!-- NAV -->
+    <nav
+      class="fixed top-0 left-0 w-full z-50 px-6 py-6 transition-all duration-300"
+      id="navbar"
     >
-      <!-- Header -->
-      <header class="flex justify-between items-center z-50 w-full relative">
-        <div class="slide-down flex items-center gap-2 cursor-pointer z-50">
-          <svg
-            width="32"
-            height="32"
-            viewBox="0 0 24 24"
-            fill="none"
-            class="text-white"
+      <div class="max-w-7xl mx-auto flex justify-between items-center">
+        <div class="flex items-center gap-2 font-bold text-2xl tracking-tight">
+          <span
+            class="w-6 h-6 bg-white rounded-full flex items-center justify-center text-black text-xs"
+            >/</span
           >
-            <path
-              d="M4 12L9 17L20 6"
-              stroke="currentColor"
-              stroke-width="3"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            />
-            <path
-              d="M4 6L9 11"
-              stroke="currentColor"
-              stroke-width="3"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            />
-          </svg>
-          <span class="text-3xl font-bold tracking-tight">Slay</span>
+          Slay
+        </div>
+        <div
+          class="hidden md:flex items-center gap-8 bg-white/5 backdrop-blur-md px-8 py-3 rounded-full border border-white/10"
+        >
+          <a
+            href="#section-features"
+            class="text-sm font-medium text-white/70 hover:text-white transition-colors"
+            >Features</a
+          >
+          <a
+            href="#section-points"
+            class="text-sm font-medium text-white/70 hover:text-white transition-colors"
+            >Points</a
+          >
+          <a
+            href="#section-card"
+            class="text-sm font-medium text-white/70 hover:text-white transition-colors"
+            >Card</a
+          >
         </div>
         <button
-          class="slide-down glass px-6 py-3 rounded-full text-sm font-semibold hover:bg-white/20 transition-all flex items-center gap-2 z-50"
+          class="bg-white text-black px-6 py-2.5 rounded-full text-sm font-bold hover:bg-gray-200 transition-colors"
         >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-            <path
-              d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM10 17L5 12L6.41 10.59L10 14.17L17.59 6.58L19 8L10 17Z"
-            />
-          </svg>
-          Get early access
-        </button>
-      </header>
-
-      <!-- Navigation -->
-      <div
-        class="absolute right-6 md:right-12 top-1/2 -translate-y-1/2 flex items-center gap-3 z-40"
-      >
-        <div id="nav-items-container" class="flex gap-2">
-          <button
-            class="nav-item glass px-4 py-2 rounded-full text-xs font-medium hover:bg-white/20"
-          >
-            Contact
-          </button>
-          <button
-            class="nav-item glass px-4 py-2 rounded-full text-xs font-medium hover:bg-white/20"
-          >
-            FAQ
-          </button>
-          <button
-            class="nav-item glass px-4 py-2 rounded-full text-xs font-medium hover:bg-white/20"
-          >
-            Rewards
-          </button>
-          <button
-            class="nav-item glass px-4 py-2 rounded-full text-xs font-medium hover:bg-white/20"
-          >
-            Use Case
-          </button>
-        </div>
-        <button
-          id="menu-btn"
-          class="slide-left glass px-5 py-2 rounded-full text-xs font-medium hover:bg-white/20 transition-all flex items-center gap-2 z-50"
-        >
-          <span id="menu-text" class="w-10 text-center block relative"
-            >Menu</span
-          >
-          <span class="menu-icon text-lg leading-none pb-1">|</span>
+          Get App
         </button>
       </div>
+    </nav>
 
-      <!-- Hero Content -->
+    <!-- SECTION 1: NEW HERO (Revolut Style) -->
+    <section
+      class="relative min-h-screen w-full flex flex-col items-center justify-center pt-32 pb-20 px-6 overflow-hidden"
+    >
+      <div class="hero-glow"></div>
+
       <div
-        class="flex-grow flex flex-col items-center justify-center z-10 pointer-events-none w-full"
+        class="text-center max-w-5xl mx-auto z-10 mb-16 hero-anim opacity-0 translate-y-10"
       >
-        <div class="text-center relative overflow-visible px-4">
-          <h1
-            class="text-7xl md:text-9xl font-black tracking-tighter leading-tight flex items-center justify-center gap-0"
+        <h1
+          class="text-7xl md:text-9xl font-bold tracking-tighter leading-[0.9] mb-8"
+        >
+          Change the way <br />
+          you <span class="text-gradient">money.</span>
+        </h1>
+        <p class="text-xl text-white/60 max-w-2xl mx-auto leading-relaxed">
+          One app for all things money. From crypto to fiat, spending to saving.
+          Slay bridges the gap with zero friction.
+        </p>
+        <div class="mt-10 flex flex-col md:flex-row gap-4 justify-center">
+          <button
+            class="bg-white text-black px-8 py-4 rounded-full font-bold text-base hover:scale-105 transition-transform"
           >
-            <span class="slash-mark text-white transform origin-center">/</span>
-            <span class="reveal-text-container flex items-center">
-              <span class="pl-2 md:pl-4">Slash the friction</span>
-            </span>
-          </h1>
-        </div>
-        <div class="fade-in subtext mt-8 text-center max-w-xl px-4">
-          <p
-            class="text-lg md:text-xl font-medium text-gray-200 leading-relaxed"
+            Get Slay Free
+          </button>
+          <button
+            class="glass px-8 py-4 rounded-full font-bold text-base hover:bg-white/10 transition-colors"
           >
-            A refined, seamless way to move crypto — because payments should
-            feel effortless.
-          </p>
+            View Plans
+          </button>
         </div>
       </div>
 
-      <!-- Footer -->
-      <footer
-        class="flex flex-col md:flex-row justify-between items-end w-full z-20 pb-0 pointer-events-none"
+      <!-- Hero Visual: Dashboard/App Interface -->
+      <div
+        class="relative w-full max-w-6xl hero-anim opacity-0 translate-y-20 scale-95"
       >
         <div
-          class="slide-up glass p-4 rounded-xl max-w-sm text-[10px] md:text-xs text-gray-300 leading-relaxed backdrop-blur-md relative pointer-events-auto"
+          class="aspect-[16/9] md:aspect-[21/9] bg-[#0F0F11] rounded-t-[40px] border-t border-l border-r border-white/10 shadow-2xl overflow-hidden relative"
         >
-          <button
-            onclick="this.parentElement.style.opacity = '0'"
-            class="absolute top-2 right-2 text-white hover:text-gray-300 transition-opacity"
-          >
-            <svg
-              width="12"
-              height="12"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-            >
-              <line x1="18" y1="6" x2="6" y2="18"></line>
-              <line x1="6" y1="6" x2="18" y2="18"></line>
-            </svg>
-          </button>
-          Slay is a financial technology company, not a bank. Banking services
-          provided by Column N.A., and Piermont Bank; Members FDIC.
+          <!-- Mock UI -->
+
+          <div class="container flex items-center justify-center" >
+         
+
+            <div class="cover atvImg">
+              <div
+                class="atvImg-layer"
+                data-img="http://robindelaporte.fr/codepen/visa-bg-2.jpg"
+              ></div>
+              <div
+                class="atvImg-layer"
+                data-img="http://robindelaporte.fr/codepen/visa.png"
+              ></div>
+            </div>
+
+
+            
+          </div>
         </div>
-        <div
-          class="slide-up glass rounded-full p-3 flex items-center justify-center hover:bg-white/20 transition-all cursor-pointer pointer-events-auto"
-          onclick="document.getElementById('section-2').scrollIntoView({behavior: 'smooth'})"
-        >
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <rect
-              x="5"
-              y="2"
-              width="14"
-              height="20"
-              rx="7"
-              stroke="white"
-              stroke-width="2"
-            />
-            <path
-              id="scroll-wheel"
-              d="M12 6V10"
-              stroke="white"
-              stroke-width="2"
-              stroke-linecap="round"
-            />
-            <path
-              d="M8 16L12 20L16 16"
-              stroke="white"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            />
-          </svg>
-        </div>
-      </footer>
+      </div>
     </section>
 
-    <!-- ==============================================
-         SECTION 2: THE CARD (Overlay)
-         ============================================== -->
+    <!-- SECTION 2: 3D CARD (Preserved) -->
     <section
-      id="section-2"
-      class="overlay-section min-h-screen w-full bg-black relative flex flex-col items-center pt-24 pb-20 px-6 overflow-hidden"
+      id="section-card"
+      class="relative z-10 w-full py-32 px-6 flex flex-col items-center overflow-hidden"
     >
-      <!-- Ambient Glow Background -->
-      <div
-        class="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#A020F0] rounded-full blur-[150px] opacity-15 pointer-events-none"
-      ></div>
+      <div class="text-center mb-16">
+        <h2 class="text-4xl md:text-6xl font-bold mb-4">
+          Physical meets Digital
+        </h2>
+        <p class="text-white/50">The only card you'll ever need.</p>
+      </div>
 
-      <!-- Phone Mockup Container -->
-      <div
-        class="relative z-10 phone-anim transform translate-y-20 opacity-0 w-full flex justify-center mb-0 md:mb-10"
-      >
-        <!-- iPhone Frame -->
+      <div class="relative w-[320px] h-[500px] perspective-container">
         <div
-          class="w-[380px] md:w-[500px] h-[700px] md:h-[850px] bg-[#111] rounded-[60px] border-[8px] border-[#222] relative phone-frame overflow-hidden mx-auto transform origin-top hover:scale-[1.01] transition-transform duration-700"
+          id="tilt-card"
+          class="w-full h-full rounded-[32px] luxury-card-bg shadow-purple-glow flex flex-col justify-between p-8 relative z-20 cursor-pointer transform transition-transform duration-100"
         >
-          <div
-            class="absolute top-0 left-1/2 -translate-x-1/2 h-[35px] w-[160px] bg-black rounded-b-2xl z-30"
-          ></div>
+          <div class="glossy-shine"></div>
+          <div class="absolute inset-0 noise-texture pointer-events-none"></div>
 
           <div
-            class="w-full h-full bg-black flex flex-col items-center pt-36 relative perspective-container"
+            class="flex justify-between items-center relative z-10 pointer-events-none"
+          >
+            <div class="w-12 h-9 chip-gradient shadow-sm rounded-md"></div>
+            <svg
+              width="32"
+              height="32"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              class="text-white/70 rotate-90"
+            >
+              <path
+                d="M14 2C14 2 18 6 18 12C18 18 14 22 14 22"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+              />
+              <path
+                d="M10 5C10 5 12.5 8 12.5 12C12.5 16 10 19 10 19"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+              />
+              <path
+                d="M7 8C7 8 8.5 10 8.5 12C8.5 14 7 16 7 16"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+              />
+            </svg>
+          </div>
+
+          <div
+            class="flex justify-start relative z-10 mt-8 pointer-events-none"
           >
             <div
-              class="absolute inset-0 bg-gradient-to-b from-[#1a0229] to-black"
-            ></div>
-
-            <!-- THE PREMIUM PURPLE CARD (With Tilt ID and Glossy Shine) -->
-            <div
-              id="tilt-card"
-              class="w-[90%] aspect-[1.586] rounded-2xl luxury-card-bg shadow-purple-glow flex flex-col justify-between p-6 relative z-20 cursor-pointer"
+              class="text-white font-mono text-xl tracking-widest font-medium space-x-4"
             >
-              <!-- GLOSSY SHINE LAYER -->
-              <div class="glossy-shine"></div>
+              <span>4000</span> <span>1234</span> <span>5678</span>
+              <span>9010</span>
+            </div>
+          </div>
 
+          <div
+            class="flex justify-between items-end relative z-10 mt-8 pointer-events-none"
+          >
+            <div class="flex flex-col space-y-1">
               <div
-                class="absolute inset-0 noise-texture pointer-events-none"
-              ></div>
-
-              <!-- Top Row: Chip & Contactless -->
-              <div
-                class="flex justify-between items-center relative z-10 pointer-events-none"
+                class="text-white/40 font-mono text-[10px] uppercase tracking-wider"
               >
-                <div class="w-12 h-9 chip-gradient shadow-sm"></div>
-                <!-- Contactless Icon -->
-                <svg
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                  class="text-white/70 rotate-90"
-                >
-                  <path
-                    d="M14 2C14 2 18 6 18 12C18 18 14 22 14 22"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                  />
-                  <path
-                    d="M10 5C10 5 12.5 8 12.5 12C12.5 16 10 19 10 19"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                  />
-                  <path
-                    d="M7 8C7 8 8.5 10 8.5 12C8.5 14 7 16 7 16"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                  />
-                </svg>
+                Card Holder
               </div>
-
-              <!-- Middle Row: Card Number -->
-              <div
-                class="flex justify-start relative z-10 mt-8 pointer-events-none"
-              >
-                <div
-                  class="text-white font-mono text-lg md:text-xl tracking-widest font-medium space-x-4"
-                >
-                  <span>1234</span>
-                  <span>5678</span>
-                  <span>9876</span>
-                  <span>5432</span>
-                </div>
+              <div class="text-white font-bold text-sm uppercase tracking-wide">
+                JAMES SMITH
               </div>
-
-              <!-- Bottom Row: Name, Expiry, Logo -->
-              <div
-                class="flex justify-between items-end relative z-10 mt-8 pointer-events-none"
+            </div>
+            <div class="flex items-center">
+              <svg
+                width="48"
+                height="32"
+                viewBox="0 0 40 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
               >
-                <!-- Cardholder & Expiry -->
-                <div class="flex flex-col space-y-1">
-                  <div
-                    class="text-white/60 font-mono text-[10px] uppercase tracking-wider"
-                  >
-                    Card Holder
-                  </div>
-                  <div
-                    class="text-white font-bold text-sm md:text-base uppercase tracking-wide"
-                  >
-                    JAMES SMITH
-                  </div>
-                  <div class="flex items-center space-x-2 mt-1">
-                    <div
-                      class="text-white/60 font-mono text-[10px] uppercase tracking-wider"
-                    >
-                      Expires
-                    </div>
-                    <div class="text-white font-mono text-sm tracking-widest">
-                      09/28
-                    </div>
-                  </div>
-                </div>
+                <circle
+                  cx="12"
+                  cy="12"
+                  r="12"
+                  fill="#EB001B"
+                  fill-opacity="0.8"
+                />
+                <circle
+                  cx="28"
+                  cy="12"
+                  r="12"
+                  fill="#F79E1B"
+                  fill-opacity="0.8"
+                />
+                <path
+                  d="M20 12V12C17.2386 12 15 9.76142 15 7C15 4.23858 17.2386 2 20 2C22.7614 2 25 4.23858 25 7C25 9.76142 22.7614 12 20 12Z"
+                  fill="#FF5F00"
+                  fill-opacity="0.6"
+                />
+              </svg>
+            </div>
+          </div>
+          <!-- Engraved Logo -->
+          <div
+            class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 engraved-text text-6xl opacity-20 pointer-events-none select-none"
+          >
+            SLAY
+          </div>
+        </div>
+      </div>
+    </section>
 
-                <!-- Mastercard Logo -->
-                <div class="flex items-center">
-                  <svg
-                    width="50"
-                    height="30"
-                    viewBox="0 0 40 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
+    <!-- SECTION 3: UNIVERSAL PAYMENT (Revamped Single Page Slider) -->
+    <section
+      id="section-features"
+      class="py-32 px-6 bg-[#050505] border-t border-white/5"
+    >
+      <div class="max-w-7xl mx-auto">
+        <div class="mb-20">
+          <h2 class="text-5xl md:text-7xl font-bold mb-6">
+            Eliminating Friction
+          </h2>
+          <p class="text-xl text-white/60 max-w-2xl">
+            End-to-end universal payment solution. One platform for everything.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 h-[600px]">
+          <!-- Left: Navigation Tabs -->
+          <div class="flex flex-col justify-center gap-4" id="payment-tabs">
+            <!-- Tab 1 -->
+            <div class="tab-button active" onclick="setPaymentTab(0)">
+              <h3 class="text-2xl font-bold mb-2">Secure Crypto Vault</h3>
+              <p class="text-white/60 text-sm">
+                Store, send, and receive multiple cryptocurrencies with
+                military-grade security.
+              </p>
+              <div class="tab-progress"></div>
+            </div>
+            <!-- Tab 2 -->
+            <div class="tab-button" onclick="setPaymentTab(1)">
+              <h3 class="text-2xl font-bold mb-2">Financial Analytics</h3>
+              <p class="text-white/60 text-sm">
+                Real-time spending insights, trend predictions, and smart
+                alerts.
+              </p>
+              <div class="tab-progress"></div>
+            </div>
+            <!-- Tab 3 -->
+            <div class="tab-button" onclick="setPaymentTab(2)">
+              <h3 class="text-2xl font-bold mb-2">Global Payments</h3>
+              <p class="text-white/60 text-sm">
+                Send and receive payments across 180+ countries with instant
+                settlements.
+              </p>
+              <div class="tab-progress"></div>
+            </div>
+          </div>
+
+          <!-- Right: Visual Display -->
+          <div
+            class="relative bg-[#0F0F11] rounded-[32px] border border-white/10 overflow-hidden"
+          >
+            <!-- Visual 1 -->
+            <div
+              id="pay-vis-0"
+              class="feature-visual active flex items-center justify-center p-8"
+            >
+              <div
+                class="w-[300px] bg-[#1A1A1E] rounded-2xl p-6 border border-white/10 shadow-2xl"
+              >
+                <div class="flex justify-between items-center mb-8">
+                  <span class="font-bold text-lg">Wallet</span>
+                  <div class="w-8 h-8 rounded-full bg-[#A020F0]"></div>
+                </div>
+                <div class="text-4xl font-bold mb-2">$24,500.00</div>
+                <div class="text-green-400 text-sm mb-8">+4.2% this week</div>
+                <div class="space-y-3">
+                  <div
+                    class="bg-black/40 p-3 rounded-lg flex justify-between items-center"
                   >
-                    <circle
-                      cx="12"
-                      cy="12"
-                      r="12"
-                      fill="#EB001B"
-                      fill-opacity="0.8"
-                    />
-                    <circle
-                      cx="28"
-                      cy="12"
-                      r="12"
-                      fill="#F79E1B"
-                      fill-opacity="0.8"
-                    />
-                    <path
-                      d="M20 12V12C17.2386 12 15 9.76142 15 7C15 4.23858 17.2386 2 20 2C22.7614 2 25 4.23858 25 7C25 9.76142 22.7614 12 20 12Z"
-                      fill="#FF5F00"
-                      fill-opacity="0.6"
-                    />
-                    <path
-                      d="M20 22V22C17.2386 22 15 19.7614 15 17C15 14.2386 17.2386 12 20 12C22.7614 12 25 14.2386 25 17C25 19.7614 22.7614 22 20 22Z"
-                      fill="#FF5F00"
-                      fill-opacity="0.6"
-                    />
-                  </svg>
+                    <span>Bitcoin</span><span>$42,000</span>
+                  </div>
+                  <div
+                    class="bg-black/40 p-3 rounded-lg flex justify-between items-center"
+                  >
+                    <span>Ethereum</span><span>$2,800</span>
+                  </div>
                 </div>
               </div>
             </div>
-
-            <!-- Fake App UI -->
-            <div class="w-full mt-12 px-6 space-y-4 opacity-30">
-              <div class="h-4 w-1/3 bg-gray-800 rounded animate-pulse"></div>
+            <!-- Visual 2 -->
+            <div
+              id="pay-vis-1"
+              class="feature-visual flex items-center justify-center p-8"
+            >
+              <div class="w-full max-w-md">
+                <div
+                  class="flex gap-4 items-end h-[200px] px-8 pb-8 border-b border-white/10"
+                >
+                  <div
+                    class="flex-1 bg-[#A020F0] rounded-t-lg h-[40%] opacity-50"
+                  ></div>
+                  <div class="flex-1 bg-[#A020F0] rounded-t-lg h-[70%]"></div>
+                  <div
+                    class="flex-1 bg-[#A020F0] rounded-t-lg h-[50%] opacity-50"
+                  ></div>
+                  <div class="flex-1 bg-[#A020F0] rounded-t-lg h-[90%]"></div>
+                  <div
+                    class="flex-1 bg-[#A020F0] rounded-t-lg h-[60%] opacity-50"
+                  ></div>
+                </div>
+                <div
+                  class="flex justify-between mt-4 text-sm text-white/60 px-2"
+                >
+                  <span>Mon</span><span>Tue</span><span>Wed</span
+                  ><span>Thu</span><span>Fri</span>
+                </div>
+              </div>
+            </div>
+            <!-- Visual 3 -->
+            <div
+              id="pay-vis-2"
+              class="feature-visual flex items-center justify-center p-8"
+            >
               <div
-                class="h-20 w-full bg-gray-900 rounded-xl border border-gray-800"
-              ></div>
-              <div
-                class="h-20 w-full bg-gray-900 rounded-xl border border-gray-800"
-              ></div>
+                class="w-[300px] h-[300px] rounded-full border border-white/10 relative animate-spin-slow flex items-center justify-center"
+              >
+                <div
+                  class="absolute w-4 h-4 bg-white rounded-full top-0 left-1/2 -translate-x-1/2 shadow-[0_0_20px_white]"
+                ></div>
+                <div
+                  class="absolute w-4 h-4 bg-[#A020F0] rounded-full bottom-0 left-1/2 -translate-x-1/2 shadow-[0_0_20px_#A020F0]"
+                ></div>
+                <div class="text-4xl font-bold text-white/10">GLOBAL</div>
+              </div>
             </div>
           </div>
         </div>
       </div>
+    </section>
 
-      <!-- INFO CARD (Parallax) -->
-      <div
-        class="info-card-anim relative z-20 -mt-24 md:-mt-48 text-center opacity-0 translate-y-10 bg-black p-8 md:p-12 rounded-[40px] border border-white/10 shadow-2xl max-w-4xl mx-auto"
-      >
-        <h2
-          class="font-serif text-3xl md:text-5xl text-white leading-tight mb-8"
-        >
-          Making Every Transaction <br />
-          <span class="italic text-[#A020F0]"
-            >Smoother, Faster, and More Secure Than Ever.</span
+    <!-- SECTION 4: SLASH POINTS (Revamped Single Page Slider) -->
+    <section
+      id="section-points"
+      class="py-32 px-6 bg-[#050505] border-t border-white/5"
+    >
+      <div class="max-w-7xl mx-auto">
+        <div class="mb-20 text-center md:text-left">
+          <span
+            class="text-[#A020F0] font-mono text-sm tracking-widest uppercase mb-4 block"
+            >Loyalty</span
           >
-        </h2>
+          <h2 class="text-5xl md:text-7xl font-bold mb-6">
+            Points that slay harder.
+          </h2>
+          <p class="text-xl text-white/60 max-w-2xl">
+            Rewards that work for you, not for them. No middlemen, no limits.
+          </p>
+        </div>
 
-        <!-- Buttons -->
-        <div
-          class="flex flex-col md:flex-row gap-4 justify-center items-center mt-8"
-        >
-          <button
-            class="bg-white text-black px-10 py-4 rounded-full font-semibold text-sm hover:bg-gray-200 transition-colors min-w-[180px] flex items-center justify-center gap-2 group"
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 h-[600px]">
+          <!-- Right: Visual Display (Order 2 on mobile, but we use grid-flow) -->
+          <div
+            class="order-2 lg:order-1 relative bg-[#0F0F11] rounded-[32px] border border-white/10 overflow-hidden"
           >
-            Discover More
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              class="group-hover:translate-y-1 transition-transform duration-300"
+            <div
+              class="absolute top-0 left-0 w-full h-full bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20"
+            ></div>
+
+            <!-- Visual 1: Swap -->
+            <div
+              id="point-vis-0"
+              class="feature-visual active flex items-center justify-center h-full"
             >
-              <path d="M12 5v14M19 12l-7 7-7-7" />
-            </svg>
-          </button>
-          <button
-            class="border border-white/20 bg-transparent text-white px-10 py-4 rounded-full font-semibold text-sm hover:bg-white/10 transition-colors min-w-[180px]"
+              <div
+                class="w-[280px] bg-[#1A1A1E] p-6 rounded-2xl border border-white/10 shadow-2xl"
+              >
+                <div class="flex justify-between mb-6">
+                  <span class="text-xs uppercase tracking-widest">Convert</span>
+                </div>
+                <div class="flex justify-between items-center mb-4">
+                  <div class="text-2xl font-mono">5,000 PTS</div>
+                  <div>➜</div>
+                  <div class="text-2xl font-mono">0.05 ETH</div>
+                </div>
+                <button
+                  class="w-full bg-white text-black py-3 rounded-lg font-bold"
+                >
+                  Confirm Swap
+                </button>
+              </div>
+            </div>
+            <!-- Visual 2: NFT -->
+            <div
+              id="point-vis-1"
+              class="feature-visual flex items-center justify-center h-full"
+            >
+              <div
+                class="w-[260px] bg-[#1A1A1E] p-4 rounded-2xl border border-white/10 shadow-2xl text-center"
+              >
+                <div
+                  class="w-full h-[200px] bg-gradient-to-tr from-purple-600 to-blue-600 rounded-xl mb-4"
+                ></div>
+                <div class="font-bold text-lg mb-1">Slay Genesis #1</div>
+                <div class="text-[#A020F0] text-sm mb-4">25k PTS</div>
+                <button
+                  class="w-full border border-white/20 py-2 rounded-lg text-sm hover:bg-white hover:text-black transition-colors"
+                >
+                  Claim
+                </button>
+              </div>
+            </div>
+            <!-- Visual 3: Staking -->
+            <div
+              id="point-vis-2"
+              class="feature-visual flex items-center justify-center h-full"
+            >
+              <div class="text-center">
+                <div class="text-[8rem] font-bold leading-none text-white">
+                  +5%
+                </div>
+                <div class="text-2xl text-[#A020F0]">APY BOOST</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Left: Navigation Tabs -->
+          <div
+            class="order-1 lg:order-2 flex flex-col justify-center gap-4"
+            id="points-tabs"
           >
-            Join the Waitlist
-          </button>
+            <!-- Tab 1 -->
+            <div class="tab-button active" onclick="setPointsTab(0)">
+              <h3 class="text-2xl font-bold mb-2">Crypto Conversion</h3>
+              <p class="text-white/60 text-sm">
+                Convert points 1:1 into stablecoins or popular crypto instantly.
+              </p>
+              <div class="tab-progress"></div>
+            </div>
+            <!-- Tab 2 -->
+            <div class="tab-button" onclick="setPointsTab(1)">
+              <h3 class="text-2xl font-bold mb-2">NFT & Digital Assets</h3>
+              <p class="text-white/60 text-sm">
+                Redeem for exclusive Slay NFTs and digital collectibles.
+              </p>
+              <div class="tab-progress"></div>
+            </div>
+            <!-- Tab 3 -->
+            <div class="tab-button" onclick="setPointsTab(2)">
+              <h3 class="text-2xl font-bold mb-2">Staking Boosts</h3>
+              <p class="text-white/60 text-sm">
+                Apply points to increase your staking yields or unlock premium
+                pools.
+              </p>
+              <div class="tab-progress"></div>
+            </div>
+          </div>
         </div>
       </div>
     </section>
 
-    <!-- ==============================================
-         SECTION 3: FEATURES BENTO GRID (New)
-         ============================================== -->
-    <section
-      id="section-3"
-      class="relative z-10 w-full bg-[#050505] py-24 px-6 md:px-12 flex flex-col items-center border-t border-white/5"
-    >
-      <main class="slider-wrapper">
-        
-        <canvas class="webgl-canvas"></canvas>
-        <span class="slide-number" id="slideNumber">01</span>
-        <span class="slide-total" id="slideTotal">06</span>
-        <span class="help-text">
-          H: Toggle Settings • Space/→: Next • ←: Previous • Click to Advance
-        </span>
-        <nav class="slides-navigation" id="slidesNav">
-          <!-- Navigation items will be generated by JavaScript -->
-        </nav>
-      </main>
-    </section>
+    <!-- SECTION 5: FOOTER (Minimal) -->
+    <footer class="bg-black border-t border-white/10 py-20 px-6">
+      <div class="max-w-7xl mx-auto text-center">
+        <div class="text-4xl font-bold mb-8 tracking-tighter">SLAY</div>
+        <div class="flex justify-center gap-8 mb-12 text-sm text-white/60">
+          <a href="#" class="hover:text-white">Product</a>
+          <a href="#" class="hover:text-white">Company</a>
+          <a href="#" class="hover:text-white">Legal</a>
+        </div>
+        <p class="text-white/20 text-xs">
+          © 2025 Slay Financial. All rights reserved.
+        </p>
+      </div>
+    </footer>
 
-    <!-- Animation Scripts -->
+    <!-- LOGIC -->
+    <script>
+      function atvImg() {
+        var d = document,
+          de = d.documentElement,
+          bd = d.getElementsByTagName("body")[0],
+          htm = d.getElementsByTagName("html")[0],
+          win = window,
+          imgs = d.querySelectorAll(".atvImg"),
+          totalImgs = imgs.length,
+          supportsTouch = "ontouchstart" in win || navigator.msMaxTouchPoints;
+
+        if (totalImgs <= 0) {
+          return;
+        }
+
+        for (var l = 0; l < totalImgs; l++) {
+          var thisImg = imgs[l],
+            layerElems = thisImg.querySelectorAll(".atvImg-layer"),
+            totalLayerElems = layerElems.length;
+
+          if (totalLayerElems <= 0) {
+            continue;
+          }
+
+          while (thisImg.firstChild) {
+            thisImg.removeChild(thisImg.firstChild);
+          }
+
+          var containerHTML = d.createElement("div"),
+            shineHTML = d.createElement("div"),
+            shadowHTML = d.createElement("div"),
+            layersHTML = d.createElement("div"),
+            layers = [];
+
+          thisImg.id = "atvImg__" + l;
+          containerHTML.className = "atvImg-container";
+          shineHTML.className = "atvImg-shine";
+          shadowHTML.className = "atvImg-shadow";
+          layersHTML.className = "atvImg-layers";
+
+          for (var i = 0; i < totalLayerElems; i++) {
+            var layer = d.createElement("div"),
+              imgSrc = layerElems[i].getAttribute("data-img");
+
+            layer.className = "atvImg-rendered-layer";
+            layer.setAttribute("data-layer", i);
+            layer.style.backgroundImage = "url(" + imgSrc + ")";
+            layersHTML.appendChild(layer);
+
+            layers.push(layer);
+          }
+
+          containerHTML.appendChild(shadowHTML);
+          containerHTML.appendChild(layersHTML);
+          containerHTML.appendChild(shineHTML);
+          thisImg.appendChild(containerHTML);
+
+          var w =
+            thisImg.clientWidth || thisImg.offsetWidth || thisImg.scrollWidth;
+          thisImg.style.transform = "perspective(" + w * 3 + "px)";
+
+          if (supportsTouch) {
+            win.preventScroll = false;
+
+            (function (_thisImg, _layers, _totalLayers, _shine) {
+              thisImg.addEventListener("touchmove", function (e) {
+                if (win.preventScroll) {
+                  e.preventDefault();
+                }
+                processMovement(
+                  e,
+                  true,
+                  _thisImg,
+                  _layers,
+                  _totalLayers,
+                  _shine
+                );
+              });
+              thisImg.addEventListener("touchstart", function (e) {
+                win.preventScroll = true;
+                processEnter(e, _thisImg);
+              });
+              thisImg.addEventListener("touchend", function (e) {
+                win.preventScroll = false;
+                processExit(e, _thisImg, _layers, _totalLayers, _shine);
+              });
+            })(thisImg, layers, totalLayerElems, shineHTML);
+          } else {
+            (function (_thisImg, _layers, _totalLayers, _shine) {
+              thisImg.addEventListener("mousemove", function (e) {
+                processMovement(
+                  e,
+                  false,
+                  _thisImg,
+                  _layers,
+                  _totalLayers,
+                  _shine
+                );
+              });
+              thisImg.addEventListener("mouseenter", function (e) {
+                processEnter(e, _thisImg);
+              });
+              thisImg.addEventListener("mouseleave", function (e) {
+                processExit(e, _thisImg, _layers, _totalLayers, _shine);
+              });
+            })(thisImg, layers, totalLayerElems, shineHTML);
+          }
+        }
+
+        function processMovement(
+          e,
+          touchEnabled,
+          elem,
+          layers,
+          totalLayers,
+          shine
+        ) {
+          var bdst = bd.scrollTop || htm.scrollTop,
+            bdsl = bd.scrollLeft,
+            pageX = touchEnabled ? e.touches[0].pageX : e.pageX,
+            pageY = touchEnabled ? e.touches[0].pageY : e.pageY,
+            offsets = elem.getBoundingClientRect(),
+            w = elem.clientWidth || elem.offsetWidth || elem.scrollWidth,
+            h = elem.clientHeight || elem.offsetHeight || elem.scrollHeight,
+            wMultiple = 320 / w,
+            offsetX = 0.52 - (pageX - offsets.left - bdsl) / w,
+            offsetY = 0.52 - (pageY - offsets.top - bdst) / h,
+            dy = pageY - offsets.top - bdst - h / 2,
+            dx = pageX - offsets.left - bdsl - w / 2,
+            yRotate = (offsetX - dx) * (0.07 * wMultiple),
+            xRotate = (dy - offsetY) * (0.1 * wMultiple),
+            imgCSS = "rotateX(" + xRotate + "deg) rotateY(" + yRotate + "deg)",
+            arad = Math.atan2(dy, dx),
+            angle = (arad * 180) / Math.PI - 90;
+
+          if (angle < 0) {
+            angle = angle + 360;
+          }
+
+          if (elem.firstChild.className.indexOf(" over") != -1) {
+            imgCSS += " scale3d(1.07,1.07,1.07)";
+          }
+          elem.firstChild.style.transform = imgCSS;
+
+          shine.style.background =
+            "linear-gradient(" +
+            angle +
+            "deg, rgba(255,255,255," +
+            ((pageY - offsets.top - bdst) / h) * 0.4 +
+            ") 0%,rgba(255,255,255,0) 80%)";
+          shine.style.transform =
+            "translateX(" +
+            offsetX * totalLayers -
+            0.1 +
+            "px) translateY(" +
+            offsetY * totalLayers -
+            0.1 +
+            "px)";
+
+          var revNum = totalLayers;
+          for (var ly = 0; ly < totalLayers; ly++) {
+            layers[ly].style.transform =
+              "translateX(" +
+              offsetX * revNum * ((ly * 2.5) / wMultiple) +
+              "px) translateY(" +
+              offsetY * totalLayers * ((ly * 2.5) / wMultiple) +
+              "px)";
+            revNum--;
+          }
+        }
+
+        function processEnter(e, elem) {
+          elem.firstChild.className += " over";
+        }
+
+        function processExit(e, elem, layers, totalLayers, shine) {
+          var container = elem.firstChild;
+
+          container.className = container.className.replace(" over", "");
+          container.style.transform = "";
+          shine.style.cssText = "";
+
+          for (var ly = 0; ly < totalLayers; ly++) {
+            layers[ly].style.transform = "";
+          }
+        }
+      }
+
+      atvImg();
+    </script>
+
     <script>
       gsap.registerPlugin(ScrollTrigger);
 
+      // --- HERO ANIMATIONS ---
       window.addEventListener("load", () => {
-        // ... (Previous Animations for Hero & Section 2) ...
-
-        // Re-adding Hero & Sec 2 Animations for context if needed,
-        // but focusing on Section 3 here:
-
-        // --- HERO ANIMATIONS ---
-        const tl = gsap.timeline({ defaults: { ease: "power4.out" } });
-        tl.fromTo(
-          ".slash-mark",
-          { scale: 0, opacity: 0, rotation: -10 },
-          {
-            scale: 2.5,
-            opacity: 1,
-            rotation: 0,
-            duration: 1.2,
-            ease: "elastic.out(1, 0.6)",
-          }
-        )
-          .to({}, { duration: 0.8 })
-          .to(
-            ".slash-mark",
-            { scale: 1, duration: 1.2, ease: "power3.inOut" },
-            "reveal"
-          )
-          .to(
-            ".reveal-text-container",
-            { width: "auto", opacity: 1, duration: 1.2, ease: "power3.inOut" },
-            "reveal"
-          )
-          .addLabel("sync-ui", "-=0.8")
-          .to(
-            ".slide-down",
-            { opacity: 1, y: 0, duration: 1, stagger: 0.1 },
-            "sync-ui"
-          )
-          .to(".slide-left", { opacity: 1, x: 0, duration: 1 }, "sync-ui")
-          .to(".fade-in", { opacity: 1, y: 0, duration: 1 }, "sync-ui")
-          .to(
-            ".slide-up",
-            { opacity: 1, y: 0, duration: 1, stagger: 0.1 },
-            "sync-ui"
-          )
-          .to(
-            "#scroll-wheel",
-            {
-              y: 5,
-              opacity: 0,
-              duration: 1.5,
-              repeat: -1,
-              ease: "power1.inOut",
-              onStart: () => gsap.set("#scroll-wheel", { y: 0, opacity: 1 }),
-            },
-            "+=0.5"
-          );
-
-        // --- SECTION 2 ANIMATIONS ---
-        gsap.to(".phone-anim", {
-          scrollTrigger: {
-            trigger: "#section-2",
-            start: "top 70%",
-            end: "bottom top",
-            toggleActions: "play none none reverse",
-          },
+        gsap.to(".hero-anim", {
           y: 0,
           opacity: 1,
           duration: 1.2,
-          ease: "power3.out",
-        });
-        gsap.to(".info-card-anim", {
-          scrollTrigger: {
-            trigger: "#section-2",
-            start: "top 60%",
-            toggleActions: "play none none reverse",
-          },
-          y: 0,
-          opacity: 1,
-          duration: 1,
-          delay: 0.3,
-          ease: "power3.out",
-        });
-        gsap.to(".info-card-anim", {
-          scrollTrigger: {
-            trigger: "#section-2",
-            start: "top bottom",
-            end: "bottom top",
-            scrub: 1,
-          },
-          y: -250,
-          ease: "none",
-        });
-        gsap.to(".luxury-card-bg", {
-          scrollTrigger: {
-            trigger: "#section-2",
-            start: "top bottom",
-            end: "bottom top",
-            scrub: 1,
-          },
-          y: -30,
-          ease: "none",
-        });
-
-        // --- SECTION 3 ANIMATIONS (NEW) ---
-
-        // 1. Header Reveal
-        gsap.to(".section-3-header", {
-          scrollTrigger: {
-            trigger: "#section-3",
-            start: "top 80%",
-            toggleActions: "play none none reverse",
-          },
-          y: 0,
-          opacity: 1,
-          duration: 1,
+          stagger: 0.2,
           ease: "power3.out",
         });
 
-        // 2. Bento Cards Stagger
-        gsap.to(".bento-card", {
-          scrollTrigger: {
-            trigger: "#section-3",
-            start: "top 70%",
-            toggleActions: "play none none reverse",
-          },
-          y: 0,
-          opacity: 1,
-          duration: 1,
-          stagger: 0.15, // Cards appear one after another
-          ease: "power3.out",
-        });
+        // Mouse Tilt on Card
+        const card = document.getElementById("tilt-card");
+        const shine = card.querySelector(".glossy-shine");
+        if (card) {
+          card.addEventListener("mousemove", (e) => {
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const rotateX = ((y - rect.height / 2) / (rect.height / 2)) * -10;
+            const rotateY = ((x - rect.width / 2) / (rect.width / 2)) * 10;
+            gsap.to(card, {
+              rotateX: rotateX,
+              rotateY: rotateY,
+              transformPerspective: 1000,
+              duration: 0.5,
+            });
+            gsap.to(shine, {
+              opacity: 1,
+              background: `radial-gradient(circle at ${x}px ${y}px, rgba(255,255,255,0.3) 0%, transparent 60%)`,
+              duration: 0.5,
+            });
+          });
+          card.addEventListener("mouseleave", () => {
+            gsap.to(card, {
+              rotateX: 0,
+              rotateY: 0,
+              duration: 1,
+              ease: "elastic.out(1, 0.5)",
+            });
+            gsap.to(shine, { opacity: 0, duration: 0.5 });
+          });
+        }
+
+        // Init Tab Sliders
+        initTabSlider("payment-tabs", "pay-vis", 3);
+        initTabSlider("points-tabs", "point-vis", 3);
       });
 
-      // ... (Mouse Tilt & Menu Logic remains the same) ...
-      const card = document.getElementById("tilt-card");
-      const shine = card?.querySelector(".glossy-shine");
+      // --- GENERIC TAB SLIDER LOGIC ---
+      function initTabSlider(containerId, visualPrefix, count) {
+        let activeIndex = 0;
+        const container = document.getElementById(containerId);
+        if (!container) return;
 
-      if (card && shine) {
-        card.addEventListener("mousemove", (e) => {
-          const rect = card.getBoundingClientRect();
-          const x = e.clientX - rect.left;
-          const y = e.clientY - rect.top;
-          const centerX = rect.width / 2;
-          const centerY = rect.height / 2;
-          const rotateX = ((y - centerY) / centerY) * -15;
-          const rotateY = ((x - centerX) / centerX) * 15;
+        const tabs = container.querySelectorAll(".tab-button");
+        let timer;
 
-          gsap.to(card, {
-            duration: 0.5,
-            rotateX: rotateX,
-            rotateY: rotateY,
-            ease: "power2.out",
-            transformPerspective: 1000,
-            transformOrigin: "center",
+        function activate(index) {
+          // Reset all
+          tabs.forEach((t, i) => {
+            t.classList.remove("active");
+            gsap.killTweensOf(t.querySelector(".tab-progress"));
+            t.querySelector(".tab-progress").style.width = "0%";
+
+            // Visuals
+            const vis = document.getElementById(`${visualPrefix}-${i}`);
+            if (vis) vis.classList.remove("active");
           });
-          gsap.to(shine, {
-            duration: 0.5,
-            opacity: 1,
-            background: `radial-gradient(circle at ${x}px ${y}px, rgba(255,255,255,0.3) 0%, transparent 60%)`,
-            ease: "power2.out",
-          });
+
+          // Activate Current
+          const currentTab = tabs[index];
+          currentTab.classList.add("active");
+          const currentVis = document.getElementById(
+            `${visualPrefix}-${index}`
+          );
+          if (currentVis) currentVis.classList.add("active");
+
+          // Progress Bar Animation
+          gsap.fromTo(
+            currentTab.querySelector(".tab-progress"),
+            { width: "0%" },
+            { width: "100%", duration: 4, ease: "linear", onComplete: next }
+          );
+          activeIndex = index;
+        }
+
+        function next() {
+          activate((activeIndex + 1) % count);
+        }
+
+        // Click Handlers
+        tabs.forEach((t, i) => {
+          t.onclick = () => activate(i);
         });
 
-        card.addEventListener("mouseleave", () => {
-          gsap.to(card, {
-            duration: 1,
-            rotateX: 0,
-            rotateY: 0,
-            ease: "elastic.out(1, 0.5)",
-          });
-          gsap.to(shine, { duration: 1, opacity: 0, ease: "power2.out" });
-        });
-      }
+        // Expose to global scope for onClick if needed, though closure handles it.
+        // Define global setter for onclick attribute if used, but here we attached directly.
 
-      let isMenuOpen = false;
-      const menuBtn = document.getElementById("menu-btn");
-      const menuText = document.getElementById("menu-text");
-      const menuIcon = document.querySelector(".menu-icon");
-      const navItems = document.querySelectorAll(".nav-item");
-
-      if (menuBtn) {
-        menuBtn.addEventListener("click", () => {
-          if (!isMenuOpen) {
-            gsap.to(menuText, {
-              y: 10,
-              opacity: 0,
-              duration: 0.2,
-              ease: "power2.in",
-              onComplete: () => {
-                menuText.innerText = "Close";
-                gsap.fromTo(
-                  menuText,
-                  { y: -10, opacity: 0 },
-                  { y: 0, opacity: 1, duration: 0.2, ease: "power2.out" }
-                );
-              },
-            });
-            gsap.to(menuIcon, {
-              rotation: 20,
-              duration: 0.3,
-              ease: "power2.out",
-            });
-            navItems.forEach((el) => (el.style.display = "block"));
-            gsap.to(navItems, {
-              opacity: 1,
-              x: 0,
-              duration: 0.4,
-              stagger: 0.1,
-              ease: "back.out(1.7)",
-            });
-            isMenuOpen = true;
-          } else {
-            gsap.to(menuText, {
-              y: -10,
-              opacity: 0,
-              duration: 0.2,
-              ease: "power2.in",
-              onComplete: () => {
-                menuText.innerText = "Menu";
-                gsap.fromTo(
-                  menuText,
-                  { y: 10, opacity: 0 },
-                  { y: 0, opacity: 1, duration: 0.2, ease: "power2.out" }
-                );
-              },
-            });
-            gsap.to(menuIcon, {
-              rotation: 0,
-              duration: 0.3,
-              ease: "power2.out",
-            });
-            gsap.to(navItems, {
-              opacity: 0,
-              x: 20,
-              duration: 0.3,
-              stagger: 0.05,
-              onComplete: () => {
-                navItems.forEach((el) => (el.style.display = "none"));
-              },
-            });
-            isMenuOpen = false;
-          }
+        // Start observer to play only when in view
+        ScrollTrigger.create({
+          trigger: container,
+          start: "top 70%",
+          onEnter: () => activate(0),
+          once: true,
         });
       }
+
+      // Expose specific setters for HTML onclick attributes if my JS attachment fails or for explicit control
+      window.setPaymentTab = (i) => {
+        // Logic is handled by closure above, but to support inline onclick:
+        // We'd need to expose the activate function globally or re-architect slightly.
+        // The above JS attaches listeners directly, so inline onclicks in HTML can be removed or this function filled.
+        // For robustness, I will rely on the addEventListener above.
+      };
+      window.setPointsTab = (i) => {}; // Same
     </script>
   </body>
 </html>
