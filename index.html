@@ -760,7 +760,7 @@
         </p>
       </div>
 
-      <div class="relative w-[320px] h-[500px] perspective-container">
+      <div class="relative w-[320px] h-[500px] perspective-container rounded-[32px]">
         <div
           id="tilt-card"
           class="w-full h-full rounded-[32px] bg-[url('assets/bg.jpg')] bg-cover bg-center bg-no-repeat
@@ -939,127 +939,128 @@
             </div>
           </div>
 
-          <!-- Right: Visual Display -->
-          <div class="relative rounded-[32px] overflow-hidden">
-            <!-- Visual 1 -->
-            <div
-              id="pay-vis-0"
-              class="feature-visual active flex items-center justify-center p-8"
-            >
-              <img src="assets/vault.png" alt="" />
-              <!-- <div
-                class="w-[300px] bg-[#a020f0] rounded-2xl p-6 border border-white/10 shadow-2xl"
-              >
-                <div class="flex justify-between items-center mb-8">
-                  <span class="font-bold text-lg">Wallet</span>
-                  <div class="w-8 h-8 rounded-full bg-[#A020F0]"></div>
-                </div>
-                <div class="text-4xl font-bold mb-2">$24,500.00</div>
-                <div class="text-green-400 text-sm mb-8">+4.2% this week</div>
-                <div class="space-y-3">
-                  <div
-                    class="bg-black/40 p-3 rounded-lg flex justify-between items-center"
-                  >
-                    <span>Bitcoin</span><span>$42,000</span>
-                  </div>
-                  <div
-                    class="bg-black/40 p-3 rounded-lg flex justify-between items-center"
-                  >
-                    <span>Ethereum</span><span>$2,800</span>
-                  </div>
-                </div>
-              </div> -->
-            </div>
-            <!-- Visual 2 -->
-            <div
-              id="pay-vis-1"
-              class="feature-visual flex items-center justify-center p-8"
-            >
-              <img src="assets/analytics.png" alt="" />
+            <!-- Right: Visual Display -->
+            <div class="relative rounded-[32px] overflow-hidden hidden md:block">
 
-              <!-- <div class="w-full max-w-md">
-                <div
-                  class="flex gap-4 items-end h-[200px] px-8 pb-8 border-b border-white/10"
+              <!-- Visual 1 -->
+              <div
+                id="pay-vis-0"
+                class="feature-visual active flex items-center justify-center p-8"
+              >
+                <img src="assets/vault.png" alt="" />
+                <!-- <div
+                  class="w-[300px] bg-[#a020f0] rounded-2xl p-6 border border-white/10 shadow-2xl"
+                >
+                  <div class="flex justify-between items-center mb-8">
+                    <span class="font-bold text-lg">Wallet</span>
+                    <div class="w-8 h-8 rounded-full bg-[#A020F0]"></div>
+                  </div>
+                  <div class="text-4xl font-bold mb-2">$24,500.00</div>
+                  <div class="text-green-400 text-sm mb-8">+4.2% this week</div>
+                  <div class="space-y-3">
+                    <div
+                      class="bg-black/40 p-3 rounded-lg flex justify-between items-center"
+                    >
+                      <span>Bitcoin</span><span>$42,000</span>
+                    </div>
+                    <div
+                      class="bg-black/40 p-3 rounded-lg flex justify-between items-center"
+                    >
+                      <span>Ethereum</span><span>$2,800</span>
+                    </div>
+                  </div>
+                </div> -->
+              </div>
+              <!-- Visual 2 -->
+              <div
+                id="pay-vis-1"
+                class="feature-visual flex items-center justify-center p-8"
+              >
+                <img src="assets/analytics.png" alt="" />
+
+                <!-- <div class="w-full max-w-md">
+                  <div
+                    class="flex gap-4 items-end h-[200px] px-8 pb-8 border-b border-white/10"
+                  >
+                    <div
+                      class="flex-1 bg-[#A020F0] rounded-t-lg h-[40%] opacity-50"
+                    ></div>
+                    <div class="flex-1 bg-[#A020F0] rounded-t-lg h-[70%]"></div>
+                    <div
+                      class="flex-1 bg-[#A020F0] rounded-t-lg h-[50%] opacity-50"
+                    ></div>
+                    <div class="flex-1 bg-[#A020F0] rounded-t-lg h-[90%]"></div>
+                    <div
+                      class="flex-1 bg-[#A020F0] rounded-t-lg h-[60%] opacity-50"
+                    ></div>
+                  </div>
+                  <div
+                    class="flex justify-between mt-4 text-sm text-white/60 px-2"
+                  >
+                    <span>Mon</span><span>Tue</span><span>Wed</span
+                    ><span>Thu</span><span>Fri</span>
+                  </div>
+                </div> -->
+              </div>
+              <!-- Visual 3 -->
+              <div
+                id="pay-vis-2"
+                class="feature-visual flex items-center justify-center p-8"
+              >
+                <img src="assets/global.png" alt="" />
+
+                <!-- <div
+                  class="w-[300px] h-[300px] rounded-full border border-white/10 relative animate-spin-slow flex items-center justify-center"
                 >
                   <div
-                    class="flex-1 bg-[#A020F0] rounded-t-lg h-[40%] opacity-50"
+                    class="absolute w-4 h-4 bg-white rounded-full top-0 left-1/2 -translate-x-1/2 shadow-[0_0_20px_white]"
                   ></div>
-                  <div class="flex-1 bg-[#A020F0] rounded-t-lg h-[70%]"></div>
                   <div
-                    class="flex-1 bg-[#A020F0] rounded-t-lg h-[50%] opacity-50"
+                    class="absolute w-4 h-4 bg-[#A020F0] rounded-full bottom-0 left-1/2 -translate-x-1/2 shadow-[0_0_20px_#A020F0]"
                   ></div>
-                  <div class="flex-1 bg-[#A020F0] rounded-t-lg h-[90%]"></div>
-                  <div
-                    class="flex-1 bg-[#A020F0] rounded-t-lg h-[60%] opacity-50"
-                  ></div>
-                </div>
-                <div
-                  class="flex justify-between mt-4 text-sm text-white/60 px-2"
+                  <div class="text-4xl font-bold text-white/10">GLOBAL</div>
+                </div> -->
+              </div>
+              <!-- Visual 4 -->
+              <div
+                id="pay-vis-3"
+                class="feature-visual flex items-center justify-center p-8"
+              >
+                <img src="assets/ramp.png" alt="" />
+
+                <!-- <div
+                  class="w-[300px] bg-[#1A1A1E] rounded-2xl p-6 border border-white/10 shadow-2xl"
                 >
-                  <span>Mon</span><span>Tue</span><span>Wed</span
-                  ><span>Thu</span><span>Fri</span>
-                </div>
-              </div> -->
-            </div>
-            <!-- Visual 3 -->
-            <div
-              id="pay-vis-2"
-              class="feature-visual flex items-center justify-center p-8"
-            >
-              <img src="assets/global.png" alt="" />
-
-              <!-- <div
-                class="w-[300px] h-[300px] rounded-full border border-white/10 relative animate-spin-slow flex items-center justify-center"
-              >
-                <div
-                  class="absolute w-4 h-4 bg-white rounded-full top-0 left-1/2 -translate-x-1/2 shadow-[0_0_20px_white]"
-                ></div>
-                <div
-                  class="absolute w-4 h-4 bg-[#A020F0] rounded-full bottom-0 left-1/2 -translate-x-1/2 shadow-[0_0_20px_#A020F0]"
-                ></div>
-                <div class="text-4xl font-bold text-white/10">GLOBAL</div>
-              </div> -->
-            </div>
-            <!-- Visual 4 -->
-            <div
-              id="pay-vis-3"
-              class="feature-visual flex items-center justify-center p-8"
-            >
-              <img src="assets/ramp.png" alt="" />
-
-              <!-- <div
-                class="w-[300px] bg-[#1A1A1E] rounded-2xl p-6 border border-white/10 shadow-2xl"
-              >
-                <div class="flex justify-between items-center mb-6">
-                  <span class="text-xs uppercase tracking-widest text-white/60"
-                    >Exchange Rate</span
+                  <div class="flex justify-between items-center mb-6">
+                    <span class="text-xs uppercase tracking-widest text-white/60"
+                      >Exchange Rate</span
+                    >
+                  </div>
+                  <div class="flex justify-between items-center mb-6">
+                    <div class="flex flex-col">
+                      <span class="text-sm text-white/60 mb-1">You send</span>
+                      <span class="text-2xl font-mono font-bold">1 BTC</span>
+                    </div>
+                    <div class="text-2xl">⇄</div>
+                    <div class="flex flex-col text-right">
+                      <span class="text-sm text-white/60 mb-1">You get</span>
+                      <span class="text-2xl font-mono font-bold">$45,230</span>
+                    </div>
+                  </div>
+                  <div class="bg-black/40 p-3 rounded-lg mb-4 text-sm">
+                    <div class="flex justify-between text-white/60">
+                      <span>Fee</span>
+                      <span class="text-green-400">$0 (0%)</span>
+                    </div>
+                  </div>
+                  <button
+                    class="w-full bg-[#A020F0] text-white py-3 rounded-lg font-bold hover:bg-[#8a1ad4] transition-colors"
                   >
-                </div>
-                <div class="flex justify-between items-center mb-6">
-                  <div class="flex flex-col">
-                    <span class="text-sm text-white/60 mb-1">You send</span>
-                    <span class="text-2xl font-mono font-bold">1 BTC</span>
-                  </div>
-                  <div class="text-2xl">⇄</div>
-                  <div class="flex flex-col text-right">
-                    <span class="text-sm text-white/60 mb-1">You get</span>
-                    <span class="text-2xl font-mono font-bold">$45,230</span>
-                  </div>
-                </div>
-                <div class="bg-black/40 p-3 rounded-lg mb-4 text-sm">
-                  <div class="flex justify-between text-white/60">
-                    <span>Fee</span>
-                    <span class="text-green-400">$0 (0%)</span>
-                  </div>
-                </div>
-                <button
-                  class="w-full bg-[#A020F0] text-white py-3 rounded-lg font-bold hover:bg-[#8a1ad4] transition-colors"
-                >
-                  Convert Now
-                </button>
-              </div> -->
+                    Convert Now
+                  </button>
+                </div> -->
+              </div>
             </div>
-          </div>
         </div>
       </div>
     </section>
@@ -1086,7 +1087,7 @@
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 h-[600px]">
           <!-- Right: Visual Display (Order 2 on mobile, but we use grid-flow) -->
           <div
-            class="order-2 lg:order-1 relative overflow-hidden"
+            class="order-2 lg:order-1 relative overflow-hidden overflow-hidden hidden md:block"
           >
             <div
               class="absolute top-0 left-0 w-full h-full opacity-20"
