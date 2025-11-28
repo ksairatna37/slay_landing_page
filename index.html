@@ -12,7 +12,7 @@
       href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
       rel="stylesheet"
     />
-    <link rel="shortcut icon" href="assets/Frame.png" type="image/x-icon" />
+    <link rel="shortcut icon" href="assets/favicon.png" type="image/x-icon" />
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
 
@@ -329,11 +329,7 @@
         background: linear-gradient(135deg, #e2e2e2 0%, #999 50%, #e2e2e2 100%);
       }
       .engraved-text {
-        background: linear-gradient(
-          180deg,
-          rgba(0, 0, 0, 0.6) 0%,
-          rgba(255, 255, 255, 0.2) 100%
-        );
+        background: linear-gradient(180deg, #00000099 0%, #ffffff33 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         text-shadow: 0px 1px 1px #ffffff26, 0px -1px 1px rgba(0, 0, 0, 0.5);
@@ -571,6 +567,11 @@
           transform: rotate(360deg);
         }
       }
+      .company-info{
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+      }
     </style>
   </head>
   <body class="selection:bg-purple-500 selection:text-white">
@@ -656,9 +657,7 @@
         id="heroText"
         class="text-center max-w-5xl mx-auto z-10 mb-16 hero-anim opacity-0 translate-y-10"
       >
-        <h1
-          class="text-7xl md:text-9xl font-bold  leading-[0.9] mb-8"
-        >
+        <h1 class="text-7xl md:text-9xl font-bold leading-[0.9] mb-8">
           Where Your Time <br />Pays Back
         </h1>
 
@@ -682,12 +681,14 @@
         </div> -->
         <!-- Live Soon Buttons -->
         <div class="mt-10 flex flex-col md:flex-row gap-4 justify-center">
-          <button
-            class="bg-white text-black px-8 py-4 rounded-full font-bold text-base hover:scale-105 transition-transform"
-          >
-            Launching Soon
-          </button>
-         
+          <a href="#footer-section">
+            <button
+              class="bg-white text-black px-8 py-4 rounded-full font-bold text-sm hover:bg-gray-200 transition-colors"
+            >
+              Get Early Access
+            </button>
+          </a>
+
           <!-- <button
             class="glass px-8 py-4 rounded-full font-bold text-base hover:bg-white/10 transition-colors"
           >
@@ -760,11 +761,12 @@
         </p>
       </div>
 
-      <div class="relative w-[320px] h-[500px] perspective-container rounded-[32px]">
+      <div
+        class="relative w-[320px] h-[500px] perspective-container rounded-[32px]"
+      >
         <div
           id="tilt-card"
-          class="w-full h-full rounded-[32px] bg-[url('assets/bg.jpg')] bg-cover bg-center bg-no-repeat
- shadow-purple-glow flex flex-col justify-between p-8 relative z-20 cursor-pointer transform transition-transform duration-100"
+          class="w-full h-full rounded-[32px] bg-[url('assets/bg.jpg')] bg-cover bg-center bg-no-repeat shadow-purple-glow flex flex-col justify-between p-8 relative z-20 cursor-pointer transform transition-transform duration-100"
         >
           <div class="glossy-shine"></div>
           <div class="absolute inset-0 noise-texture pointer-events-none"></div>
@@ -817,16 +819,11 @@
             </div>
 
             <div class="flex flex-col space-y-1">
-              <div
-                class="text-white/40  text-[10px] uppercase tracking-wider"
-              >
+              <div class="text-white/40 text-[10px] uppercase tracking-wider">
                 MM / YY
 
-                <div
-                  class="text-white text-sm uppercase tracking-wide"
-                >
-                  <span
-                    class="text-white text-sm uppercase tracking-wide"
+                <div class="text-white text-sm uppercase tracking-wide">
+                  <span class="text-white text-sm uppercase tracking-wide"
                     >09/28</span
                   >
                 </div>
@@ -838,7 +835,7 @@
               </div>
             </div>
             <div class="flex items-center absolute justify-between w-[100%]">
-                <div></div>
+              <div></div>
               <svg
                 width="70"
                 height="50"
@@ -939,16 +936,15 @@
             </div>
           </div>
 
-            <!-- Right: Visual Display -->
-            <div class="relative rounded-[32px] overflow-hidden hidden md:block">
-
-              <!-- Visual 1 -->
-              <div
-                id="pay-vis-0"
-                class="feature-visual active flex items-center justify-center p-8"
-              >
-                <img src="assets/vault.png" alt="" />
-                <!-- <div
+          <!-- Right: Visual Display -->
+          <div class="relative rounded-[32px] overflow-hidden hidden md:block">
+            <!-- Visual 1 -->
+            <div
+              id="pay-vis-0"
+              class="feature-visual active flex items-center justify-center p-8"
+            >
+              <img src="assets/vault.png" alt="" />
+              <!-- <div
                   class="w-[300px] bg-[#a020f0] rounded-2xl p-6 border border-white/10 shadow-2xl"
                 >
                   <div class="flex justify-between items-center mb-8">
@@ -970,15 +966,15 @@
                     </div>
                   </div>
                 </div> -->
-              </div>
-              <!-- Visual 2 -->
-              <div
-                id="pay-vis-1"
-                class="feature-visual flex items-center justify-center p-8"
-              >
-                <img src="assets/analytics.png" alt="" />
+            </div>
+            <!-- Visual 2 -->
+            <div
+              id="pay-vis-1"
+              class="feature-visual flex items-center justify-center p-8"
+            >
+              <img src="assets/analytics.png" alt="" />
 
-                <!-- <div class="w-full max-w-md">
+              <!-- <div class="w-full max-w-md">
                   <div
                     class="flex gap-4 items-end h-[200px] px-8 pb-8 border-b border-white/10"
                   >
@@ -1001,15 +997,15 @@
                     ><span>Thu</span><span>Fri</span>
                   </div>
                 </div> -->
-              </div>
-              <!-- Visual 3 -->
-              <div
-                id="pay-vis-2"
-                class="feature-visual flex items-center justify-center p-8"
-              >
-                <img src="assets/global.png" alt="" />
+            </div>
+            <!-- Visual 3 -->
+            <div
+              id="pay-vis-2"
+              class="feature-visual flex items-center justify-center p-8"
+            >
+              <img src="assets/global.png" alt="" />
 
-                <!-- <div
+              <!-- <div
                   class="w-[300px] h-[300px] rounded-full border border-white/10 relative animate-spin-slow flex items-center justify-center"
                 >
                   <div
@@ -1020,15 +1016,15 @@
                   ></div>
                   <div class="text-4xl font-bold text-white/10">GLOBAL</div>
                 </div> -->
-              </div>
-              <!-- Visual 4 -->
-              <div
-                id="pay-vis-3"
-                class="feature-visual flex items-center justify-center p-8"
-              >
-                <img src="assets/ramp.png" alt="" />
+            </div>
+            <!-- Visual 4 -->
+            <div
+              id="pay-vis-3"
+              class="feature-visual flex items-center justify-center p-8"
+            >
+              <img src="assets/ramp.png" alt="" />
 
-                <!-- <div
+              <!-- <div
                   class="w-[300px] bg-[#1A1A1E] rounded-2xl p-6 border border-white/10 shadow-2xl"
                 >
                   <div class="flex justify-between items-center mb-6">
@@ -1059,8 +1055,8 @@
                     Convert Now
                   </button>
                 </div> -->
-              </div>
             </div>
+          </div>
         </div>
       </div>
     </section>
@@ -1089,9 +1085,7 @@
           <div
             class="order-2 lg:order-1 relative overflow-hidden overflow-hidden hidden md:block"
           >
-            <div
-              class="absolute top-0 left-0 w-full h-full opacity-20"
-            ></div>
+            <div class="absolute top-0 left-0 w-full h-full opacity-20"></div>
 
             <!-- Visual 1: Swap -->
             <div
@@ -1209,11 +1203,13 @@
           security experts. Instant alerts and biometrics keep your wallets and
           peace of mind safe—always.
         </p>
-        <button
-          class="bg-white text-black px-8 py-4 rounded-full font-bold text-sm hover:bg-gray-200 transition-colors"
-        >
-          Launching Soon
-        </button>
+        <a href="#footer-section">
+          <button
+            class="bg-white text-black px-8 py-4 rounded-full font-bold text-sm hover:bg-gray-200 transition-colors"
+          >
+            Get Early Access
+          </button>
+        </a>
       </div>
 
       <!-- Right: 3D Metallic Shield -->
@@ -1264,24 +1260,26 @@
           salaries, and settle in minutes — a workflow designed for speed
           without sacrificing security.
         </p>
-        <button
-          class="bg-white text-black px-8 py-4 rounded-full font-bold text-sm hover:bg-gray-200 transition-colors"
-        >
-          Launching Soon
-        </button>
+        <a href="#footer-section">
+          <button
+            class="bg-white text-black px-8 py-4 rounded-full font-bold text-sm hover:bg-gray-200 transition-colors"
+          >
+            Get Early Access
+          </button>
+        </a>
       </div>
     </section>
 
     <!-- SECTION 5: FOOTER (Minimal & Simple) -->
     <footer
       id="footer-section"
-      class="bg-[#050505] border-t border-white/10 w-screen h-screen flex flex-col items-center justify-end"
+      class="bg-[#050505]  w-screen h-screen flex flex-col items-center justify-end"
     >
       <!-- Main Footer Content -->
-      <div class="max-w-7xl mx-auto w-full px-6 pb-20 footer-parallax-section">
+      <div class="max-w-7xl mx-auto w-full px-6 pb-4 footer-parallax-section">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
           <!-- Left: Company Info -->
-          <div>
+          <div class="company-info">
             <div
               class="font-bold text-2xl tracking-tight mb-6 flex items-center gap-2"
             >
@@ -1302,7 +1300,7 @@
               All systems normal
             </p>
             <!-- Social Icons -->
-            <div class="flex gap-4">
+            <div class="flex gap-4 mb-1">
               <a
                 href="https://x.com/SlaydotMoney"
                 target="_blank"
@@ -1325,50 +1323,71 @@
 
           <!-- Right: Get in Touch -->
           <div class="flex flex-col justify-start">
-            <h3 class="text-xl font-bold mb-6">Get in Touch</h3>
+            <h3 class="text-xl font-bold mb-2">Get in Touch</h3>
             <p class="text-white/60 text-sm mb-6">
-              Subscribe to our newsletter and stay updated with the latest Slay
-              features.
+              Have questions? Fill out the form and we’ll get back to you.
             </p>
-            <!-- Email Input Form -->
+
+            <!-- Contact Form -->
             <form
-              id="newsletter-form"
-              class="flex gap-3 mb-3"
-              onsubmit="handleNewsletterSubmit(event);"
+              id="contact-form"
+              class="flex flex-col gap-4 mb-3"
+              onsubmit="handleContactSubmit(event);"
             >
+              <!-- Name -->
               <input
-                id="newsletter-email"
-                type="email"
-                placeholder="Enter your email"
-                class="flex-1 bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder:text-white/40 focus:outline-none focus:border-white/30 focus:bg-white/10 transition-all"
+                id="contact-name"
+                type="text"
+                placeholder="Your Name"
+                class="bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder:text-white/40 focus:outline-none focus:border-white/30 focus:bg-white/10 transition-all"
                 required
               />
+
+              <!-- Email -->
+              <input
+                id="contact-email"
+                type="email"
+                placeholder="Email Address"
+                class="bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder:text-white/40 focus:outline-none focus:border-white/30 focus:bg-white/10 transition-all"
+                required
+              />
+
+              <!-- Phone -->
+              <input
+                id="contact-phone"
+                type="tel"
+                placeholder="Phone Number"
+                class="bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder:text-white/40 focus:outline-none focus:border-white/30 focus:bg-white/10 transition-all"
+              />
+
+              <!-- Message -->
+              <textarea
+                id="contact-message"
+                placeholder="Your Message"
+                rows="4"
+                class="bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder:text-white/40 focus:outline-none focus:border-white/30 focus:bg-white/10 transition-all"
+                required
+              ></textarea>
+
+              <!-- Submit Button -->
               <button
-                id="subscribe-btn"
+                id="send-btn"
                 type="submit"
-                class="bg-white text-black px-6 py-3 rounded-lg font-bold hover:bg-gray-200 transition-all duration-300 whitespace-nowrap"
+                class="bg-white text-black px-6 py-3 rounded-lg font-bold hover:bg-gray-200 transition-all duration-300"
               >
-                Subscribe
+                Send Message
               </button>
             </form>
-            <p id="form-message" class="text-xs text-white/40 mb-6">
-              We'll never spam you. Unsubscribe anytime.
-            </p>
-            <!-- Contact Email -->
-            <p class="text-xs text-white/60">
-              Questions? Reach us at:
-              <a
-                href="mailto:sid@slay.money"
-                class="text-[#A020F0] hover:text-[#8a1ad4] transition-colors"
-                >sid@slay.money</a
-              >
+
+            <p id="form-message" class="text-xs text-white/40">
+              We usually reply within 24 hours.
             </p>
           </div>
         </div>
       </div>
 
       <!-- Bottom Section: Copyright -->
-      <div class="w-full border-t border-white/10 py-8 px-6">
+      <div class="w-full border-t border-white/5 mt-4 py-8 px-6">
         <p class="text-xs text-white/40 text-center">
           © 2025 Slay Money App. All rights reserved.
         </p>
