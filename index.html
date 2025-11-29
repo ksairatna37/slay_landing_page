@@ -847,6 +847,230 @@
           opacity: 1;
         }
       }
+      /* Tab Content Styles */
+      .card-tab-content {
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
+        transform: scale(0.95) translateY(20px);
+        transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      .card-tab-content.active {
+        opacity: 1;
+        pointer-events: auto;
+        transform: scale(1) translateY(0);
+      }
+
+      /* Virtual Card Glassmorphism */
+      .glass-card-virtual {
+        background: rgba(160, 32, 240, 0.08);
+        backdrop-filter: blur(40px);
+        -webkit-backdrop-filter: blur(40px);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        box-shadow: 0 20px 60px rgba(160, 32, 240, 0.3),
+          inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      }
+
+      .glass-overlay-virtual {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 50%;
+        background: linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.12) 0%,
+          transparent 100%
+        );
+        pointer-events: none;
+        z-index: 1;
+        border-radius: 32px 32px 0 0;
+      }
+
+      /* Shimmer Effect */
+      .shimmer-effect-virtual {
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 200%;
+        height: 200%;
+        background: linear-gradient(
+          135deg,
+          transparent 0%,
+          rgba(160, 32, 240, 0.25) 45%,
+          rgba(192, 96, 255, 0.25) 55%,
+          transparent 100%
+        );
+        animation: shimmer 4s linear infinite;
+        pointer-events: none;
+      }
+
+      @keyframes shimmer {
+        0% {
+          transform: translateX(-100%) translateY(-100%) rotate(45deg);
+        }
+        100% {
+          transform: translateX(100%) translateY(100%) rotate(45deg);
+        }
+      }
+
+      /* Virtual Badge */
+      .virtual-badge-top {
+        position: absolute;
+        top: 28px;
+        left: 28px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 16px;
+        background: rgba(160, 32, 240, 0.2);
+        border: 1px solid rgba(160, 32, 240, 0.4);
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 700;
+        color: #c060ff;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        z-index: 10;
+      }
+
+      .pulse-dot {
+        width: 6px;
+        height: 6px;
+        background: #a020f0;
+        border-radius: 50%;
+        box-shadow: 0 0 10px rgba(160, 32, 240, 0.8);
+        animation: pulse-dot 2s ease-in-out infinite;
+      }
+
+      @keyframes pulse-dot {
+        0%,
+        100% {
+          transform: scale(1);
+          opacity: 1;
+        }
+        50% {
+          transform: scale(1.4);
+          opacity: 0.7;
+        }
+      }
+
+      /* Holographic Chip */
+      .holographic-chip {
+        width: 48px;
+        height: 38px;
+        background: linear-gradient(
+          135deg,
+          rgba(160, 32, 240, 0.4) 0%,
+          rgba(192, 96, 255, 0.4) 50%,
+          rgba(160, 32, 240, 0.4) 100%
+        );
+        border-radius: 8px;
+        border: 1px solid rgba(160, 32, 240, 0.6);
+        position: relative;
+        box-shadow: 0 4px 12px rgba(160, 32, 240, 0.4),
+          inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        animation: holo-glow 3s ease-in-out infinite;
+      }
+
+      .chip-inner {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 36px;
+        height: 26px;
+        background: linear-gradient(
+          135deg,
+          rgba(160, 32, 240, 0.6) 0%,
+          rgba(192, 96, 255, 0.6) 100%
+        );
+        border-radius: 4px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      @keyframes holo-glow {
+        0%,
+        100% {
+          box-shadow: 0 4px 12px rgba(160, 32, 240, 0.4),
+            inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+        50% {
+          box-shadow: 0 6px 20px rgba(160, 32, 240, 0.6),
+            inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        }
+      }
+
+      /* CVV & Status Displays */
+      .cvv-display,
+      .virtual-status {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+
+      .cvv-display {
+        padding: 8px 12px;
+        background: rgba(0, 0, 0, 0.3);
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .virtual-status {
+        text-align: right;
+      }
+
+      /* Tab Button Hover Effects */
+      .card-tab-btn:hover {
+        transform: translateY(-2px);
+      }
+
+      .card-tab-btn:active {
+        transform: translateY(0);
+      }
+
+      /* Responsive Adjustments */
+      @media (max-width: 768px) {
+        .card-tab-content {
+          position: relative;
+        }
+
+        #physical-card-content {
+          display: block;
+        }
+
+        #virtual-card-content {
+          display: none;
+        }
+
+        #physical-card-content.active {
+          display: block;
+        }
+
+        #virtual-card-content.active {
+          display: block;
+        }
+      }
+      /* Cursor glow shadow */
+.card-cursor-shadow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  border-radius: 32px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 5;
+  background: radial-gradient(
+    circle at var(--mx) var(--my),
+    #a020f073,
+    transparent 60%
+  );
+}
+
     </style>
   </head>
   <body class="selection:bg-purple-500 selection:text-white">
@@ -1018,7 +1242,7 @@
       </div>
     </section>
 
-    <!-- SECTION 2: 3D CARD (Preserved) -->
+    <!-- SECTION 2: 3D CARD (Tabbed) -->
     <section
       id="section-card"
       class="parallax-section relative z-10 w-full py-8 px-6 flex flex-col items-center overflow-hidden"
@@ -1026,7 +1250,7 @@
       <div class="text-center mb-16">
         <span
           class="text-[#A020F0] font-mono text-sm tracking-widest uppercase mb-4 block"
-          >SlAY VIRTUALLY</span
+          >SLAY VIRTUALLY</span
         >
         <h2 class="text-4xl md:text-6xl font-bold mb-4">
           Physical meets Digital
@@ -1036,118 +1260,260 @@
         </p>
       </div>
 
-      <div
-        class="relative w-[320px] h-[500px] perspective-container rounded-[32px]"
-      >
-        <div
-          id="tilt-card"
-          class="w-full h-full rounded-[32px] bg-[url('assets/bg.jpg')] bg-cover bg-center bg-no-repeat shadow-purple-glow flex flex-col justify-between p-8 relative z-20 cursor-pointer transform transition-transform duration-100"
-        >
-          <div class="glossy-shine"></div>
-          <div class="absolute inset-0 noise-texture pointer-events-none"></div>
-
+      <!-- Tab Content Container -->
+      <div class="relative min-h-[600px] flex items-center justify-center">
+        <!-- Physical Card Tab Content -->
+        <div id="physical-card-content" class="card-tab-content active">
           <div
-            class="flex justify-between items-center relative z-10 pointer-events-none"
-          >
-            <!-- <div class="w-12 h-9 chip-gradient shadow-sm rounded-md"></div> -->
-            <img src="assets/chip.png" class="w-12 h-9 shadow-sm" alt="" />
-
-            <svg
-              width="32"
-              height="32"
-              viewBox="0 0 24 24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              class="text-white/70"
-            >
-              <path
-                d="M14 2C14 2 18 6 18 12C18 18 14 22 14 22"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-              />
-              <path
-                d="M10 5C10 5 12.5 8 12.5 12C12.5 16 10 19 10 19"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-              />
-              <path
-                d="M7 8C7 8 8.5 10 8.5 12C8.5 14 7 16 7 16"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-              />
-            </svg>
-          </div>
-
-          <div
-            class="flex flex-col justify-end items-start relative z-10 mt-8 pointer-events-none"
+            class="relative w-[320px] h-[500px] perspective-container rounded-[32px]"
           >
             <div
-              class="flex justify-start relative z-10 mb-6 pointer-events-none"
+              id="tilt-card"
+              class="w-full h-full rounded-[32px] bg-[url('assets/bg.jpg')] bg-cover bg-center bg-no-repeat shadow-purple-glow flex flex-col justify-between p-8 relative z-20 cursor-pointer transform transition-transform duration-100"
             >
-              <div class="text-white text-xl font-medium space-x-4">
-                <span>5567</span><span>3467</span><span>6324</span
-                ><span>0823</span>
+              <div class="glossy-shine"></div>
+              <div
+                class="absolute inset-0 noise-texture pointer-events-none"
+              ></div>
+
+              <div
+                class="flex justify-between items-center relative z-10 pointer-events-none"
+              >
+                <img src="assets/chip.png" class="w-12 h-9 shadow-sm" alt="" />
+
+                <svg
+                  width="32"
+                  height="32"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="text-white/70"
+                >
+                  <path
+                    d="M14 2C14 2 18 6 18 12C18 18 14 22 14 22"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                  />
+                  <path
+                    d="M10 5C10 5 12.5 8 12.5 12C12.5 16 10 19 10 19"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                  />
+                  <path
+                    d="M7 8C7 8 8.5 10 8.5 12C8.5 14 7 16 7 16"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                  />
+                </svg>
               </div>
-            </div>
 
-            <div class="flex flex-col space-y-1">
-              <div class="text-white/40 text-[10px] uppercase tracking-wider">
-                MM / YY
+              <div
+                class="flex flex-col justify-end items-start relative z-10 mt-8 pointer-events-none"
+              >
+                <div
+                  class="flex justify-start relative z-10 mb-6 pointer-events-none"
+                >
+                  <div class="text-white text-xl font-medium space-x-4">
+                    <span>7894</span><span>••••</span><span>••••</span
+                    ><span>3421</span>
+                  </div>
+                </div>
 
-                <div class="text-white text-sm uppercase tracking-wide">
-                  <span class="text-white text-sm uppercase tracking-wide"
-                    >09/28</span
+                <div class="flex flex-col space-y-1">
+                  <div
+                    class="text-white/40 text-[10px] uppercase tracking-wider"
                   >
+                    MM / YY
+
+                    <div class="text-white text-sm uppercase tracking-wide">
+                      <span class="text-white text-sm uppercase tracking-wide"
+                        >09/28</span
+                      >
+                    </div>
+                    <div
+                      class="text-white font-medium text-sm uppercase tracking-wide"
+                    >
+                      JAMES SMITH
+                    </div>
+                  </div>
                 </div>
                 <div
-                  class="text-white font-medium text-sm uppercase tracking-wide"
+                  class="flex items-center absolute justify-between w-[100%]"
                 >
-                  JAMES SMITH
+                  <div></div>
+                  <svg
+                    width="70"
+                    height="50"
+                    viewBox="0 0 40 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <circle
+                      cx="12"
+                      cy="12"
+                      r="12"
+                      fill="#EB001B"
+                      fill-opacity="0.8"
+                    />
+                    <circle
+                      cx="28"
+                      cy="12"
+                      r="12"
+                      fill="#F79E1B"
+                      fill-opacity="0.8"
+                    />
+                    <path
+                      d="M20 12V12C17.2386 12 15 9.76142 15 7C15 4.23858 17.2386 2 20 2C22.7614 2 25 4.23858 25 7C25 9.76142 22.7614 12 20 12Z"
+                      fill="#FF5F00"
+                      fill-opacity="0.6"
+                    />
+                  </svg>
                 </div>
               </div>
-            </div>
-            <div class="flex items-center absolute justify-between w-[100%]">
-              <div></div>
-              <svg
-                width="70"
-                height="50"
-                viewBox="0 0 40 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
+              <!-- Engraved Logo -->
+              <div
+                class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 engraved-text text-7xl opacity-20 pointer-events-none select-none"
               >
-                <circle
-                  cx="12"
-                  cy="12"
-                  r="12"
-                  fill="#EB001B"
-                  fill-opacity="0.8"
-                />
-                <circle
-                  cx="28"
-                  cy="12"
-                  r="12"
-                  fill="#F79E1B"
-                  fill-opacity="0.8"
-                />
-                <path
-                  d="M20 12V12C17.2386 12 15 9.76142 15 7C15 4.23858 17.2386 2 20 2C22.7614 2 25 4.23858 25 7C25 9.76142 22.7614 12 20 12Z"
-                  fill="#FF5F00"
-                  fill-opacity="0.6"
-                />
-              </svg>
+                SLAY
+              </div>
             </div>
           </div>
-          <!-- Engraved Logo -->
+        </div>
+
+        <!-- Virtual Card Tab Content -->
+        <div id="virtual-card-content" class="card-tab-content">
           <div
-            class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 engraved-text text-7xl opacity-20 pointer-events-none select-none"
+            class="relative w-[320px] h-[500px] perspective-container rounded-[32px]"
           >
-            SLAY
+            <div
+              id="tilt-card-virtual"
+              class="w-full h-full rounded-[32px] glass-card-virtual shadow-purple-glow flex flex-col justify-between p-8 relative z-20 cursor-pointer transform transition-transform duration-100"
+            >
+<div class="card-cursor-shadow" id="cursor-shadow-virtual"></div>
+
+              <!-- Glass overlay -->
+              <div class="glass-overlay-virtual"></div>
+
+              <div
+                class="flex justify-between items-center relative z-10 pointer-events-none"
+              >
+                <!-- Holographic Chip -->
+                <img src="assets/chip.png" class="w-12 h-9 shadow-sm" alt="" />
+                <svg
+                  width="32"
+                  height="32"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="text-white/70"
+                >
+                  <path
+                    d="M14 2C14 2 18 6 18 12C18 18 14 22 14 22"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                  />
+                  <path
+                    d="M10 5C10 5 12.5 8 12.5 12C12.5 16 10 19 10 19"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                  />
+                  <path
+                    d="M7 8C7 8 8.5 10 8.5 12C8.5 14 7 16 7 16"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                  />
+                </svg>
+              </div>
+
+              <div
+                class="flex flex-col justify-end items-start relative z-10 mt-8 pointer-events-none"
+              >
+                <div
+                  class="flex justify-start relative z-10 mb-6 pointer-events-none"
+                >
+                  <div class="text-white text-xl font-medium space-x-4">
+                    <span>7894</span><span>••••</span><span>••••</span
+                    ><span>3421</span>
+                  </div>
+                </div>
+
+                <div class="flex flex-col space-y-1">
+                  <div
+                    class="text-white/40 text-[10px] uppercase tracking-wider"
+                  >
+                    EXPIRES
+
+                    <div class="text-white text-sm uppercase tracking-wide">
+                      <span class="text-white text-sm uppercase tracking-wide"
+                        >06/27</span
+                      >
+                    </div>
+                    <div
+                      class="text-white font-medium text-sm uppercase tracking-wide"
+                    >
+                      JAMES SMITH
+                    </div>
+                  </div>
+                </div>
+                <div
+                  class="flex items-center absolute justify-between w-[100%]"
+                >
+                  <div></div>
+
+                  <!-- Virtual Status -->
+                  <div class="virtual-status">
+                    <div
+                      class="text-white/40 text-[10px] uppercase tracking-wider"
+                    >
+                      Status
+                    </div>
+                    <div class="text-[#A020F0] text-sm font-bold">ACTIVE</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Engraved Logo -->
+              <div
+                class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 engraved-text text-7xl opacity-50 pointer-events-none select-none bg-[#a020f0] px-4"
+              >
+                SLAY
+              </div>
+            </div>
           </div>
         </div>
       </div>
+
+      <!-- Bottom Tab Switcher -->
+      <div class="flex gap-4 justify-center mt-12">
+        <button
+          id="physical-tab-btn"
+          onclick="switchCardTab('physical')"
+          class="card-tab-btn px-8 py-4 rounded-full font-bold text-base transition-all duration-300 bg-white text-black"
+        >
+          Physical Card
+        </button>
+        <button
+          id="virtual-tab-btn"
+          onclick="switchCardTab('virtual')"
+          class="card-tab-btn px-8 py-4 rounded-full font-bold text-base transition-all duration-300 border border-white/20 text-white/70 hover:text-white hover:border-white/40"
+        >
+          Virtual Card
+        </button>
+      </div>
+
+      <!-- <a href="#footer-section" class="mt-8">
+        <button
+          class="bg-white text-black px-8 py-4 rounded-full font-bold text-sm hover:bg-gray-200 transition-colors"
+        >
+          Slay your card
+        </button>
+      </a> -->
     </section>
 
     <!-- SECTION 3: UNIVERSAL PAYMENT (Revamped Single Page Slider) -->
@@ -2670,5 +3036,164 @@
         }
       }
     </script>
+    <script>
+      // Card Tab Switching Function
+      function switchCardTab(tab) {
+        // Get tab buttons
+        const physicalBtn = document.getElementById("physical-tab-btn");
+        const virtualBtn = document.getElementById("virtual-tab-btn");
+
+        // Get tab content
+        const physicalContent = document.getElementById(
+          "physical-card-content"
+        );
+        const virtualContent = document.getElementById("virtual-card-content");
+
+        if (tab === "physical") {
+          // Update buttons
+          physicalBtn.classList.remove(
+            "border",
+            "border-white/20",
+            "text-white/70"
+          );
+          physicalBtn.classList.add("bg-white", "text-black");
+          virtualBtn.classList.remove("bg-white", "text-black");
+          virtualBtn.classList.add(
+            "border",
+            "border-white/20",
+            "text-white/70"
+          );
+
+          // Update content with GSAP if available
+          if (typeof gsap !== "undefined") {
+            gsap.to(virtualContent, {
+              opacity: 0,
+              scale: 0.95,
+              y: 20,
+              duration: 0.4,
+              ease: "power2.in",
+              onComplete: () => {
+                virtualContent.classList.remove("active");
+                physicalContent.classList.add("active");
+                gsap.fromTo(
+                  physicalContent,
+                  { opacity: 0, scale: 0.95, y: 20 },
+                  {
+                    opacity: 1,
+                    scale: 1,
+                    y: 0,
+                    duration: 0.5,
+                    ease: "power2.out",
+                  }
+                );
+              },
+            });
+          } else {
+            virtualContent.classList.remove("active");
+            physicalContent.classList.add("active");
+          }
+        } else {
+          // Update buttons
+          virtualBtn.classList.remove(
+            "border",
+            "border-white/20",
+            "text-white/70"
+          );
+          virtualBtn.classList.add("bg-white", "text-black");
+          physicalBtn.classList.remove("bg-white", "text-black");
+          physicalBtn.classList.add(
+            "border",
+            "border-white/20",
+            "text-white/70"
+          );
+
+          // Update content with GSAP if available
+          if (typeof gsap !== "undefined") {
+            gsap.to(physicalContent, {
+              opacity: 0,
+              scale: 0.95,
+              y: 20,
+              duration: 0.4,
+              ease: "power2.in",
+              onComplete: () => {
+                physicalContent.classList.remove("active");
+                virtualContent.classList.add("active");
+                gsap.fromTo(
+                  virtualContent,
+                  { opacity: 0, scale: 0.95, y: 20 },
+                  {
+                    opacity: 1,
+                    scale: 1,
+                    y: 0,
+                    duration: 0.5,
+                    ease: "power2.out",
+                  }
+                );
+              },
+            });
+          } else {
+            physicalContent.classList.remove("active");
+            virtualContent.classList.add("active");
+          }
+        }
+      }
+
+      // Add 3D tilt effect to virtual card if GSAP is available
+      if (typeof gsap !== "undefined") {
+        const virtualCard = document.getElementById("tilt-card-virtual");
+
+        if (virtualCard) {
+          virtualCard.addEventListener("mousemove", (e) => {
+            const rect = virtualCard.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+
+            const rotateX = (y - centerY) / 20;
+            const rotateY = (centerX - x) / 20;
+
+            gsap.to(virtualCard, {
+              rotateX: rotateX,
+              rotateY: rotateY,
+              duration: 0.5,
+              ease: "power2.out",
+            });
+            
+          });
+
+          virtualCard.addEventListener("mouseleave", () => {
+            gsap.to(virtualCard, {
+              rotateX: 0,
+              rotateY: 0,
+              duration: 0.5,
+              ease: "power2.out",
+            });
+                        
+
+          });
+        }
+      }
+    </script>
+    <script>
+  const card = document.getElementById("tilt-card-virtual");
+  const glow = document.getElementById("cursor-shadow-virtual");
+
+  card.addEventListener("mousemove", (e) => {
+    const rect = card.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    glow.style.setProperty("--mx", x + "px");
+    glow.style.setProperty("--my", y + "px");
+    glow.style.opacity = 0.2;
+  });
+
+  card.addEventListener("mouseleave", () => {
+    glow.style.opacity = 0;
+  });
+</script>
+
   </body>
 </html>
