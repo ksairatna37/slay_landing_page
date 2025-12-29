@@ -1,14 +1,13 @@
 [
   {
     "relation": [
-      "delegate_permission/common.get_login_creds",
-      "delegate_permission/common.handle_all_urls"
+      "delegate_permission/common.get_login_creds"
     ],
     "target": {
       "namespace": "android_app",
       "package_name": "com.slay.app", 
       "sha256_cert_fingerprints": [
-        "AA:BB:CC:DD:EE:FF:11:22:33:44:55:66:77:88:99:00:11:22:33:44:55:66:77:88:99:AA:BB:CC:DD:EE:FF:00"
+        "CD:5E:A6:82:E3:46:F1:01:06:CA:F9:70:68:95:BF:DA:26:BB:41:81:05:BA:A4:16:1C:B4:99:5D:7E:94:F7:B1"
       ]
     }
   }
