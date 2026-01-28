@@ -8,7 +8,8 @@
       "namespace": "android_app",
       "package_name": "com.slay.app",
       "sha256_cert_fingerprints": [
-        "FA:C6:17:45:DC:09:03:78:6F:B9:ED:E6:2A:96:2B:39:9F:73:48:F0:BB:6F:89:9B:83:32:66:75:91:03:3B:9C"
+        "FA:C6:17:45:DC:09:03:78:6F:B9:ED:E6:2A:96:2B:39:9F:73:48:F0:BB:6F:89:9B:83:32:66:75:91:03:3B:9C",
+        "46:4A:F1:65:12:A9:99:A7:84:5C:E2:08:88:19:24:1D:CB:E3:EE:1C:63:3A:E1:85:40:C4:3F:0C:E2:18:38:8D"
       ]
     }
   }
